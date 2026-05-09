@@ -3,10 +3,7 @@ import useUIStore from '../../store/uiSlice';
 import useBoardStore from '../../store/boardSlice';
 import { isFiltering } from '../../utils/filterCards';
 
-const LABEL_COLORS = [
-  '#ef4444', '#f97316', '#eab308', '#22c55e',
-  '#06b6d4', '#6366f1', '#8b5cf6', '#ec4899',
-];
+const LABEL_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#6366f1'];
 
 const DUE_OPTIONS = [
   { value: 'overdue',  label: 'Overdue',   color: 'text-red-400' },

@@ -89,7 +89,16 @@ const boardHandlers = (io, socket) => {
       socket.emit('error', { message: err.message, code: 500 });
     }
   });
+
+  // ── CHAT EVENTS ───────────────────────────────────────────────────────────
+
+  socket.on('chat:message', async ({ boardId, message }) => {
+    try {
+      socket.to(boardId).emit('chat:message', { message });
+    } catch (err) {
+      socket.emit('error', { message: err.message, code: 500 });
+    }
+  });
 };
 
 module.exports = boardHandlers;
-

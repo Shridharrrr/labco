@@ -2,7 +2,6 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import useUIStore from '../../store/uiSlice';
 import useBoardStore from '../../store/boardSlice';
-import ContextMenu from '../ui/ContextMenu';
 import * as cardService from '../../services/cardService';
 import { getSocket } from '../../hooks/useSocket';
 
@@ -50,20 +49,7 @@ export default function Card({ card, boardId }) {
     }
   };
 
-  const menuItems = [
-    {
-      label: 'Open card',
-      icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>,
-      onClick: () => openCard(card._id),
-    },
-    'divider',
-    {
-      label: 'Archive card',
-      icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>,
-      onClick: handleArchive,
-      danger: true,
-    },
-  ];
+
 
   return (
     <div
@@ -174,19 +160,7 @@ export default function Card({ card, boardId }) {
         )}
       </div>
 
-      {/* Context menu — floats over card, doesn't trigger drag */}
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-        <ContextMenu items={menuItems}>
-          <button
-            onClick={e => e.stopPropagation()}
-            className="w-6 h-6 flex items-center justify-center rounded-lg bg-[#2a2a2a] hover:bg-white/15 text-white/50 hover:text-white transition-all"
-          >
-            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-              <circle cx="12" cy="5" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="19" r="1.5" />
-            </svg>
-          </button>
-        </ContextMenu>
-      </div>
+
     </div>
   );
 }

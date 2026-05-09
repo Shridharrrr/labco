@@ -4,7 +4,6 @@ import { useDroppable } from '@dnd-kit/core';
 import { useState } from 'react';
 import Card from './Card';
 import AddCardForm from './AddCardForm';
-import ContextMenu from '../ui/ContextMenu';
 import useUIStore from '../../store/uiSlice';
 import useBoardStore from '../../store/boardSlice';
 import * as boardService from '../../services/boardService';
@@ -12,9 +11,7 @@ import * as cardService from '../../services/cardService';
 import { getSocket } from '../../hooks/useSocket';
 import { applyFilters } from '../../utils/filterCards';
 
-const COLUMN_COLORS = [
-  '#6366f1', '#ec4899', '#06b6d4', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#84cc16',
-];
+const COLUMN_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#6366f1'];
 
 export default function Column({ column, boardId }) {
   const { cards, addCard, updateColumn, deleteColumn } = useBoardStore();
@@ -105,30 +102,6 @@ export default function Column({ column, boardId }) {
     droppableRef(el);
   };
 
-  const menuItems = [
-    {
-      label: 'Rename',
-      icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>,
-      onClick: () => { setRenameValue(column.title); setIsRenaming(true); },
-    },
-    {
-      label: 'Change color',
-      icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>,
-      onClick: () => setShowColorPicker(v => !v),
-    },
-    {
-      label: 'Add card',
-      icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>,
-      onClick: () => setAddingCard(column._id, true),
-    },
-    'divider',
-    {
-      label: 'Delete column',
-      icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>,
-      onClick: handleDelete,
-      danger: true,
-    },
-  ];
 
   const dotColor = column.color || '#6366f1';
 
@@ -181,12 +154,14 @@ export default function Column({ column, boardId }) {
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
           </button>
 
-          {/* Context menu trigger */}
-          <ContextMenu items={menuItems}>
-            <button className="text-white/40 hover:text-white/90 p-1.5 rounded-lg hover:bg-white/8 transition-all cursor-pointer">
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="19" r="1.5" /></svg>
-            </button>
-          </ContextMenu>
+          {/* Delete column button */}
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDelete(); }}
+            className="text-white/40 hover:text-red-400 p-1.5 rounded-lg hover:bg-white/8 transition-all cursor-pointer"
+            title="Delete column"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
         </div>
       </div>
 

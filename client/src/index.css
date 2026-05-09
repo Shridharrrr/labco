@@ -43,6 +43,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Global reset for cursors on interactive elements */
+button, [role="button"], a {
+  cursor: pointer;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

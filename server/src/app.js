@@ -8,6 +8,7 @@ const boardRoutes = require('./routes/board.routes');
 const columnRoutes = require('./routes/column.routes');
 const cardRoutes = require('./routes/card.routes');
 const activityRoutes = require('./routes/activity.routes');
+const messageRoutes = require('./routes/message.routes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -28,6 +29,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/boards', boardRoutes);
 app.use('/api/boards/:boardId/activity', activityRoutes);
+app.use('/api/boards/:boardId/messages', messageRoutes);
 app.use('/api/columns', columnRoutes);
 app.use('/api/cards', cardRoutes);
 
