@@ -1,0 +1,33 @@
+import usePresenceStore from '../../store/presenceSlice';
+import Avatar from '../ui/Avatar';
+
+export default function OnlineAvatars() {
+  const { onlineUsers } = usePresenceStore();
+
+  if (!onlineUsers.length) return null;
+
+  return (
+    <div className="flex items-center gap-1">
+      <div className="flex -space-x-2">
+        {onlineUsers.slice(0, 6).map((u) => (
+          <Avatar
+            key={u.userId}
+            name={u.name || u.email}
+            src={u.avatar}
+            color={u.color}
+            size="sm"
+          />
+        ))}
+        {onlineUsers.length > 6 && (
+          <div className="w-7 h-7 rounded-full bg-white/10 border-2 border-[#0f0e17]
+            flex items-center justify-center text-[10px] text-white/60 font-semibold">
+            +{onlineUsers.length - 6}
+          </div>
+        )}
+      </div>
+      <span className="ml-2 text-xs text-white/40 hidden sm:block">
+        {onlineUsers.length} online
+      </span>
+    </div>
+  );
+}

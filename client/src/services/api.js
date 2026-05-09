@@ -1,0 +1,82 @@
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
+  withCredentials: true,
+});
+
+// Attach access token to every request
+api.interceptors.request.use((config) => {
+  // Read from Zustand persisted storage
+  const stored = localStorage.getItem('labco-auth');
+  if (stored) {
+    const { state } = JSON.parse(stored);
+    if (state?.accessToken) {
+      config.headers.Authorization = `Bearer ${state.accessToken}`;
+    }
+  }
+  return config;
+});
+
+// On 401 → try to refresh token, then retry
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((p) => (error ? p.reject(error) : p.resolve(token)));
+  failedQueue = [];
+};
+
+api.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const original = error.config;
+    if (error.response?.status === 401 && !original._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            original.headers.Authorization = `Bearer ${token}`;
+            return api(original);
+          })
+          .catch(Promise.reject.bind(Promise));
+      }
+
+      original._retry = true;
+      isRefreshing = true;
+
+      try {
+        const { data } = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
+        const newToken = data.accessToken;
+
+        // Update persisted store
+        const stored = localStorage.getItem('labco-auth');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          parsed.state.accessToken = newToken;
+          localStorage.setItem('labco-auth', JSON.stringify(parsed));
+        }
+
+        processQueue(null, newToken);
+        original.headers.Authorization = `Bearer ${newToken}`;
+        return api(original);
+      } catch (err) {
+        processQueue(err, null);
+        // Clear auth and redirect to login
+        localStorage.removeItem('labco-auth');
+        window.location.href = '/login';
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
