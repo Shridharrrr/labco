@@ -172,3 +172,25 @@ exports.removeMember = async (req, res, next) => {
     next(err);
   }
 };
+
+// POST /api/boards/:boardId/star — toggle favorite star for user
+exports.toggleStar = async (req, res, next) => {
+  try {
+    const board = req.board;
+    const userId = req.user.userId;
+
+    if (!board.stars) board.stars = [];
+    const index = board.stars.findIndex(id => id.toString() === userId.toString());
+    
+    if (index > -1) {
+      board.stars.splice(index, 1);
+    } else {
+      board.stars.push(userId);
+    }
+
+    await board.save();
+    return res.json(board);
+  } catch (err) {
+    next(err);
+  }
+};

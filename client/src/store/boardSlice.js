@@ -24,6 +24,13 @@ const useBoardStore = create((set, get) => ({
       })
     ),
 
+  updateBoardInfo: (changes) =>
+    set(produce((s) => {
+      if (s.board) {
+        Object.assign(s.board, changes);
+      }
+    })),
+
   clearBoard: () => set({ board: null, columns: {}, cards: {}, columnOrder: [], undoStack: [], redoStack: [] }),
 
   // ── Column actions ────────────────────────────────────────────────────────

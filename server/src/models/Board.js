@@ -13,6 +13,7 @@ const boardSchema = new mongoose.Schema(
     ],
     columns: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Column' }],
     background: { type: String, default: '#1e1b4b' },
+    stars: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     isArchived: { type: Boolean, default: false },
   },
   { timestamps: true }

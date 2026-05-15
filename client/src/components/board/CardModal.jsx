@@ -10,7 +10,7 @@ const LABEL_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#6366f1'];
 
 export default function CardModal({ boardId }) {
   const { activeCardId, closeCard, addToast } = useUIStore();
-  const { cards, updateCard } = useBoardStore();
+  const { board, cards, updateCard } = useBoardStore();
 
   const card = cards[activeCardId];
   const [detail, setDetail] = useState(null);
@@ -128,30 +128,62 @@ export default function CardModal({ boardId }) {
             </div>
           </div>
 
-          {/* Labels */}
-          <div>
-            <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2.5">Labels</h4>
-            <div className="flex flex-wrap gap-2">
-              {LABEL_COLORS.map((color) => {
-                const isActive = detail?.labels?.find((l) => l.color === color);
-                return (
-                  <button
-                    key={color}
-                    onClick={() => {
-                      const labels = detail?.labels || [];
-                      const next = isActive
-                        ? labels.filter((l) => l.color !== color)
-                        : [...labels, { text: '', color }];
-                      patch({ labels: next });
-                    }}
-                    className={`h-6 w-10 rounded-md transition-all flex items-center justify-center border-2
-                      ${isActive ? 'border-transparent' : 'border-white/10 opacity-40 hover:opacity-100 hover:border-white/30'}`}
-                    style={{ background: isActive ? color : 'transparent' }}
-                  >
-                    {isActive && <div className="w-1.5 h-1.5 rounded-full bg-white/60" />}
-                  </button>
-                );
-              })}
+          {/* Assignees & Labels */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Assignees */}
+            <div>
+              <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2.5">Assignees</h4>
+              <div className="flex flex-wrap gap-2">
+                {board?.members?.map((m) => {
+                  const isAssigned = detail?.assignees?.find((a) => a._id === m.user._id);
+                  const initial = (m.user.name || m.user.email)?.[0]?.toUpperCase() || '?';
+                  return (
+                    <button
+                      key={m.user._id}
+                      onClick={() => {
+                        const assignees = detail?.assignees || [];
+                        const next = isAssigned
+                          ? assignees.filter((a) => a._id !== m.user._id)
+                          : [...assignees, { _id: m.user._id, name: m.user.name, email: m.user.email, avatar: m.user.avatar }];
+                        patch({ assignees: next });
+                      }}
+                      title={m.user.name || m.user.email}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all border-2
+                        ${isAssigned ? 'border-brand-500 scale-110 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'border-transparent opacity-50 hover:opacity-100 hover:scale-105'}`}
+                      style={{ background: `hsl(${(m.user.name?.charCodeAt(0) || 200) * 5 % 360}, 60%, 35%)`, color: '#fff' }}
+                    >
+                      {initial}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Labels */}
+            <div>
+              <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2.5">Labels</h4>
+              <div className="flex flex-wrap gap-2">
+                {LABEL_COLORS.map((color) => {
+                  const isActive = detail?.labels?.find((l) => l.color === color);
+                  return (
+                    <button
+                      key={color}
+                      onClick={() => {
+                        const labels = detail?.labels || [];
+                        const next = isActive
+                          ? labels.filter((l) => l.color !== color)
+                          : [...labels, { text: '', color }];
+                        patch({ labels: next });
+                      }}
+                      className={`h-7 w-11 rounded-md transition-all flex items-center justify-center border-2
+                        ${isActive ? 'border-transparent' : 'border-white/10 opacity-40 hover:opacity-100 hover:border-white/30'}`}
+                      style={{ background: isActive ? color : 'transparent' }}
+                    >
+                      {isActive && <div className="w-1.5 h-1.5 rounded-full bg-white/60" />}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

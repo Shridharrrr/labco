@@ -11,6 +11,7 @@ const {
   inviteMember,
   changeMemberRole,
   removeMember,
+  toggleStar,
 } = require('../controllers/board.controller');
 const { reorderColumns, createColumn } = require('../controllers/column.controller');
 
@@ -19,6 +20,7 @@ router.post('/', auth, createBoard);
 router.get('/:boardId', auth, boardAccess('viewer'), getBoard);
 router.patch('/:boardId', auth, boardAccess('editor'), updateBoard);
 router.delete('/:boardId', auth, boardAccess('owner'), archiveBoard);
+router.post('/:boardId/star', auth, boardAccess('viewer'), toggleStar);
 
 // Members
 router.post('/:boardId/members', auth, boardAccess('owner'), inviteMember);

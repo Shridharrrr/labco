@@ -50,18 +50,28 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
   const [search, setSearch] = useState('');
   const [showNewBoard, setShowNewBoard] = useState(false);
   const [newTitle, setNewTitle] = useState('');
-  const [favorites, setFavorites] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('labco-favorites') || '[]'); } catch { return []; }
-  });
-
-  const toggleFavorite = (boardId, e) => {
+  const toggleFavorite = async (boardId, e) => {
     e.preventDefault();
     e.stopPropagation();
-    setFavorites(prev => {
-      const next = prev.includes(boardId) ? prev.filter(id => id !== boardId) : [...prev, boardId];
-      localStorage.setItem('labco-favorites', JSON.stringify(next));
-      return next;
-    });
+    
+    // Optimistic UI
+    setBoards(prev => prev.map(b => {
+      if (b._id === boardId) {
+        const isFav = b.stars?.includes(user.userId);
+        const newStars = isFav 
+          ? b.stars.filter(id => id !== user.userId) 
+          : [...(b.stars || []), user.userId];
+        return { ...b, stars: newStars };
+      }
+      return b;
+    }));
+
+    // Trigger API
+    try {
+      await boardService.toggleStar(boardId);
+    } catch {
+      // Ignore error for simple optimistic UI
+    }
   };
 
   const handleLogout = async () => {
@@ -86,7 +96,7 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
   };
 
   const filtered = boards.filter(b => b.title.toLowerCase().includes(search.toLowerCase()));
-  const favoriteBoards = filtered.filter(b => favorites.includes(b._id));
+  const favoriteBoards = filtered.filter(b => b.stars?.includes(user?.userId));
   const allBoards = filtered;
 
   return (
@@ -169,7 +179,7 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
               board={board}
               color={BG_DOTS[i % BG_DOTS.length]}
               active={board._id === activeBoardId}
-              isFav={favorites.includes(board._id)}
+              isFav={board.stars?.includes(user?.userId)}
               onFav={toggleFavorite}
               collapsed={collapsed}
             />

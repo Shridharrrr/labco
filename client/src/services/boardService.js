@@ -15,3 +15,4 @@ export const updateColumn = (columnId, data) => api.patch(`/columns/${columnId}`
 export const deleteColumn = (columnId) => api.delete(`/columns/${columnId}`);
 
 export const getActivity = (boardId, params) => api.get(`/boards/${boardId}/activity`, { params });
+export const toggleStar = (boardId) => api.post(`/boards/${boardId}/star`);
