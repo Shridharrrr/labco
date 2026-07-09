@@ -47,16 +47,16 @@ export default function ActivityDrawer({ boardId, onClose }) {
   };
 
   return (
-    <div className="fixed right-0 top-0 bottom-0 w-80 bg-[#13121f] border-l border-white/10
-      z-40 flex flex-col shadow-2xl animate-[slideIn_0.25s_ease-out]">
+    <div className="fixed right-0 top-0 bottom-0 w-80 bg-[#0c0c0f] border-l border-white/[0.06]
+      z-40 flex flex-col shadow-2xl shadow-black/60 animate-[slideIn_0.2s_ease-out]">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-        <h3 className="text-sm font-semibold text-white">Activity Log</h3>
+      <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/[0.06]">
+        <h3 className="text-[12px] font-semibold text-white">Activity Log</h3>
         <button
           onClick={onClose}
-          className="text-white/40 hover:text-white transition-colors text-lg"
+          className="text-white/25 hover:text-white/70 transition-colors p-1 rounded hover:bg-white/[0.06]"
         >
-          ✕
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
 

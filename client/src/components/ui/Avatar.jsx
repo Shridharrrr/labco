@@ -10,13 +10,13 @@ export default function Avatar({ name = '', src = '', color = '#6366f1', size = 
 
   return (
     <div
-      className={`${sizes[size]} rounded-full flex items-center justify-center
-        font-semibold text-white ring-2 ring-[#0f0e17] select-none shrink-0`}
+      className={`${sizes[size]} rounded-md flex items-center justify-center
+        font-semibold text-white ring-1 ring-[#09090b] select-none shrink-0`}
       style={{ background: src ? undefined : color }}
       title={name}
     >
       {src ? (
-        <img src={src} alt={name} className="w-full h-full rounded-full object-cover" />
+        <img src={src} alt={name} className="w-full h-full rounded-md object-cover" />
       ) : (
         initials || '?'
       )}

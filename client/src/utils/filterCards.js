@@ -1,15 +1,15 @@
 /**
  * Applies active filters to a list of cards.
  * @param {object[]} cards - array of card objects
- * @param {object}   filters - { search, labels, dueDate, hasChecklist }
+ * @param {object}   filters - { search, covers, dueDate, hasChecklist }
  * @returns {object[]} filtered cards
  */
 export function applyFilters(cards, filters) {
   if (!filters) return cards;
-  const { search, labels, dueDate, hasChecklist } = filters;
+  const { search, covers, dueDate, hasChecklist } = filters;
 
   const hasActiveFilter =
-    search || labels?.length || dueDate || hasChecklist;
+    search || covers?.length || dueDate || hasChecklist;
   if (!hasActiveFilter) return cards;
 
   const now = Date.now();
@@ -21,11 +21,11 @@ export function applyFilters(cards, filters) {
       return false;
     }
 
-    // ── Label filter ─────────────────────────────────────────────────────
-    if (labels?.length) {
-      const cardColors = (card.labels || []).map((l) => l.color);
-      const hasMatch = labels.some((color) => cardColors.includes(color));
-      if (!hasMatch) return false;
+    // ── Cover filter ─────────────────────────────────────────────────────
+    if (covers?.length) {
+      if (!card.coverColor || !covers.includes(card.coverColor)) {
+        return false;
+      }
     }
 
     // ── Due date filter ──────────────────────────────────────────────────
@@ -48,5 +48,5 @@ export function applyFilters(cards, filters) {
  */
 export function isFiltering(filters) {
   if (!filters) return false;
-  return !!(filters.search || filters.labels?.length || filters.dueDate || filters.hasChecklist);
+  return !!(filters.search || filters.covers?.length || filters.dueDate || filters.hasChecklist);
 }

@@ -57,19 +57,19 @@ export default function TimelineTab() {
   const todayPos = getPosition(new Date().toISOString());
 
   return (
-    <div className="flex-1 flex flex-col bg-[#111111] overflow-hidden">
+    <div className="flex-1 flex flex-col bg-[#0c0c0f] overflow-hidden">
       
       {/* Toolbar */}
       <div className="flex items-center justify-between px-6 py-3 border-b border-white/[0.06] shrink-0">
         <div>
-          <h1 className="text-sm font-bold text-white tracking-tight">Project Timeline</h1>
+          <h1 className="text-sm font-bold text-white tracking-tight">Board Timeline</h1>
           <p className="text-[10px] text-white/40 uppercase tracking-widest mt-0.5">Cards with Due Dates</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setZoom(Math.max(0.5, zoom - 0.25))} className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 transition-colors">
+          <button onClick={() => setZoom(Math.max(0.5, zoom - 0.25))} className="p-1 rounded-md bg-white/[0.04] hover:bg-white/[0.08] text-white/50 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" /></svg>
           </button>
-          <button onClick={() => setZoom(Math.min(2, zoom + 0.25))} className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 transition-colors">
+          <button onClick={() => setZoom(Math.min(2, zoom + 0.25))} className="p-1 rounded-md bg-white/[0.04] hover:bg-white/[0.08] text-white/50 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
           </button>
         </div>
@@ -79,8 +79,8 @@ export default function TimelineTab() {
       <div className="flex-1 overflow-auto relative">
         
         {/* Timeline Header */}
-        <div className="sticky top-0 z-20 flex bg-[#151515] border-b border-white/[0.06] shadow-sm">
-          <div className="w-64 shrink-0 border-r border-white/[0.06] bg-[#151515] p-3 sticky left-0 z-30 flex items-end">
+        <div className="sticky top-0 z-20 flex bg-[#111114] border-b border-white/[0.06] shadow-sm">
+          <div className="w-64 shrink-0 border-r border-white/[0.06] bg-[#111114] p-3 sticky left-0 z-30 flex items-end">
             <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Board Columns</span>
           </div>
           <div className="flex relative min-w-max">
@@ -124,9 +124,9 @@ export default function TimelineTab() {
               <div key={colId} className="flex border-b border-white/[0.04] group/row hover:bg-white/[0.01] transition-colors relative z-10">
                 
                 {/* Column Name */}
-                <div className="w-64 shrink-0 border-r border-white/[0.06] p-4 sticky left-0 z-20 bg-[#111111] group-hover/row:bg-[#151515] transition-colors flex items-center justify-between">
+                <div className="w-64 shrink-0 border-r border-white/[0.06] p-4 sticky left-0 z-20 bg-[#0c0c0f] group-hover/row:bg-[#111114] transition-colors flex items-center justify-between">
                   <div className="flex items-center gap-2 truncate">
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background: col.color || '#6366f1' }} />
+                    <span className="w-2 h-2 rounded-sm shrink-0" style={{ background: col.color || '#6366f1' }} />
                     <span className="text-[12px] font-bold text-white/80 truncate">{col.title}</span>
                   </div>
                   <span className="text-[10px] text-white/30 font-medium px-1.5 py-0.5 rounded-md bg-white/5">{colCards.length}</span>

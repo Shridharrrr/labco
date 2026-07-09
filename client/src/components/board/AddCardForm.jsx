@@ -14,7 +14,7 @@ export default function AddCardForm({ onAdd, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-2">
+    <form onSubmit={handleSubmit} className="mt-1.5">
       <textarea
         id="add-card-input"
         autoFocus
@@ -29,23 +29,23 @@ export default function AddCardForm({ onAdd, onCancel }) {
           if (e.key === 'Escape') onCancel();
         }}
         placeholder="Card title..."
-        className="w-full bg-white/10 border border-white/15 rounded-xl px-3 py-2.5
-          text-white placeholder-white/30 text-sm outline-none resize-none
-          focus:border-brand-500/70 focus:ring-1 focus:ring-brand-500/30 transition-all"
+        className="w-full bg-[#161619] border border-white/[0.10] rounded-lg px-3 py-2
+          text-white placeholder-white/25 text-sm outline-none resize-none
+          focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20 transition-all"
       />
-      <div className="flex items-center gap-2 mt-2">
+      <div className="flex items-center gap-2 mt-1.5">
         <button
           type="submit"
           disabled={!title.trim() || loading}
-          className="px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-sm
-            font-medium rounded-lg transition-colors disabled:opacity-50"
+          className="px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs
+            font-medium rounded-md transition-colors disabled:opacity-50"
         >
           Add card
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-3 py-1.5 text-white/50 hover:text-white text-sm transition-colors"
+          className="px-2.5 py-1.5 text-white/40 hover:text-white text-xs transition-colors"
         >
           Cancel
         </button>

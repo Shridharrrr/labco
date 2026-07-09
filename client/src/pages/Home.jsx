@@ -4,12 +4,12 @@ import * as boardService from '../services/boardService';
 import Spinner from '../components/ui/Spinner';
 
 const BG_GRADIENTS = [
-  'from-violet-600 to-indigo-700',
-  'from-pink-600 to-rose-700',
-  'from-cyan-600 to-blue-700',
-  'from-emerald-600 to-teal-700',
-  'from-amber-600 to-orange-700',
-  'from-purple-600 to-fuchsia-700',
+  'from-indigo-600 to-indigo-800',
+  'from-rose-600 to-rose-800',
+  'from-cyan-600 to-cyan-800',
+  'from-emerald-600 to-emerald-800',
+  'from-amber-600 to-amber-800',
+  'from-violet-600 to-violet-800',
 ];
 
 /**
@@ -47,21 +47,21 @@ export default function Home() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#111111]">
+    <div className="flex-1 overflow-y-auto bg-[#0c0c0f]">
       {/* Page header */}
-      <div className="px-8 pt-8 pb-6 border-b border-white/[0.06]">
+      <div className="px-8 pt-7 pb-5 border-b border-white/[0.06]">
         <div className="flex items-end justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">My Boards</h1>
-            <p className="text-white/40 text-sm mt-1">Pick a board or create a new one</p>
+            <h1 className="text-xl font-bold text-white tracking-tight">My Boards</h1>
+            <p className="text-white/35 text-xs mt-1">Pick a board or create a new one</p>
           </div>
           <button
             id="create-board-btn"
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-brand-600 hover:bg-brand-500
-              text-white text-sm font-medium rounded-xl transition-colors shadow-lg shadow-brand-500/20"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-500
+              text-white text-xs font-medium rounded-md transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
             New board
           </button>
         </div>
@@ -70,7 +70,7 @@ export default function Home() {
       <div className="px-8 py-6">
         {/* Create board inline form */}
         {showCreate && (
-          <form onSubmit={handleCreate} className="mb-6 flex gap-3 items-center p-4 bg-white/[0.03] border border-white/[0.06] rounded-2xl">
+          <form onSubmit={handleCreate} className="mb-5 flex gap-3 items-center p-3.5 bg-white/[0.02] border border-white/[0.08] rounded-lg">
             <input
               autoFocus
               type="text"
@@ -78,20 +78,20 @@ export default function Home() {
               onChange={e => setNewTitle(e.target.value)}
               onKeyDown={e => e.key === 'Escape' && setShowCreate(false)}
               placeholder="Board name..."
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm
-                text-white placeholder-white/30 outline-none focus:border-brand-500/70 transition-all"
+              className="flex-1 bg-[#111114] border border-white/[0.10] rounded-md px-3.5 py-2 text-sm
+                text-white placeholder-white/25 outline-none focus:border-brand-500/60 transition-all"
             />
             <button
               type="submit"
               disabled={creating || !newTitle.trim()}
-              className="px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-sm
-                font-medium rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white text-sm
+                font-medium rounded-md transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {creating ? <Spinner size="sm" /> : null}
               Create
             </button>
             <button type="button" onClick={() => setShowCreate(false)}
-              className="px-4 py-2.5 text-white/40 hover:text-white text-sm transition-colors rounded-xl hover:bg-white/5">
+              className="px-3 py-2 text-white/35 hover:text-white text-sm transition-colors rounded-md hover:bg-white/[0.04]">
               Cancel
             </button>
           </form>
@@ -101,31 +101,31 @@ export default function Home() {
           <div className="flex justify-center py-20"><Spinner /></div>
         ) : boards.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" /></svg>
+            <div className="w-14 h-14 rounded-lg bg-white/[0.04] flex items-center justify-center mx-auto mb-4 border border-white/[0.06]">
+              <svg className="w-7 h-7 text-white/15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" /></svg>
             </div>
-            <p className="text-white/40 text-sm">No boards yet. Create your first one!</p>
+            <p className="text-white/35 text-sm">No boards yet. Create your first one!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
             {boards.map((board, i) => (
               <Link
                 key={board._id}
                 to={`/boards/${board._id}`}
-                className={`group relative h-40 rounded-2xl bg-gradient-to-br ${BG_GRADIENTS[i % BG_GRADIENTS.length]}
-                  p-5 flex flex-col justify-end overflow-hidden hover:scale-[1.02] active:scale-[0.99]
-                  transition-transform shadow-lg cursor-pointer`}
+                className={`group relative h-36 rounded-lg bg-gradient-to-br ${BG_GRADIENTS[i % BG_GRADIENTS.length]}
+                  p-4 flex flex-col justify-end overflow-hidden hover:scale-[1.02] active:scale-[0.99]
+                  transition-transform shadow-md cursor-pointer`}
               >
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                {/* Decorative circles */}
-                <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-white/10" />
-                <div className="absolute -top-1 -right-1 w-14 h-14 rounded-full bg-white/10" />
+                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/15 transition-colors" />
+                {/* Decorative geometric shapes */}
+                <div className="absolute -top-6 -right-6 w-20 h-20 rounded-lg bg-white/[0.07] rotate-12" />
+                <div className="absolute top-2 -right-2 w-10 h-10 rounded-lg bg-white/[0.05] rotate-12" />
                 <div className="relative">
-                  <h2 className="font-bold text-white text-base leading-snug truncate">{board.title}</h2>
+                  <h2 className="font-semibold text-white text-sm leading-snug truncate">{board.title}</h2>
                   {board.description && (
-                    <p className="text-white/60 text-xs mt-0.5 truncate">{board.description}</p>
+                    <p className="text-white/50 text-[11px] mt-0.5 truncate">{board.description}</p>
                   )}
-                  <p className="text-white/40 text-xs mt-1.5">
+                  <p className="text-white/35 text-[11px] mt-1.5 font-medium">
                     {board.members?.length} member{board.members?.length !== 1 ? 's' : ''}
                   </p>
                 </div>
@@ -135,13 +135,13 @@ export default function Home() {
             {/* Create new board card */}
             <button
               onClick={() => setShowCreate(true)}
-              className="group h-40 rounded-2xl border-2 border-dashed border-white/10 hover:border-brand-500/40
-                flex flex-col items-center justify-center gap-2 transition-all hover:bg-brand-500/5 cursor-pointer"
+              className="group h-36 rounded-lg border border-dashed border-white/[0.08] hover:border-brand-500/30
+                flex flex-col items-center justify-center gap-2 transition-all hover:bg-brand-500/[0.04] cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-xl bg-white/5 group-hover:bg-brand-500/10 flex items-center justify-center transition-colors">
-                <svg className="w-5 h-5 text-white/30 group-hover:text-brand-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+              <div className="w-9 h-9 rounded-lg bg-white/[0.04] group-hover:bg-brand-500/10 flex items-center justify-center transition-colors border border-white/[0.06]">
+                <svg className="w-4 h-4 text-white/25 group-hover:text-brand-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
               </div>
-              <span className="text-sm text-white/30 group-hover:text-white/60 transition-colors font-medium">New board</span>
+              <span className="text-xs text-white/25 group-hover:text-white/50 transition-colors font-medium">New board</span>
             </button>
           </div>
         )}

@@ -19,8 +19,8 @@ export default function OnlineAvatars() {
           />
         ))}
         {onlineUsers.length > 6 && (
-          <div className="w-7 h-7 rounded-full bg-white/10 border-2 border-[#0f0e17]
-            flex items-center justify-center text-[10px] text-white/60 font-semibold">
+          <div className="w-7 h-7 rounded-md bg-white/10 border border-[#09090b]
+            flex items-center justify-center text-[9px] text-white/50 font-semibold">
             +{onlineUsers.length - 6}
           </div>
         )}

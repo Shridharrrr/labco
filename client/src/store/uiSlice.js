@@ -13,7 +13,7 @@ const useUIStore = create((set) => ({
   // ── Board filter state ────────────────────────────────────────────────────
   filters: {
     search: '',       // text search on card title
-    labels: [],       // array of color strings
+    covers: [],       // array of color strings
     dueDate: null,    // 'overdue' | 'due_soon' | 'no_date' | null
     hasChecklist: false,
   },
@@ -22,7 +22,7 @@ const useUIStore = create((set) => ({
     set((s) => ({ filters: { ...s.filters, [key]: value } })),
 
   clearFilters: () =>
-    set({ filters: { search: '', labels: [], dueDate: null, hasChecklist: false } }),
+    set({ filters: { search: '', covers: [], dueDate: null, hasChecklist: false } }),
 
   // ─────────────────────────────────────────────────────────────────────────
 

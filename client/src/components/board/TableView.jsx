@@ -32,7 +32,7 @@ export default function TableView() {
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-white/[0.06]">
-            {['Title', 'Column', 'Labels', 'Due Date', 'Checklist', 'Assignees'].map((h) => (
+            {['Title', 'Column', 'Due Date', 'Checklist', 'Assignees'].map((h) => (
               <th key={h} className="text-left text-[11px] font-semibold text-white/30 uppercase tracking-wider pb-3 px-3 first:pl-0">
                 {h}
               </th>
@@ -55,7 +55,7 @@ export default function TableView() {
                 <td className="py-3 px-3 pl-0 max-w-[260px]">
                   <div className="flex items-center gap-2.5">
                     {card.coverColor && (
-                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: card.coverColor }} />
+                      <span className="w-2 h-2 rounded-sm shrink-0" style={{ background: card.coverColor }} />
                     )}
                     <span className="text-white/85 font-medium group-hover:text-white transition-colors truncate">
                       {card.title}
@@ -69,38 +69,23 @@ export default function TableView() {
                 {/* Column */}
                 <td className="py-3 px-3">
                   <span className="flex items-center gap-1.5 text-white/50 text-xs">
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: card._columnColor }} />
+                    <span className="w-1.5 h-1.5 rounded-sm" style={{ background: card._columnColor }} />
                     {card._columnTitle}
                   </span>
-                </td>
-
-                {/* Labels */}
-                <td className="py-3 px-3">
-                  <div className="flex flex-wrap gap-1">
-                    {(card.labels || []).map((lbl, i) => (
-                      <span
-                        key={i}
-                        className="px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                        style={{ background: lbl.color + '20', color: lbl.color }}
-                      >
-                        {lbl.text || '●'}
-                      </span>
-                    ))}
-                  </div>
                 </td>
 
                 {/* Due date */}
                 <td className="py-3 px-3">
                   {card.dueDate ? (
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${
-                      isDueOverdue ? 'bg-red-500/15 text-red-400' :
-                      isDueSoon    ? 'bg-amber-500/15 text-amber-400' :
+                    <span className={`text-[11px] font-medium px-2 py-0.5 rounded ${
+                      isDueOverdue ? 'bg-red-500/12 text-red-400' :
+                      isDueSoon    ? 'bg-amber-500/12 text-amber-400' :
                                      'text-white/40'
                     }`}>
                       {new Date(card.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                   ) : (
-                    <span className="text-white/20 text-xs">—</span>
+                    <span className="text-white/15 text-xs">—</span>
                   )}
                 </td>
 
@@ -108,40 +93,40 @@ export default function TableView() {
                 <td className="py-3 px-3">
                   {card.checklist?.length > 0 ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                      <div className="w-16 h-1 bg-white/[0.06] rounded overflow-hidden">
                         <div
-                          className="h-full rounded-full transition-all"
+                          className="h-full rounded transition-all"
                           style={{
                             width: `${(checkedCount / card.checklist.length) * 100}%`,
                             background: checkedCount === card.checklist.length ? '#22c55e' : '#6366f1',
                           }}
                         />
                       </div>
-                      <span className={`text-xs ${checkedCount === card.checklist.length ? 'text-emerald-400' : 'text-white/40'}`}>
+                      <span className={`text-[11px] ${checkedCount === card.checklist.length ? 'text-emerald-400' : 'text-white/35'}`}>
                         {checkedCount}/{card.checklist.length}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-white/20 text-xs">—</span>
+                    <span className="text-white/15 text-xs">—</span>
                   )}
                 </td>
 
                 {/* Assignees */}
                 <td className="py-3 px-3">
                   {(card.assignees || []).length > 0 ? (
-                    <div className="flex items-center -space-x-1.5">
+                    <div className="flex items-center -space-x-1">
                       {card.assignees.slice(0, 4).map((a, i) => (
                         <div
                           key={i}
                           title={a.name || a.email}
-                          className="w-6 h-6 rounded-full border-2 border-[#111111] flex items-center justify-center text-[10px] font-bold uppercase"
-                          style={{ background: `hsl(${(a.name?.charCodeAt(0) || 200) * 5 % 360}, 55%, 38%)`, color: '#fff' }}
+                          className="w-6 h-6 rounded-md border border-[#0c0c0f] flex items-center justify-center text-[9px] font-bold uppercase"
+                          style={{ background: `hsl(${(a.name?.charCodeAt(0) || 200) * 5 % 360}, 55%, 32%)`, color: '#fff' }}
                         >
                           {(a.name || a.email)?.[0]}
                         </div>
                       ))}
                       {card.assignees.length > 4 && (
-                        <div className="w-6 h-6 rounded-full border-2 border-[#111111] bg-white/10 flex items-center justify-center text-[9px] text-white/50">
+                        <div className="w-6 h-6 rounded-md border border-[#0c0c0f] bg-white/10 flex items-center justify-center text-[8px] text-white/45">
                           +{card.assignees.length - 4}
                         </div>
                       )}

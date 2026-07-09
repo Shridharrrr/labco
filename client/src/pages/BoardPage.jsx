@@ -87,7 +87,7 @@ export default function BoardPage() {
 
   if (!board) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#111111]">
+      <div className="flex-1 flex items-center justify-center bg-[#0c0c0f]">
         <Spinner size="lg" />
       </div>
     );
@@ -96,66 +96,66 @@ export default function BoardPage() {
   const filterActive = isFiltering(filters);
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden bg-[#111111]" onMouseMove={handleMouseMove}>
+    <div className="flex flex-col flex-1 overflow-hidden bg-[#0c0c0f]" onMouseMove={handleMouseMove}>
 
       {/* ── Top bar ─────────────────────────────────────────────────── */}
       <header className="shrink-0 border-b border-white/[0.06]">
 
         {/* Row 1: breadcrumb + actions */}
-        <div className="flex items-center justify-between px-5 pt-3.5 pb-0">
-          <div className="flex items-center gap-2 text-sm min-w-0">
-            <Link to="/" className="text-white/30 hover:text-white/60 transition-colors shrink-0">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center justify-between px-5 pt-3 pb-0">
+          <div className="flex items-center gap-2 text-xs min-w-0">
+            <div className="text-white/25 shrink-0 select-none">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
               </svg>
-            </Link>
-            <span className="text-white/20 shrink-0">/</span>
-            <span className="text-white/40 text-xs shrink-0">Projects</span>
-            <span className="text-white/20 shrink-0">/</span>
-            <span className="text-white font-semibold text-[15px] truncate">{board.title}</span>
+            </div>
+            <span className="text-white/15 shrink-0">/</span>
+            <Link to="/" className="text-white/30 hover:text-white/60 transition-colors text-[11px] shrink-0">Boards</Link>
+            <span className="text-white/15 shrink-0">/</span>
+            <span className="text-white font-semibold text-[13px] truncate">{board.title}</span>
 
             {/* Star Button */}
             <button
               onClick={handleToggleStar}
               title={isStarred ? "Remove from favorites" : "Add to favorites"}
-              className={`ml-1 p-1 rounded-md transition-colors ${
+              className={`ml-1 p-1 rounded transition-colors ${
                 isStarred 
                   ? 'text-yellow-400 hover:bg-yellow-400/10' 
-                  : 'text-white/30 hover:text-white/70 hover:bg-white/5'
+                  : 'text-white/25 hover:text-white/60 hover:bg-white/[0.04]'
               }`}
             >
-              <svg className={`w-4 h-4 ${isStarred ? 'fill-current' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-3.5 h-3.5 ${isStarred ? 'fill-current' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
             </button>
             <button
               onClick={() => setIsMembersOpen(true)}
-              className="shrink-0 ml-1 flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium bg-white/5 hover:bg-white/10 text-white/45 hover:text-white/90 transition-all border border-white/[0.06]"
+              className="shrink-0 ml-1 flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium bg-white/[0.04] hover:bg-white/[0.08] text-white/40 hover:text-white/80 transition-all border border-white/[0.06]"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
               Share
             </button>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             <OnlineAvatars />
 
             {/* View switcher */}
             {activeTab === 'tasks' && (
-              <div className="flex items-center bg-white/[0.04] border border-white/[0.07] rounded-lg p-0.5">
+              <div className="flex items-center bg-white/[0.03] border border-white/[0.06] rounded-md p-0.5">
                 <button
                   onClick={() => setViewMode('kanban')}
                   title="Kanban view"
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${viewMode === 'kanban' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'}`}
+                  className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-all ${viewMode === 'kanban' ? 'bg-white/[0.08] text-white' : 'text-white/35 hover:text-white/60'}`}
                 >
                   <KanbanIcon /> Board
                 </button>
                 <button
                   onClick={() => setViewMode('table')}
                   title="Table view"
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${viewMode === 'table' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'}`}
+                  className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-all ${viewMode === 'table' ? 'bg-white/[0.08] text-white' : 'text-white/35 hover:text-white/60'}`}
                 >
                   <TableIcon /> Table
                 </button>
@@ -166,12 +166,12 @@ export default function BoardPage() {
             {activeTab === 'tasks' && (
               <button
                 onClick={() => setShowFilters(v => !v)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all
+                className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-md transition-all
                   ${showFilters || filterActive
-                    ? 'bg-brand-600/20 text-brand-400 border border-brand-500/30'
-                    : 'bg-white/[0.04] text-white/45 hover:text-white/80 hover:bg-white/[0.08] border border-white/[0.07]'}`}
+                    ? 'bg-brand-600/15 text-brand-400 border border-brand-500/25'
+                    : 'bg-white/[0.03] text-white/40 hover:text-white/70 hover:bg-white/[0.06] border border-white/[0.06]'}`}
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
                 Filter{filterActive ? ' ●' : ''}
@@ -181,12 +181,12 @@ export default function BoardPage() {
             {/* Activity */}
             <button
               onClick={toggleActivity}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all
+              className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-md transition-all
                 ${isActivityOpen
-                  ? 'bg-brand-600 text-white shadow-lg shadow-brand-500/20'
-                  : 'bg-white/[0.04] text-white/45 hover:text-white/80 hover:bg-white/[0.08] border border-white/[0.07]'}`}
+                  ? 'bg-brand-600 text-white'
+                  : 'bg-white/[0.03] text-white/40 hover:text-white/70 hover:bg-white/[0.06] border border-white/[0.06]'}`}
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
               Activity
@@ -195,12 +195,12 @@ export default function BoardPage() {
             {/* Chat / Members Panel */}
             <button
               onClick={toggleRightPanel}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all
+              className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-md transition-all
                 ${isRightPanelOpen
-                  ? 'bg-brand-600 text-white shadow-lg shadow-brand-500/20'
-                  : 'bg-white/[0.04] text-white/45 hover:text-white/80 hover:bg-white/[0.08] border border-white/[0.07]'}`}
+                  ? 'bg-brand-600 text-white'
+                  : 'bg-white/[0.03] text-white/40 hover:text-white/70 hover:bg-white/[0.06] border border-white/[0.06]'}`}
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
               Chat
@@ -209,7 +209,7 @@ export default function BoardPage() {
         </div>
 
         {/* Row 2: tabs */}
-        <div className="flex items-center gap-0 px-5 pt-2">
+        <div className="flex items-center gap-0 px-5 pt-1.5">
           {TABS.map((tab) => {
             const key = tab.toLowerCase();
             const isActive = activeTab === key;
@@ -217,15 +217,15 @@ export default function BoardPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(key)}
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-all -mb-px ${
+                className={`px-3 py-2 text-[12px] font-medium border-b-2 transition-all -mb-px ${
                   isActive
                     ? 'text-white border-brand-500'
-                    : 'text-white/35 border-transparent hover:text-white/65 hover:border-white/15'
+                    : 'text-white/30 border-transparent hover:text-white/55 hover:border-white/10'
                 }`}
               >
                 {tab}
                 {tab === 'Tasks' && (
-                  <span className="ml-2 text-[9px] font-bold px-1.5 py-0.5 bg-brand-500/20 text-brand-400 rounded-full">●</span>
+                  <span className="ml-1.5 text-[8px] font-bold px-1 py-px bg-brand-500/20 text-brand-400 rounded">●</span>
                 )}
               </button>
             );
@@ -256,7 +256,7 @@ export default function BoardPage() {
         ) : activeTab === 'discussion' ? (
           <DiscussionTab boardId={boardId} />
         ) : (
-          <div className="flex flex-col items-center justify-center flex-1 text-white/20 text-sm gap-3">
+          <div className="flex flex-col items-center justify-center flex-1 text-white/15 text-sm gap-3">
             <svg className="w-10 h-10 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

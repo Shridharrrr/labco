@@ -112,15 +112,15 @@ export default function Column({ column, boardId }) {
       className="shrink-0 w-72 flex flex-col max-h-[calc(100vh-10rem)] select-none"
     >
       {/* Column header */}
-      <div className="flex items-center justify-between px-1 pt-1 pb-3 group">
+      <div className="flex items-center justify-between px-1 pt-1 pb-2.5 group">
         {/* Drag handle area (left side) */}
         <div
           {...attributes}
           {...listeners}
-          className="flex items-center gap-2.5 flex-1 cursor-grab active:cursor-grabbing min-w-0"
+          className="flex items-center gap-2 flex-1 cursor-grab active:cursor-grabbing min-w-0"
         >
           <span
-            className="w-2.5 h-2.5 rounded-full shrink-0 cursor-pointer"
+            className="w-2 h-2 rounded-sm shrink-0 cursor-pointer"
             style={{ background: dotColor }}
             onClick={(e) => { e.stopPropagation(); setShowColorPicker(v => !v); }}
           />
@@ -131,15 +131,15 @@ export default function Column({ column, boardId }) {
               onChange={e => setRenameValue(e.target.value)}
               onBlur={handleRename}
               onKeyDown={e => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') setIsRenaming(false); }}
-              className="flex-1 bg-white/5 border border-brand-500/60 rounded-lg px-2 py-0.5 text-sm font-medium text-white outline-none"
+              className="flex-1 bg-white/[0.05] border border-brand-500/50 rounded px-2 py-0.5 text-sm font-medium text-white outline-none"
               onClick={e => e.stopPropagation()}
             />
           ) : (
-            <h3 className="text-[14px] font-medium text-white/90 truncate tracking-wide" onDoubleClick={() => { setRenameValue(column.title); setIsRenaming(true); }}>
+            <h3 className="text-[13px] font-semibold text-white/80 truncate tracking-wide uppercase" onDoubleClick={() => { setRenameValue(column.title); setIsRenaming(true); }}>
               {column.title}
             </h3>
           )}
-          <span className={`text-[11px] shrink-0 ${isFiltered ? 'text-brand-400 font-semibold' : 'text-white/30'}`}>
+          <span className={`text-[10px] shrink-0 font-mono ${isFiltered ? 'text-brand-400 font-semibold' : 'text-white/25'}`}>
               {isFiltered ? `${columnCards.length}/${rawColumnCards.length}` : rawColumnCards.length}
             </span>
         </div>
@@ -149,7 +149,7 @@ export default function Column({ column, boardId }) {
           {/* Quick add card */}
           <button
             onClick={(e) => { e.stopPropagation(); setAddingCard(column._id, true); }}
-            className="text-white/40 hover:text-white/90 p-1.5 rounded-lg hover:bg-white/8 transition-all cursor-pointer"
+            className="text-white/35 hover:text-white/80 p-1 rounded hover:bg-white/[0.06] transition-all cursor-pointer"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
           </button>
@@ -157,7 +157,7 @@ export default function Column({ column, boardId }) {
           {/* Delete column button */}
           <button
             onClick={(e) => { e.stopPropagation(); handleDelete(); }}
-            className="text-white/40 hover:text-red-400 p-1.5 rounded-lg hover:bg-white/8 transition-all cursor-pointer"
+            className="text-white/35 hover:text-red-400 p-1 rounded hover:bg-white/[0.06] transition-all cursor-pointer"
             title="Delete column"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -167,12 +167,12 @@ export default function Column({ column, boardId }) {
 
       {/* Color picker popover */}
       {showColorPicker && (
-        <div className="mb-2 px-1 flex flex-wrap gap-1.5 p-2 bg-white/[0.04] border border-white/[0.08] rounded-xl">
+        <div className="mb-2 px-1 flex flex-wrap gap-1.5 p-2 bg-[#161619] border border-white/[0.10] rounded-lg">
           {COLUMN_COLORS.map(c => (
             <button
               key={c}
               onClick={() => handleColorChange(c)}
-              className="w-5 h-5 rounded-full transition-transform hover:scale-125"
+              className="w-5 h-5 rounded-sm transition-transform hover:scale-125"
               style={{
                 background: c,
                 outline: column.color === c ? `2px solid ${c}` : '2px solid transparent',
@@ -184,7 +184,7 @@ export default function Column({ column, boardId }) {
       )}
 
       {/* Cards list */}
-      <div className="flex-1 overflow-y-auto px-0.5 pb-3 space-y-3">
+      <div className="flex-1 overflow-y-auto px-0.5 pb-3 space-y-2">
         <SortableContext
           items={columnCards.map((c) => c._id)}
           strategy={verticalListSortingStrategy}

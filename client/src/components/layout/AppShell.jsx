@@ -18,7 +18,7 @@ export default function AppShell({ children }) {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#111111] overflow-hidden">
+    <div className="flex h-screen bg-[#09090b] overflow-hidden">
       <Sidebar
         boards={boards}
         setBoards={setBoards}

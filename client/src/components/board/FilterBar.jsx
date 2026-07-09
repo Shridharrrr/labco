@@ -16,26 +16,26 @@ export default function FilterBar() {
   const { cards } = useBoardStore();
   const inputRef = useRef(null);
 
-  // Collect all unique label colors used across all cards
+  // Collect all unique cover colors used across all cards
   const usedColors = [...new Set(
-    Object.values(cards).flatMap((c) => (c.labels || []).map((l) => l.color))
+    Object.values(cards).map((c) => c.coverColor).filter(Boolean)
   )];
   const colorOptions = usedColors.length ? usedColors : LABEL_COLORS;
 
   const active = isFiltering(filters);
 
-  const toggleLabel = (color) => {
-    const next = filters.labels.includes(color)
-      ? filters.labels.filter((c) => c !== color)
-      : [...filters.labels, color];
-    setFilter('labels', next);
+  const toggleCover = (color) => {
+    const next = (filters.covers || []).includes(color)
+      ? filters.covers.filter((c) => c !== color)
+      : [...(filters.covers || []), color];
+    setFilter('covers', next);
   };
 
   return (
-    <div className="flex items-center gap-3 px-5 py-2 border-b border-white/[0.05] bg-[#0e0e0e]">
+    <div className="flex items-center gap-2.5 px-5 py-2 border-b border-white/[0.05] bg-[#09090b]">
       {/* Search */}
-      <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.07] rounded-lg px-3 py-1.5 w-52">
-        <svg className="w-3.5 h-3.5 text-white/30 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-md px-2.5 py-1.5 w-48">
+        <svg className="w-3 h-3 text-white/25 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
@@ -44,35 +44,35 @@ export default function FilterBar() {
           value={filters.search}
           onChange={(e) => setFilter('search', e.target.value)}
           placeholder="Search cards..."
-          className="bg-transparent text-xs text-white/70 placeholder-white/25 outline-none flex-1"
+          className="bg-transparent text-[11px] text-white/65 placeholder-white/20 outline-none flex-1"
         />
         {filters.search && (
-          <button onClick={() => setFilter('search', '')} className="text-white/30 hover:text-white/70">
+          <button onClick={() => setFilter('search', '')} className="text-white/25 hover:text-white/60">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         )}
       </div>
 
       {/* Divider */}
-      <div className="w-px h-5 bg-white/[0.07]" />
+      <div className="w-px h-4 bg-white/[0.06]" />
 
-      {/* Label filter */}
+      {/* Cover Color filter */}
       <div className="flex items-center gap-1.5">
-        <span className="text-[10px] text-white/30 uppercase tracking-wider font-semibold">Labels</span>
+        <span className="text-[9px] text-white/25 uppercase tracking-wider font-semibold">Covers</span>
         <div className="flex items-center gap-1">
           {colorOptions.map((color) => {
-            const isActive = filters.labels.includes(color);
+            const isActive = (filters.covers || []).includes(color);
             return (
               <button
                 key={color}
-                onClick={() => toggleLabel(color)}
+                onClick={() => toggleCover(color)}
                 title={color}
-                className="w-4 h-4 rounded-full transition-all hover:scale-125"
+                className="w-3.5 h-3.5 rounded-sm transition-all hover:scale-125"
                 style={{
                   background: color,
                   outline: isActive ? `2px solid ${color}` : '2px solid transparent',
                   outlineOffset: '2px',
-                  opacity: isActive ? 1 : 0.5,
+                  opacity: isActive ? 1 : 0.45,
                 }}
               />
             );
@@ -81,20 +81,20 @@ export default function FilterBar() {
       </div>
 
       {/* Divider */}
-      <div className="w-px h-5 bg-white/[0.07]" />
+      <div className="w-px h-4 bg-white/[0.06]" />
 
       {/* Due date filter */}
       <div className="flex items-center gap-1.5">
-        <span className="text-[10px] text-white/30 uppercase tracking-wider font-semibold">Due</span>
+        <span className="text-[9px] text-white/25 uppercase tracking-wider font-semibold">Due</span>
         <div className="flex items-center gap-1">
           {DUE_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setFilter('dueDate', filters.dueDate === opt.value ? null : opt.value)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+              className={`px-2 py-0.5 rounded-md text-[10px] font-medium transition-all ${
                 filters.dueDate === opt.value
-                  ? `${opt.color} bg-white/10 border border-white/15`
-                  : 'text-white/35 hover:text-white/60 hover:bg-white/5'
+                  ? `${opt.color} bg-white/[0.08] border border-white/[0.12]`
+                  : 'text-white/30 hover:text-white/55 hover:bg-white/[0.04]'
               }`}
             >
               {opt.label}
@@ -104,18 +104,18 @@ export default function FilterBar() {
       </div>
 
       {/* Divider */}
-      <div className="w-px h-5 bg-white/[0.07]" />
+      <div className="w-px h-4 bg-white/[0.06]" />
 
       {/* Checklist toggle */}
       <button
         onClick={() => setFilter('hasChecklist', !filters.hasChecklist)}
-        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+        className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium transition-all ${
           filters.hasChecklist
-            ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20'
-            : 'text-white/35 hover:text-white/60 hover:bg-white/5'
+            ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/15'
+            : 'text-white/30 hover:text-white/55 hover:bg-white/[0.04]'
         }`}
       >
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
         </svg>
         Has checklist
@@ -124,12 +124,12 @@ export default function FilterBar() {
       {/* Clear all */}
       {active && (
         <>
-          <div className="w-px h-5 bg-white/[0.07]" />
+          <div className="w-px h-4 bg-white/[0.06]" />
           <button
             onClick={clearFilters}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium text-brand-400 hover:text-brand-300 hover:bg-brand-500/10 transition-all"
+            className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium text-brand-400 hover:text-brand-300 hover:bg-brand-500/10 transition-all"
           >
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
             Clear filters
           </button>
         </>
@@ -137,7 +137,7 @@ export default function FilterBar() {
 
       {/* Active filter count badge */}
       {active && (
-        <span className="ml-auto text-[10px] px-2 py-0.5 bg-brand-500/20 text-brand-400 rounded-full font-semibold">
+        <span className="ml-auto text-[9px] px-1.5 py-0.5 bg-brand-500/15 text-brand-400 rounded-md font-semibold">
           Filtered
         </span>
       )}
