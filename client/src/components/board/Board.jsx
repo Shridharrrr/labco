@@ -13,7 +13,6 @@ import useDragHandlers from '../../hooks/useDragHandlers';
 import Column from './Column';
 import Card from './Card';
 import AddColumnForm from './AddColumnForm';
-import CardModal from './CardModal';
 import * as boardService from '../../services/boardService';
 import { getSocket } from '../../hooks/useSocket';
 
@@ -90,9 +89,6 @@ export default function Board({ boardId }) {
           ) : null}
         </DragOverlay>
       </DndContext>
-
-      {/* Card detail modal */}
-      <CardModal boardId={boardId} />
     </>
   );
 }

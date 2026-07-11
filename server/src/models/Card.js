@@ -37,6 +37,8 @@ const cardSchema = new mongoose.Schema(
     ],
     coverColor: { type: String, default: '' },
     isArchived: { type: Boolean, default: false },
+    // 'none' | 'started' | 'completed'
+    status: { type: String, enum: ['none', 'started', 'completed'], default: 'none' },
   },
   { timestamps: true }
 );

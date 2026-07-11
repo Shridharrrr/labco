@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as boardService from '../services/boardService';
 import Spinner from '../components/ui/Spinner';
+import { notifyBoardCreated } from '../components/layout/AppShell';
 
 const BG_GRADIENTS = [
   'from-indigo-600 to-indigo-800',
@@ -39,6 +40,8 @@ export default function Home() {
     try {
       const { data } = await boardService.createBoard({ title: newTitle.trim() });
       setBoards(prev => [...(prev || []), data]);
+      // Immediately push new board into the sidebar
+      notifyBoardCreated(data);
       setNewTitle('');
       setShowCreate(false);
       navigate(`/boards/${data._id}`);

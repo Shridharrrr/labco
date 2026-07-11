@@ -34,15 +34,22 @@ exports.createColumn = async (req, res, next) => {
   }
 };
 
-// PATCH /api/columns/:columnId — rename / update color
+// PATCH /api/columns/:columnId — rename / update color / update columnType
 exports.updateColumn = async (req, res, next) => {
   try {
-    const { title, color } = req.body;
+    const { title, color, columnType } = req.body;
     const column = await Column.findById(req.params.columnId);
     if (!column) return res.status(404).json({ message: 'Column not found' });
 
     if (title) column.title = title;
     if (color) column.color = color;
+    if (columnType !== undefined) {
+      column.columnType = columnType;
+      // Auto-update all cards in this column with the corresponding status
+      const statusMap = { initial: 'started', final: 'completed', none: 'none' };
+      const newStatus = statusMap[columnType] || 'none';
+      await Card.updateMany({ column: column._id }, { status: newStatus });
+    }
     await column.save();
 
     if (title) {

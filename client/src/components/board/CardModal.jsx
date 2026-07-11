@@ -1,32 +1,41 @@
 import { useState, useEffect } from 'react';
-import Modal from '../ui/Modal';
 import Spinner from '../ui/Spinner';
 import useBoardStore from '../../store/boardSlice';
 import useUIStore from '../../store/uiSlice';
 import * as cardService from '../../services/cardService';
 import { getSocket } from '../../hooks/useSocket';
 
-const LABEL_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#6366f1'];
+const COVER_COLORS = [
+  '#ef4444', '#f97316', '#eab308', '#22c55e', '#6366f1', '#0d9488',
+];
+
+const STATUS_BADGE = {
+  started:   { label: 'Started',   cls: 'bg-blue-500/10 text-blue-400' },
+  completed: { label: 'Done',      cls: 'bg-emerald-500/10 text-emerald-400' },
+};
 
 export default function CardModal({ boardId }) {
   const { activeCardId, closeCard, addToast } = useUIStore();
   const { board, cards, updateCard } = useBoardStore();
-
   const card = cards[activeCardId];
+
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState('');
   const [editingDesc, setEditingDesc] = useState(false);
   const [newCheckItem, setNewCheckItem] = useState('');
   const [saving, setSaving] = useState(false);
+  const [showChecklist, setShowChecklist] = useState(false);
 
   useEffect(() => {
     if (!activeCardId) return;
     setLoading(true);
+    setShowChecklist(false);
     cardService.getCard(activeCardId)
       .then(({ data }) => {
         setDetail(data);
         setDescription(data.description || '');
+        if (data.checklist?.length > 0) setShowChecklist(true);
       })
       .catch(() => addToast({ message: 'Failed to load card', type: 'error' }))
       .finally(() => setLoading(false));
@@ -36,241 +45,273 @@ export default function CardModal({ boardId }) {
 
   const patch = async (changes) => {
     setSaving(true);
-    // Optimistic update locally
-    setDetail((prev) => ({ ...prev, ...changes }));
+    setDetail(prev => ({ ...prev, ...changes }));
     updateCard(activeCardId, changes);
-
     try {
       const { data } = await cardService.updateCard(activeCardId, changes);
       setDetail(data);
       getSocket()?.emit('card:update', { boardId, cardId: activeCardId, changes });
     } catch {
       addToast({ message: 'Failed to update card', type: 'error' });
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   };
 
-  const saveDescription = () => {
-    patch({ description });
-    setEditingDesc(false);
-  };
-
+  const saveDescription = () => { patch({ description }); setEditingDesc(false); };
   const toggleCheckItem = (idx) => {
     if (!detail) return;
-    const checklist = detail.checklist.map((item, i) =>
-      i === idx ? { ...item, completed: !item.completed } : item
-    );
-    patch({ checklist });
+    patch({ checklist: detail.checklist.map((item, i) => i === idx ? { ...item, completed: !item.completed } : item) });
   };
-
+  const deleteCheckItem = (idx) => patch({ checklist: detail.checklist.filter((_, i) => i !== idx) });
   const addCheckItem = (e) => {
     e.preventDefault();
     if (!newCheckItem.trim()) return;
-    const checklist = [...(detail?.checklist || []), { text: newCheckItem.trim(), completed: false }];
-    patch({ checklist });
+    patch({ checklist: [...(detail?.checklist || []), { text: newCheckItem.trim(), completed: false }] });
     setNewCheckItem('');
   };
 
-  const checkedCount = detail?.checklist?.filter((i) => i.completed).length ?? 0;
+  const checkedCount = detail?.checklist?.filter(i => i.completed).length ?? 0;
   const totalCount = detail?.checklist?.length ?? 0;
+  const allDone = totalCount > 0 && checkedCount === totalCount;
+  const badge = STATUS_BADGE[detail?.status];
 
   return (
-    <Modal onClose={closeCard}>
-      {/* Cover Bar */}
-      {detail?.coverColor && (
-        <div className="h-1.5 rounded-t-lg" style={{ background: detail.coverColor }} />
-      )}
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 animate-[fadeIn_0.1s_ease-out]"
+      onClick={(e) => e.target === e.currentTarget && closeCard()}
+    >
+      <div className={`bg-[#111114] border border-white/[0.08] rounded-lg shadow-2xl shadow-black/50
+        w-full mx-4 flex flex-col overflow-hidden transition-[max-width] duration-200
+        ${showChecklist ? 'max-w-[760px]' : 'max-w-[520px]'}`}>
 
-      {/* Header */}
-      <div className={`flex items-start justify-between px-5 pb-4 border-b border-white/[0.08] ${detail?.coverColor ? 'pt-5' : 'pt-5'}`}>
-        <div className="pr-4 min-w-0">
-          <h2 className="text-base font-semibold text-white leading-tight truncate">{card.title}</h2>
-          <p className="text-[11px] text-white/35 mt-1 flex items-center gap-1.5">
-            in <span className="font-medium text-white/55">{detail?.column?.title || 'Unknown'}</span>
-          </p>
+        {/* Cover line */}
+        {detail?.coverColor && <div className="h-1" style={{ background: detail.coverColor }} />}
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06]">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <h2 className="text-[15px] font-semibold text-white truncate">{card.title}</h2>
+            {badge && (
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${badge.cls} shrink-0`}>
+                {badge.label}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1 shrink-0 ml-3">
+            <button
+              onClick={() => setShowChecklist(v => !v)}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium transition-colors
+                ${showChecklist ? 'bg-white/[0.08] text-white/70' : 'text-white/30 hover:text-white/60 hover:bg-white/[0.04]'}`}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              {totalCount > 0 ? `${checkedCount}/${totalCount}` : 'Checklist'}
+            </button>
+            <button onClick={closeCard} className="text-white/25 hover:text-white/60 p-1 rounded hover:bg-white/[0.04] transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
-        <button onClick={closeCard} className="text-white/30 hover:text-white/80 transition-colors p-1.5 hover:bg-white/[0.06] rounded-md shrink-0">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
-      </div>
 
-      {loading ? (
-        <div className="flex justify-center py-16"><Spinner /></div>
-      ) : (
-        <div className="px-5 py-5 space-y-6 max-h-[65vh] overflow-y-auto">
-          
-          {/* Properties Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* Due Date */}
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3">
-              <h4 className="text-[10px] font-semibold text-white/35 uppercase tracking-wider mb-2">Due Date</h4>
-              <input
-                type="date"
-                value={detail?.dueDate ? new Date(detail.dueDate).toISOString().split('T')[0] : ''}
-                onChange={(e) => patch({ dueDate: e.target.value || null })}
-                className="w-full bg-transparent text-sm text-white/80 outline-none cursor-pointer"
-              />
-            </div>
+        {loading ? (
+          <div className="flex justify-center py-16"><Spinner /></div>
+        ) : (
+          <div className="flex flex-1 overflow-hidden max-h-[65vh]">
 
-            {/* Cover */}
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3">
-              <h4 className="text-[10px] font-semibold text-white/35 uppercase tracking-wider mb-2">Cover</h4>
-              <div className="flex flex-wrap gap-1.5">
-                {LABEL_COLORS.slice(0, 6).map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => patch({ coverColor: detail?.coverColor === color ? null : color })}
-                    className="w-6 h-6 rounded transition-all hover:scale-110 flex items-center justify-center"
-                    style={{ background: color, opacity: detail?.coverColor === color ? 1 : 0.55 }}
-                  >
-                    {detail?.coverColor === color && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+            {/* Left — main content */}
+            <div className="flex-1 overflow-y-auto">
 
-          {/* Assignees */}
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3">
-            <h4 className="text-[10px] font-semibold text-white/35 uppercase tracking-wider mb-2">Assignees</h4>
-            <div className="flex flex-wrap gap-1.5">
-              {board?.members?.map((m) => {
-                const isAssigned = detail?.assignees?.find((a) => a._id === m.user._id);
-                const initial = (m.user.name || m.user.email)?.[0]?.toUpperCase() || '?';
-                return (
-                  <button
-                    key={m.user._id}
-                    onClick={() => {
-                      const assignees = detail?.assignees || [];
-                      const next = isAssigned
-                        ? assignees.filter((a) => a._id !== m.user._id)
-                        : [...assignees, { _id: m.user._id, name: m.user.name, email: m.user.email, avatar: m.user.avatar }];
-                      patch({ assignees: next });
-                    }}
-                    title={m.user.name || m.user.email}
-                    className={`w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-bold transition-all
-                      ${isAssigned ? 'ring-2 ring-brand-500 ring-offset-1 ring-offset-[#111114]' : 'opacity-40 hover:opacity-90'}`}
-                    style={{ background: `hsl(${(m.user.name?.charCodeAt(0) || 200) * 5 % 360}, 55%, 32%)`, color: '#fff' }}
-                  >
-                    {initial}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <svg className="w-3.5 h-3.5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
-              <h4 className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Description</h4>
-            </div>
-            
-            {editingDesc ? (
-              <div className="animate-[fadeIn_0.12s_ease-out]">
-                <textarea
-                  autoFocus
-                  rows={4}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-brand-500/40 rounded-lg px-3.5 py-2.5 text-sm text-white/85 outline-none focus:bg-white/[0.04] resize-y transition-all"
-                  placeholder="Add a more detailed description..."
-                />
-                <div className="flex gap-2 mt-2">
-                  <button onClick={saveDescription} className="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-medium rounded-md transition-colors">
-                    Save
-                  </button>
-                  <button onClick={() => setEditingDesc(false)} className="px-3.5 py-1.5 bg-white/[0.05] text-white/50 hover:text-white hover:bg-white/10 text-xs font-medium rounded-md transition-colors">
-                    Cancel
-                  </button>
+              {/* Meta row */}
+              <div className="px-5 py-3 border-b border-white/[0.06] flex items-center gap-5 text-[11px]">
+                {/* Column */}
+                <div className="flex items-center gap-1.5 text-white/30">
+                  <span className="text-white/20">Column</span>
+                  <span className="font-medium text-white/55">{detail?.column?.title || '—'}</span>
+                </div>
+                {/* Due */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-white/20">Due</span>
+                  <input
+                    type="date"
+                    value={detail?.dueDate ? new Date(detail.dueDate).toISOString().split('T')[0] : ''}
+                    onChange={(e) => patch({ dueDate: e.target.value || null })}
+                    className="bg-transparent text-[11px] text-white/55 font-medium outline-none cursor-pointer"
+                  />
                 </div>
               </div>
-            ) : (
-              <div
-                onClick={() => setEditingDesc(true)}
-                className={`min-h-[3.5rem] rounded-lg px-3.5 py-2.5 text-sm transition-all cursor-pointer border
-                  ${description ? 'border-transparent hover:bg-white/[0.03] text-white/75 leading-relaxed' : 'border-dashed border-white/[0.08] hover:border-white/[0.15] bg-white/[0.02] text-white/25 italic'}`}
-              >
-                {description || 'Add a more detailed description...'}
-              </div>
-            )}
-          </div>
 
-          {/* Checklist */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <svg className="w-3.5 h-3.5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
-                <h4 className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">
-                  Checklist
-                </h4>
+              {/* Properties */}
+              <div className="px-5 py-3 border-b border-white/[0.06] space-y-3">
+                {/* Cover */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-white/20 w-16 shrink-0">Cover</span>
+                  <div className="flex gap-1.5">
+                    {COVER_COLORS.map(c => (
+                      <button
+                        key={c}
+                        onClick={() => patch({ coverColor: detail?.coverColor === c ? null : c })}
+                        className={`w-5 h-5 rounded-sm transition-all hover:scale-110 ${detail?.coverColor === c ? 'ring-1.5 ring-white/50 ring-offset-1 ring-offset-[#111114]' : 'opacity-45 hover:opacity-80'}`}
+                        style={{ background: c }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                {/* Assignees */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-white/20 w-16 shrink-0">Assign</span>
+                  <div className="flex gap-1">
+                    {board?.members?.map(m => {
+                      const isAssigned = detail?.assignees?.find(a => a._id === m.user._id);
+                      const initial = (m.user.name || m.user.email)?.[0]?.toUpperCase() || '?';
+                      return (
+                        <button
+                          key={m.user._id}
+                          onClick={() => {
+                            const assignees = detail?.assignees || [];
+                            const next = isAssigned
+                              ? assignees.filter(a => a._id !== m.user._id)
+                              : [...assignees, { _id: m.user._id, name: m.user.name, email: m.user.email }];
+                            patch({ assignees: next });
+                          }}
+                          title={m.user.name || m.user.email}
+                          className={`w-6 h-6 rounded flex items-center justify-center text-[9px] font-bold transition-all
+                            ${isAssigned ? 'ring-1.5 ring-brand-500 ring-offset-1 ring-offset-[#111114]' : 'opacity-30 hover:opacity-70'}`}
+                          style={{ background: `hsl(${(m.user.name?.charCodeAt(0) || 200) * 5 % 360}, 50%, 30%)`, color: '#fff' }}
+                        >
+                          {initial}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-              {totalCount > 0 && (
-                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${checkedCount === totalCount ? 'text-emerald-400 bg-emerald-500/10' : 'text-white/35 bg-white/[0.04]'}`}>
-                  {checkedCount}/{totalCount}
-                </span>
-              )}
-            </div>
 
-            {totalCount > 0 && (
-              <div className="w-full bg-white/[0.06] rounded h-1 mb-3 overflow-hidden">
-                <div
-                  className={`h-full transition-all duration-300 rounded ${checkedCount === totalCount ? 'bg-emerald-500' : 'bg-brand-500'}`}
-                  style={{ width: `${(checkedCount / totalCount) * 100}%` }}
-                />
-              </div>
-            )}
+              {/* Description */}
+              <div className="px-5 py-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] text-white/20 font-medium uppercase tracking-wider">Description</span>
+                  {!editingDesc && (
+                    <button onClick={() => setEditingDesc(true)} className="text-[10px] text-white/20 hover:text-white/50 transition-colors">
+                      {description ? 'Edit' : 'Add'}
+                    </button>
+                  )}
+                </div>
 
-            <div className="space-y-0.5 mb-3">
-              {detail?.checklist?.map((item, idx) => (
-                <label key={idx} className="flex items-start gap-2.5 py-1.5 px-2 rounded-md hover:bg-white/[0.03] cursor-pointer transition-colors group">
-                  <div className="pt-0.5">
-                    <input
-                      type="checkbox"
-                      checked={item.completed}
-                      onChange={() => toggleCheckItem(idx)}
-                      className="sr-only"
+                {editingDesc ? (
+                  <div>
+                    <textarea
+                      autoFocus rows={3} value={description}
+                      onChange={e => setDescription(e.target.value)}
+                      className="w-full bg-white/[0.03] border border-white/[0.08] rounded px-3 py-2 text-sm text-white/80
+                        outline-none focus:border-brand-500/40 resize-y placeholder-white/15 transition-colors"
+                      placeholder="Add description..."
                     />
-                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
-                      item.completed
-                        ? 'bg-brand-600 border-brand-500/80 text-white shadow-sm shadow-brand-500/20'
-                        : 'border-white/20 group-hover:border-white/35 bg-white/[0.02]'
-                    }`}>
-                      {item.completed && (
-                        <svg className="w-2.5 h-2.5 animate-[fadeIn_0.1s_ease-out]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
+                    <div className="flex gap-2 mt-2">
+                      <button onClick={saveDescription} className="px-3 py-1 bg-brand-600 hover:bg-brand-500 text-white text-[11px] font-medium rounded transition-colors">Save</button>
+                      <button onClick={() => { setEditingDesc(false); setDescription(detail?.description || ''); }} className="px-3 py-1 text-white/30 hover:text-white/60 text-[11px] rounded hover:bg-white/[0.04] transition-colors">Cancel</button>
                     </div>
                   </div>
-                  <span className={`text-sm leading-snug transition-colors ${item.completed ? 'line-through text-white/25' : 'text-white/75 group-hover:text-white/90'}`}>
-                    {item.text}
-                  </span>
-                </label>
-              ))}
+                ) : (
+                  <div
+                    onClick={() => setEditingDesc(true)}
+                    className={`rounded px-3 py-2 text-sm cursor-pointer transition-colors
+                      ${description ? 'text-white/60 leading-relaxed hover:bg-white/[0.03]' : 'text-white/15 italic border border-dashed border-white/[0.06] hover:border-white/[0.10]'}`}
+                  >
+                    {description || 'No description'}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <form onSubmit={addCheckItem}>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newCheckItem}
-                  onChange={(e) => setNewCheckItem(e.target.value)}
-                  placeholder="Add an item..."
-                  className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm text-white placeholder-white/25 outline-none focus:border-brand-500/40 transition-all"
-                />
-                <button type="submit" disabled={!newCheckItem.trim()}
-                  className="px-3 py-1.5 bg-white/[0.06] hover:bg-white/10 disabled:opacity-40 text-white/70 text-sm font-medium rounded-lg transition-colors">
-                  Add
-                </button>
-              </div>
-            </form>
-          </div>
+            {/* Right — checklist panel */}
+            {showChecklist && (
+              <div className="w-64 shrink-0 border-l border-white/[0.06] flex flex-col bg-[#0c0c0f]">
 
-          {saving && <div className="fixed bottom-4 right-4 bg-[#111114] border border-white/[0.10] px-3 py-1.5 rounded-md text-[11px] text-white/50 shadow-xl animate-[fadeIn_0.15s_ease-out]">Saving…</div>}
-        </div>
-      )}
-    </Modal>
+                {/* Header */}
+                <div className="px-3.5 py-3 border-b border-white/[0.06]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-white/20 font-medium uppercase tracking-wider">Checklist</span>
+                    {totalCount > 0 && (
+                      <span className={`text-[10px] font-mono font-semibold ${allDone ? 'text-emerald-400' : 'text-white/25'}`}>
+                        {checkedCount}/{totalCount}
+                      </span>
+                    )}
+                  </div>
+                  {totalCount > 0 && (
+                    <div className="mt-2 w-full bg-white/[0.04] rounded-sm h-1 overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 ${allDone ? 'bg-emerald-500' : 'bg-brand-500'}`}
+                        style={{ width: `${(checkedCount / totalCount) * 100}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Items */}
+                <div className="flex-1 overflow-y-auto py-1">
+                  {detail?.checklist?.map((item, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => toggleCheckItem(idx)}
+                      className="group flex items-center gap-2.5 px-3.5 py-2 cursor-pointer hover:bg-white/[0.03] transition-colors"
+                    >
+                      <div className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center shrink-0 transition-all
+                        ${item.completed
+                          ? 'bg-brand-600 border-brand-500 text-white'
+                          : 'border-white/15 group-hover:border-white/30'}`}
+                      >
+                        {item.completed && (
+                          <svg className="w-2 h-2" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                      <span className={`text-[12px] flex-1 transition-colors select-none
+                        ${item.completed ? 'line-through text-white/15' : 'text-white/60 group-hover:text-white/80'}`}>
+                        {item.text}
+                      </span>
+                      <button
+                        onClick={e => { e.stopPropagation(); deleteCheckItem(idx); }}
+                        className="opacity-0 group-hover:opacity-100 text-white/15 hover:text-red-400 transition-all shrink-0"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add form */}
+                <form onSubmit={addCheckItem} className="px-3 py-2.5 border-t border-white/[0.06]">
+                  <div className="flex gap-1.5">
+                    <input
+                      type="text" value={newCheckItem}
+                      onChange={e => setNewCheckItem(e.target.value)}
+                      placeholder="Add item..."
+                      className="flex-1 bg-white/[0.03] border border-white/[0.06] rounded px-2.5 py-1.5 text-[12px] text-white
+                        placeholder-white/15 outline-none focus:border-white/[0.12] transition-colors"
+                    />
+                    <button type="submit" disabled={!newCheckItem.trim()}
+                      className="px-2.5 py-1.5 text-[11px] font-medium text-white/40 hover:text-white/70 bg-white/[0.04]
+                        hover:bg-white/[0.08] rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                      Add
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </div>
+        )}
+
+        {saving && (
+          <div className="absolute bottom-3 right-3 bg-[#111114] border border-white/[0.08] px-2.5 py-1 rounded text-[10px] text-white/30 shadow-lg">
+            Saving…
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

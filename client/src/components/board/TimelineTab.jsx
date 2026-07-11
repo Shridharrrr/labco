@@ -16,9 +16,12 @@ export default function TimelineTab() {
 
   // Compute timeline boundaries
   const { minDate, maxDate } = useMemo(() => {
-    const validDates = timelineCards
-      .map(c => new Date(c.dueDate).getTime())
-      .filter(t => !isNaN(t));
+    let allDates = [];
+    timelineCards.forEach(c => {
+      if (c.createdAt) allDates.push(new Date(c.createdAt).getTime());
+      if (c.dueDate) allDates.push(new Date(c.dueDate).getTime());
+    });
+    const validDates = allDates.filter(t => !isNaN(t));
 
     if (validDates.length === 0) {
       const today = new Date();
@@ -135,10 +138,11 @@ export default function TimelineTab() {
                 {/* Card Tracks */}
                 <div className="flex-1 relative min-h-[60px] py-3">
                   {colCards.map((card, idx) => {
-                    // Span a few days visually ending at due date
-                    const width = Math.max(cellWidth * 2.5, 60); 
-                    const leftPos = getPosition(card.dueDate);
-                    const left = leftPos - width + cellWidth; // Align right edge to the end of due date cell
+                    const startPos = getPosition(card.createdAt || new Date().toISOString());
+                    const endPos = getPosition(card.dueDate);
+                    const left = Math.min(startPos, endPos);
+                    const right = Math.max(startPos, endPos) + cellWidth;
+                    const width = Math.max(right - left, cellWidth);
                     
                     return (
                       <div
@@ -151,7 +155,7 @@ export default function TimelineTab() {
                           top: `${(idx * 44) + 12}px`,
                           background: card.coverColor || col.color || '#374151',
                         }}
-                        title={`${card.title}\nDue: ${new Date(card.dueDate).toLocaleDateString()}`}
+                        title={`${card.title}\nCreated: ${new Date(card.createdAt || Date.now()).toLocaleDateString()}\nDue: ${new Date(card.dueDate).toLocaleDateString()}`}
                       >
                         <span className="text-[11px] font-semibold text-white truncate drop-shadow-md">{card.title}</span>
                       </div>

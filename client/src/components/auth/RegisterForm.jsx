@@ -4,12 +4,79 @@ import * as authService from '../../services/authService';
 import useAuthStore from '../../store/authSlice';
 import Spinner from '../ui/Spinner';
 
+// Premium Inline SVG Icons
+const RocketIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M4.5 16.5c-1.5 1.26-2 3.5-2 3.5s2.24-.5 3.5-2" />
+    <path d="M12 15c.97 0 1.91-.15 2.78-.42a9.49 9.49 0 0 0 5.48-5.48A9.78 9.78 0 0 0 21 6c0-1.66-1.34-3-3-3a9.78 9.78 0 0 0-3.08.72 9.49 9.49 0 0 0-5.48 5.48A10.3 10.3 0 0 0 9 12c0 2.22 1.22 4.15 3 5Z" />
+    <path d="M9 12a3 3 0 0 0 3-3" />
+    <path d="M8 15h.01" />
+    <path d="M15 8h.01" />
+    <path d="M10 11v.01" />
+    <path d="M13 14v.01" />
+    <path d="M11.5 20.5S13 22 15 22s2.5-1.5 2.5-1.5" />
+    <path d="M2 10.5S3.5 12 5.5 12s2.5-1.5 2.5-1.5" />
+  </svg>
+);
+
+const ShieldIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </svg>
+);
+
+const SparklesIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+    <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z" />
+    <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z" />
+  </svg>
+);
+
+const UserIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const MailIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect width="20" height="16" x="2" y="4" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </svg>
+);
+
+const LockIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
+
+const EyeIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const EyeOffIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+    <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+    <line x1="2" y1="2" x2="22" y2="22" />
+  </svg>
+);
+
 export default function RegisterForm() {
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,17 +94,27 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#09090b]">
-      {/* Left — Branding Panel */}
-      <div className="hidden lg:flex w-[480px] flex-col justify-between p-10
-        bg-gradient-to-br from-[#0f0f12] to-[#111114] border-r border-white/[0.06] relative overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-brand-600/8 rounded-full blur-3xl" />
-        <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-brand-500/5 rounded-full blur-3xl" />
+    <div className="min-h-screen flex bg-[#09090b] relative overflow-hidden">
+      {/* Background Grids & Glows */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff01_1px,transparent_1px),linear-gradient(to_bottom,#ffffff01_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+      <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Left - Branding Panel */}
+      <div className="hidden lg:flex w-[480px] flex-col justify-between p-10 pr-16
+        bg-gradient-to-br from-[#0c0c0f] to-[#121217] border-r border-white/[0.04] relative overflow-hidden shrink-0">
         
+        {/* Subtle branding background grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
+        
+        {/* Decorative sloped divider */}
+        <div className="absolute top-0 right-0 bottom-0 w-24 bg-[#09090b] translate-x-12 -skew-x-[6deg] origin-top-right border-l border-white/[0.08] pointer-events-none" />
+        {/* Sloped border glow line */}
+        <div className="absolute top-0 right-0 bottom-0 w-[1px] bg-gradient-to-b from-brand-500/0 via-brand-500/25 to-brand-500/0 translate-x-[36px] -skew-x-[6deg] origin-top pointer-events-none" />
+
         {/* Logo */}
         <div className="relative z-10 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center font-bold text-white text-sm">
+          <div className="w-9 h-9 rounded-lg bg-black border border-white/[0.08] flex items-center justify-center font-bold text-white text-sm">
             L
           </div>
           <span className="text-xl font-bold text-white tracking-tight">LabCo</span>
@@ -54,17 +131,32 @@ export default function RegisterForm() {
             </p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {[
-              { icon: '🚀', text: 'Get started in seconds' },
-              { icon: '🔒', text: 'Secure by default' },
-              { icon: '♾️', text: 'Unlimited boards & members' },
-            ].map((f) => (
-              <div key={f.text} className="flex items-center gap-3 text-sm text-white/50">
-                <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-base">
+              {
+                icon: <RocketIcon className="w-5 h-5 text-brand-400" />,
+                title: 'Get started in seconds',
+                desc: 'No complex setup. Sign up and start organizing.'
+              },
+              {
+                icon: <ShieldIcon className="w-5 h-5 text-brand-400" />,
+                title: 'Secure by default',
+                desc: 'Your data is encrypted and backed up securely.'
+              },
+              {
+                icon: <SparklesIcon className="w-5 h-5 text-brand-400" />,
+                title: 'Unlimited boards & members',
+                desc: 'Grow your team without artificial boundaries.'
+              },
+            ].map((f, i) => (
+              <div key={i} className="flex gap-4 items-start text-sm">
+                <div className="w-10 h-10 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center shrink-0 shadow-inner">
                   {f.icon}
                 </div>
-                {f.text}
+                <div className="space-y-1">
+                  <h4 className="font-semibold text-white/80">{f.title}</h4>
+                  <p className="text-xs text-white/40 leading-relaxed">{f.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -73,13 +165,13 @@ export default function RegisterForm() {
         <p className="relative z-10 text-[11px] text-white/20">© 2026 LabCo. All rights reserved.</p>
       </div>
 
-      {/* Right — Register Form */}
-      <div className="flex-1 flex items-center justify-center px-6">
+      {/* Right - Register Form */}
+      <div className="flex-1 flex items-center justify-center px-6 relative z-10">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="inline-flex items-center gap-2.5 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center font-bold text-white text-sm">
+              <div className="w-9 h-9 rounded-lg bg-black border border-white/[0.08] flex items-center justify-center font-bold text-white text-sm">
                 L
               </div>
               <span className="text-xl font-bold text-white tracking-tight">LabCo</span>
@@ -87,13 +179,15 @@ export default function RegisterForm() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white">Create account</h1>
-            <p className="text-white/40 text-sm mt-1.5">Create your free workspace</p>
+            <h1 className="text-2xl font-bold text-white bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">Create account</h1>
+            <p className="text-white/40 text-sm mt-1.5 font-medium">Create your free workspace</p>
           </div>
 
           {error && (
             <div className="mb-5 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm flex items-center gap-2">
-              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               {error}
             </div>
           )}
@@ -101,63 +195,87 @@ export default function RegisterForm() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-[13px] font-medium text-white/60 mb-2">Name</label>
-              <input
-                id="register-name"
-                type="text"
-                required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Your name"
-                className="w-full bg-[#111114] border border-white/[0.10] rounded-lg px-4 py-2.5
-                  text-white placeholder-white/20 text-sm outline-none
-                  focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30">
+                  <UserIcon className="w-4 h-4" />
+                </div>
+                <input
+                  id="register-name"
+                  type="text"
+                  required
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Your name"
+                  className="w-full bg-white/[0.02] border border-white/[0.08] hover:border-white/[0.12] rounded-lg pl-10 pr-4 py-2.5
+                    text-white placeholder-white/20 text-sm outline-none focus:bg-white/[0.04]
+                    focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200"
+                />
+              </div>
             </div>
+
             <div>
               <label className="block text-[13px] font-medium text-white/60 mb-2">Email</label>
-              <input
-                id="register-email"
-                type="email"
-                required
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="you@example.com"
-                className="w-full bg-[#111114] border border-white/[0.10] rounded-lg px-4 py-2.5
-                  text-white placeholder-white/20 text-sm outline-none
-                  focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30">
+                  <MailIcon className="w-4 h-4" />
+                </div>
+                <input
+                  id="register-email"
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="you@example.com"
+                  className="w-full bg-white/[0.02] border border-white/[0.08] hover:border-white/[0.12] rounded-lg pl-10 pr-4 py-2.5
+                    text-white placeholder-white/20 text-sm outline-none focus:bg-white/[0.04]
+                    focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200"
+                />
+              </div>
             </div>
+            
             <div>
               <label className="block text-[13px] font-medium text-white/60 mb-2">Password</label>
-              <input
-                id="register-password"
-                type="password"
-                required
-                minLength={6}
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder="Min. 6 characters"
-                className="w-full bg-[#111114] border border-white/[0.10] rounded-lg px-4 py-2.5
-                  text-white placeholder-white/20 text-sm outline-none
-                  focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30">
+                  <LockIcon className="w-4 h-4" />
+                </div>
+                <input
+                  id="register-password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="Min. 6 characters"
+                  className="w-full bg-white/[0.02] border border-white/[0.08] hover:border-white/[0.12] rounded-lg pl-10 pr-10 py-2.5
+                    text-white placeholder-white/20 text-sm outline-none focus:bg-white/[0.04]
+                    focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/35 hover:text-white/60 focus:outline-none"
+                >
+                  {showPassword ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <button
               id="register-submit"
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 mt-1
-                bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm
-                rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 py-2.5 mt-2
+                bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm rounded-lg
+                transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? <Spinner size="sm" /> : 'Create account'}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-white/35">
+          <p className="mt-6 text-center text-sm text-white/35 font-medium">
             Already have an account?{' '}
-            <Link to="/login" className="text-brand-400 hover:text-brand-300 font-medium transition-colors">
+            <Link to="/login" className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
               Sign in
             </Link>
           </p>

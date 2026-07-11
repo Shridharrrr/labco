@@ -88,8 +88,14 @@ const useBoardStore = create((set, get) => ({
         toCol.cards.splice(newOrder, 0, cardId);
       }
 
-      // Update card reference
-      if (s.cards[cardId]) s.cards[cardId].column = toColumnId;
+      // Update card reference and auto-assign status from column type
+      if (s.cards[cardId]) {
+        s.cards[cardId].column = toColumnId;
+        const statusMap = { initial: 'started', final: 'completed', none: 'none' };
+        if (toCol?.columnType) {
+          s.cards[cardId].status = statusMap[toCol.columnType] ?? 'none';
+        }
+      }
     })),
 
   // ── Drag state ────────────────────────────────────────────────────────────

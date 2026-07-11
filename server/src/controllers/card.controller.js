@@ -15,12 +15,17 @@ exports.createCard = async (req, res, next) => {
 
     const order = column.cards.length;
 
+    // Auto-assign status based on column type
+    const statusMap = { initial: 'started', final: 'completed', none: 'none' };
+    const status = statusMap[column.columnType] || 'none';
+
     const card = await Card.create({
       title,
       description,
       column: column._id,
       board: column.board,
       order,
+      status,
     });
 
     column.cards.push(card._id);
@@ -130,9 +135,14 @@ exports.moveCard = async (req, res, next) => {
     targetCol.cards.splice(newOrder, 0, card._id);
     await targetCol.save();
 
-    // Update card's column reference and order
+    // Auto-assign status based on target column type
+    const statusMap = { initial: 'started', final: 'completed', none: 'none' };
+    const newStatus = statusMap[targetCol.columnType] || 'none';
+
+    // Update card's column reference, order, and status
     card.column = toColumnId;
     card.order = newOrder;
+    card.status = newStatus;
     await card.save();
 
     // Re-sync order field for all cards in affected columns

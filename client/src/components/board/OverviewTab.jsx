@@ -10,6 +10,7 @@ export default function OverviewTab({ boardId }) {
 
   const [description, setDescription] = useState(board?.description || '');
   const [isEditingDesc, setIsEditingDesc] = useState(false);
+  const [editMode, setEditMode] = useState('write'); // 'write' | 'preview'
   const [activities, setActivities] = useState([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
 
@@ -47,12 +48,55 @@ export default function OverviewTab({ boardId }) {
     (c) => !c.isArchived && c.assignees?.some((a) => (a._id || a) === (user?._id || user?.userId))
   ).sort((a, b) => new Date(a.dueDate || '2099') - new Date(b.dueDate || '2099'));
 
-  // Compute progress (cards in 'Done' vs total)
-  const doneColumn = columns ? Object.values(columns).find(c => c.title?.toLowerCase().includes('done')) : null;
+  // Compute progress: cards in 'final' type column(s) vs total
+  const finalColumns = columns ? Object.values(columns).filter(c => c.columnType === 'final') : [];
+  const doneColumn = finalColumns.length > 0
+    ? finalColumns[0]
+    : (columns ? Object.values(columns).find(c => c.title?.toLowerCase().includes('done')) : null);
   const allActiveCards = cards ? Object.values(cards).filter(c => !c.isArchived) : [];
   const totalCardsCount = allActiveCards.length;
-  const doneCardsCount = doneColumn ? doneColumn.cards.length : 0;
+  const doneCardsCount = finalColumns.length > 0
+    ? finalColumns.reduce((sum, col) => sum + (col.cards?.length || 0), 0)
+    : (doneColumn ? doneColumn.cards.length : 0);
   const progressPercent = totalCardsCount === 0 ? 0 : Math.round((doneCardsCount / totalCardsCount) * 100);
+
+  const parseMarkdown = (text) => {
+    if (!text) return '';
+    let html = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+      
+    // Code blocks
+    html = html.replace(/```([\s\S]*?)```/g, '<pre class="bg-black/40 p-3 rounded-md my-3 overflow-x-auto font-mono text-xs"><code>$1</code></pre>');
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code class="bg-white/10 px-1.5 py-0.5 rounded text-brand-300 font-mono text-[11px]">$1</code>');
+    // Headings
+    html = html.replace(/^### (.*$)/gim, '<h3 class="text-sm font-bold mt-4 mb-2 text-white/90">$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2 class="text-base font-bold mt-5 mb-2 text-white border-b border-white/10 pb-1.5">$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1 class="text-lg font-bold mt-6 mb-3 text-white border-b border-white/10 pb-2">$1</h1>');
+    // Bold & Italic
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-white/90">$1</strong>');
+    html = html.replace(/\*([^*]+)\*/g, '<em class="italic">$1</em>');
+    html = html.replace(/_([^_]+)_/g, '<em class="italic">$1</em>');
+    // Links
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-brand-400 hover:underline">$1</a>');
+    // Unordered Lists
+    html = html.replace(/^\s*[-*+] (.*$)/gim, '<li class="ml-5 list-disc marker:text-white/30">$1</li>');
+    // Blockquotes
+    html = html.replace(/^\> (.*$)/gim, '<blockquote class="border-l-2 border-brand-500/50 pl-3 py-0.5 my-2 text-white/60 bg-brand-500/5 rounded-r">$1</blockquote>');
+    
+    // Wrap list items in ul
+    html = html.replace(/(<li class="ml-5 list-disc marker:text-white\/30">.*?<\/li>(?:\s*<br\s*\/?>|\n)*)+/g, match => `<ul class="my-2 space-y-1">${match}</ul>`);
+    
+    // Paragraphs / Line breaks
+    html = html.split(/\n\n+/).map(p => {
+      if (p.trim().startsWith('<h') || p.trim().startsWith('<pre') || p.trim().startsWith('<ul') || p.trim().startsWith('<blockquote')) return p;
+      return `<p class="mb-3">${p.replace(/\n/g, '<br/>')}</p>`;
+    }).join('');
+
+    return html;
+  };
 
   return (
     <div className="flex-1 overflow-y-auto p-6 flex justify-center">
@@ -72,16 +116,30 @@ export default function OverviewTab({ boardId }) {
                   Edit
                 </button>
               ) : (
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                  <div className="flex bg-black/40 rounded p-1 mr-2">
+                    <button
+                      onClick={() => setEditMode('write')}
+                      className={`px-3 py-1 rounded text-[11px] font-medium transition-colors ${editMode === 'write' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/80'}`}
+                    >
+                      Write
+                    </button>
+                    <button
+                      onClick={() => setEditMode('preview')}
+                      className={`px-3 py-1 rounded text-[11px] font-medium transition-colors ${editMode === 'preview' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/80'}`}
+                    >
+                      Preview
+                    </button>
+                  </div>
                   <button
-                    onClick={() => { setIsEditingDesc(false); setDescription(board.description || ''); }}
-                    className="px-2.5 py-1 rounded-md text-[11px] font-medium text-white/45 hover:text-white transition-colors"
+                    onClick={() => { setIsEditingDesc(false); setDescription(board.description || ''); setEditMode('write'); }}
+                    className="px-2.5 py-1.5 rounded-md text-[11px] font-medium text-white/45 hover:text-white transition-colors hover:bg-white/5"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSaveDescription}
-                    className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-600 hover:bg-brand-500 text-white transition-colors"
+                    className="px-3 py-1.5 rounded-md text-[11px] font-medium bg-brand-600 hover:bg-brand-500 text-white transition-colors shadow-sm"
                   >
                     Save
                   </button>
@@ -90,20 +148,24 @@ export default function OverviewTab({ boardId }) {
             </div>
 
             {isEditingDesc ? (
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Write a description, board goals, or helpful links here..."
-                className="w-full h-48 bg-[#09090b] border border-white/[0.10] rounded-lg p-3.5 text-sm text-white/85 placeholder-white/25 outline-none focus:border-brand-500/40 transition-colors resize-y"
-              />
+              editMode === 'write' ? (
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Write a description, board goals, or helpful links here... (Markdown supported)"
+                  className="w-full h-48 bg-black/20 border border-white/[0.08] rounded-lg p-4 text-sm text-white/85 placeholder-white/25 outline-none focus:border-brand-500/40 focus:bg-white/[0.02] transition-colors resize-y font-mono"
+                />
+              ) : (
+                <div 
+                  className="w-full min-h-[12rem] bg-[#09090b] border border-white/[0.04] rounded-lg p-4 text-sm text-white/70 leading-relaxed overflow-y-auto"
+                  dangerouslySetInnerHTML={{ __html: description ? parseMarkdown(description) : '<span class="italic opacity-50">Nothing to preview</span>' }}
+                />
+              )
             ) : (
-              <div className="min-h-[8rem] text-sm text-white/60 leading-relaxed whitespace-pre-wrap">
-                {board?.description ? (
-                  board.description
-                ) : (
-                  <span className="italic opacity-50">No description provided. Click Edit to add one.</span>
-                )}
-              </div>
+              <div 
+                className="min-h-[8rem] text-sm text-white/70 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: board?.description ? parseMarkdown(board.description) : '<span class="italic opacity-50">No description provided. Click Edit to add one.</span>' }}
+              />
             )}
           </section>
 
@@ -154,7 +216,7 @@ export default function OverviewTab({ boardId }) {
               <div className="bg-gradient-to-r from-brand-600 to-brand-400 h-2.5 rounded-full transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }} />
             </div>
             <p className="text-xs text-white/40 mt-3 relative z-10">
-              {doneCardsCount} of {totalCardsCount} cards in "{doneColumn?.title || 'Done'}"
+              {doneCardsCount} of {totalCardsCount} cards{doneColumn ? ` in "${doneColumn.title}"` : ''}
             </p>
           </section>
 
