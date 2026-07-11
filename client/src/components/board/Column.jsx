@@ -183,7 +183,7 @@ export default function Column({ column, boardId }) {
           {/* Quick add card */}
           <button
             onClick={(e) => { e.stopPropagation(); setAddingCard(column._id, true); }}
-            className="text-white/35 hover:text-white/80 p-1 rounded hover:bg-white/[0.06] transition-all cursor-pointer"
+            className="text-white/40 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg transition-all duration-200 cursor-pointer active:scale-95"
             title="Add card"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,10 +196,10 @@ export default function Column({ column, boardId }) {
             <button
               onClick={(e) => { e.stopPropagation(); setShowMenu(v => !v); }}
               title="Column settings"
-              className={`p-1 rounded transition-all cursor-pointer
+              className={`p-1.5 rounded-lg transition-all duration-200 cursor-pointer active:scale-95
                 ${showMenu
-                  ? 'bg-white/[0.08] text-white/80'
-                  : 'text-white/35 hover:text-white/80 hover:bg-white/[0.06]'}`}
+                  ? 'bg-white/[0.08] text-white'
+                  : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
             >
               <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                 <circle cx="5" cy="12" r="1.5" />

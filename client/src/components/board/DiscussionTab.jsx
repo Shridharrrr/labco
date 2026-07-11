@@ -147,10 +147,10 @@ export default function DiscussionTab({ boardId }) {
                     
                     {/* Hover Actions Menu */}
                     <div className="absolute right-5 -top-3 opacity-0 group-hover:opacity-100 transition-opacity bg-[#161619] border border-white/[0.10] rounded-md shadow-xl flex items-center px-0.5 z-10">
-                      <button onClick={() => handleReply(msg.user)} className="p-1.5 text-white/35 hover:text-white hover:bg-white/[0.06] rounded transition-colors" title="Reply">
+                      <button onClick={() => handleReply(msg.user)} className="p-1.5 text-white/35 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95" title="Reply">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
                       </button>
-                      <button onClick={() => navigator.clipboard.writeText(msg.text)} className="p-1.5 text-white/35 hover:text-white hover:bg-white/[0.06] rounded transition-colors" title="Copy text">
+                      <button onClick={() => navigator.clipboard.writeText(msg.text)} className="p-1.5 text-white/35 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95" title="Copy text">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                       </button>
                     </div>
@@ -201,7 +201,7 @@ export default function DiscussionTab({ boardId }) {
             />
 
             <div className="flex items-center justify-between px-2.5 pb-2 mt-0.5">
-              <button type="button" className="p-1 text-white/25 hover:text-white/70 transition-colors rounded hover:bg-white/[0.04]" title="Add attachment">
+              <button type="button" className="p-1.5 text-white/25 hover:text-white hover:bg-white/[0.06] transition-all duration-200 rounded-lg active:scale-95" title="Add attachment">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v16m8-8H4" /></svg>
               </button>
 

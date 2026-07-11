@@ -69,11 +69,12 @@ export default function Board({ boardId }) {
               <button
                 id="add-column-btn"
                 onClick={() => setAddingColumn(true)}
-                className="shrink-0 w-64 flex items-center gap-2 px-3.5 py-2.5
-                  border border-dashed border-white/[0.08] hover:border-white/[0.16]
-                  text-white/25 hover:text-white/55 rounded-lg transition-all text-xs font-medium group"
+                className="shrink-0 w-64 flex items-center gap-2.5 px-4 py-3
+                  border border-dashed border-white/[0.08] hover:border-white/[0.15]
+                  text-white/40 hover:text-white rounded-xl transition-all duration-200 text-xs font-semibold group
+                  hover:bg-white/[0.06] active:scale-[0.98]"
               >
-                <svg className="w-3.5 h-3.5 text-white/15 group-hover:text-white/45 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                <svg className="w-3.5 h-3.5 text-white/20 group-hover:text-white/80 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                 Add column
               </button>
             )}

@@ -1,4 +1,5 @@
 const Board = require('../models/Board');
+const User = require('../models/User');
 const { addUser, removeUser, getOnlineUsers } = require('../services/presence.service');
 
 // Assign a consistent color to each user for cursor display
@@ -21,9 +22,13 @@ const presenceHandlers = (io, socket) => {
       socket.join(boardId);
       socket.currentBoardId = boardId;
 
+      const userDoc = await User.findById(userId).select('name avatar');
+
       const userInfo = {
         userId,
         email,
+        name: userDoc?.name,
+        avatar: userDoc?.avatar,
         color: userColor(userId),
       };
 

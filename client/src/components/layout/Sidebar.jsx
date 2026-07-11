@@ -114,7 +114,7 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
         {!collapsed && (
           <button
             onClick={() => setCollapsed(true)}
-            className="ml-auto text-white/25 hover:text-white/60 transition-colors"
+            className="ml-auto text-white/40 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg active:scale-95 transition-all duration-200"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
           </button>
@@ -122,7 +122,7 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
         {collapsed && (
           <button
             onClick={() => setCollapsed(false)}
-            className="text-white/25 hover:text-white/60 transition-colors mx-auto"
+            className="text-white/40 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg active:scale-95 transition-all duration-200 mx-auto"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
           </button>
@@ -187,23 +187,34 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
 
           {/* New board inline form */}
           {!collapsed && showNewBoard && (
-            <form onSubmit={handleCreate} className="mt-1 px-1">
-              <input
-                autoFocus
-                type="text"
-                value={newTitle}
-                onChange={e => setNewTitle(e.target.value)}
-                onKeyDown={e => e.key === 'Escape' && setShowNewBoard(false)}
-                placeholder="Board name..."
-                className="w-full bg-white/[0.04] border border-white/[0.10] rounded-md px-2.5 py-1.5 text-xs text-white placeholder-white/25 outline-none focus:border-brand-500/50 transition-all"
-              />
-              <div className="flex gap-1.5 mt-1.5">
+            <form 
+              onSubmit={handleCreate} 
+              className="mt-2 mx-1 p-2 bg-[#161619] border border-white/[0.08] rounded-lg shadow-xl relative overflow-hidden group"
+              style={{ animation: 'slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)' }}
+            >
+              {/* Subtle hover glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+              
+              <div className="relative z-10 flex items-center gap-1.5 bg-black/20 border border-white/[0.06] rounded-md px-2 py-1.5 mb-2 focus-within:border-brand-500/40 transition-colors">
+                <svg className="w-3 h-3 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                <input
+                  autoFocus
+                  type="text"
+                  value={newTitle}
+                  onChange={e => setNewTitle(e.target.value)}
+                  onKeyDown={e => e.key === 'Escape' && setShowNewBoard(false)}
+                  placeholder="Board name..."
+                  className="w-full bg-transparent border-none p-0 text-xs text-white placeholder-white/30 outline-none ring-0"
+                />
+              </div>
+              
+              <div className="relative z-10 flex gap-1.5">
                 <button type="submit" disabled={creating || !newTitle.trim()}
-                  className="flex-1 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-[11px] rounded-md disabled:opacity-50 transition-colors font-medium">
+                  className="flex-1 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-[11px] rounded-md disabled:opacity-50 transition-colors font-medium shadow-[0_2px_10px_rgba(99,102,241,0.2)]">
                   Create
                 </button>
                 <button type="button" onClick={() => setShowNewBoard(false)}
-                  className="flex-1 py-1.5 bg-white/[0.04] hover:bg-white/[0.08] text-white/40 text-[11px] rounded-md transition-colors">
+                  className="flex-1 py-1.5 text-white/40 hover:text-white hover:bg-white/[0.06] text-[11px] rounded-lg transition-all duration-200">
                   Cancel
                 </button>
               </div>
@@ -217,8 +228,9 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
         {/* + New Board */}
         <button
           onClick={() => { if (collapsed) { setCollapsed(false); setTimeout(() => setShowNewBoard(true), 300); } else setShowNewBoard(v => !v); }}
-          className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-xs font-medium
-            bg-brand-600/10 hover:bg-brand-600/20 text-brand-400 hover:text-brand-300 transition-all
+          className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs font-semibold
+            text-white/40 hover:text-white border border-dashed border-white/[0.08] hover:border-white/[0.15] bg-transparent transition-all duration-200
+            hover:bg-white/[0.06] active:scale-[0.97]
             ${collapsed ? 'justify-center' : ''}`}
         >
           {ICONS.plus}
@@ -226,9 +238,13 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
         </button>
 
         {/* User profile + logout */}
-        <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-white/[0.04] transition-colors group ${collapsed ? 'justify-center' : ''}`}>
-          <div className="w-6 h-6 rounded-md bg-brand-600/20 text-brand-400 flex items-center justify-center font-bold text-[10px] uppercase shrink-0">
-            {user?.name?.[0] || user?.email?.[0]}
+        <div className={`flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/[0.06] transition-all duration-200 group ${collapsed ? 'justify-center' : ''}`}>
+          <div className="w-6 h-6 rounded-md bg-brand-600/20 text-brand-400 flex items-center justify-center font-bold text-[10px] uppercase shrink-0 overflow-hidden">
+            {user?.avatar ? (
+              <img src={user.avatar} alt="User Avatar" className="w-full h-full object-cover" />
+            ) : (
+              user?.name?.[0] || user?.email?.[0]
+            )}
           </div>
           {!collapsed && (
             <>
@@ -236,7 +252,7 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
                 <p className="text-[11px] font-medium text-white/75 truncate">{user?.name || 'User'}</p>
                 <p className="text-[9px] text-white/25 truncate">{user?.email}</p>
               </div>
-              <button onClick={handleLogout} className="text-white/15 hover:text-white/60 opacity-0 group-hover:opacity-100 transition-all" title="Sign out">
+              <button onClick={handleLogout} className="text-white/40 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all duration-200 p-1.5 rounded-lg active:scale-95" title="Sign out">
                 {ICONS.logout}
               </button>
             </>
@@ -252,8 +268,8 @@ function BoardItem({ board, color, active, isFav, onFav, collapsed }) {
     <Link
       to={`/boards/${board._id}`}
       title={board.title}
-      className={`group relative flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition-all
-        ${active ? 'bg-white/[0.08] text-white' : 'text-white/45 hover:text-white/80 hover:bg-white/[0.04]'}
+      className={`group relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-200
+        ${active ? 'bg-white/[0.08] text-white shadow-sm' : 'text-white/45 hover:text-white/80 hover:bg-white/[0.06]'}
         ${collapsed ? 'justify-center' : ''}`}
     >
       <span className="w-1.5 h-1.5 rounded-sm shrink-0" style={{ background: color }} />

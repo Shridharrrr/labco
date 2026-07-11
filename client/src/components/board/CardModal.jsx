@@ -107,7 +107,7 @@ export default function CardModal({ boardId }) {
               </svg>
               {totalCount > 0 ? `${checkedCount}/${totalCount}` : 'Checklist'}
             </button>
-            <button onClick={closeCard} className="text-white/25 hover:text-white/60 p-1 rounded hover:bg-white/[0.04] transition-colors">
+            <button onClick={closeCard} className="text-white/25 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg transition-all duration-200 active:scale-95">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -193,7 +193,7 @@ export default function CardModal({ boardId }) {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[11px] text-white/20 font-medium uppercase tracking-wider">Description</span>
                   {!editingDesc && (
-                    <button onClick={() => setEditingDesc(true)} className="text-[10px] text-white/20 hover:text-white/50 transition-colors">
+                    <button onClick={() => setEditingDesc(true)} className="px-2 py-1 text-[10px] text-white/40 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95">
                       {description ? 'Edit' : 'Add'}
                     </button>
                   )}
@@ -210,7 +210,7 @@ export default function CardModal({ boardId }) {
                     />
                     <div className="flex gap-2 mt-2">
                       <button onClick={saveDescription} className="px-3 py-1 bg-brand-600 hover:bg-brand-500 text-white text-[11px] font-medium rounded transition-colors">Save</button>
-                      <button onClick={() => { setEditingDesc(false); setDescription(detail?.description || ''); }} className="px-3 py-1 text-white/30 hover:text-white/60 text-[11px] rounded hover:bg-white/[0.04] transition-colors">Cancel</button>
+                      <button onClick={() => { setEditingDesc(false); setDescription(detail?.description || ''); }} className="px-3 py-1.5 text-white/40 hover:text-white hover:bg-white/[0.06] text-[11px] rounded-lg transition-all duration-200">Cancel</button>
                     </div>
                   </div>
                 ) : (

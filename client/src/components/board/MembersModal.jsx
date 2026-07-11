@@ -56,7 +56,7 @@ export default function MembersModal({ boardId, onClose }) {
       <div className="w-full max-w-md bg-[#111114] border border-white/[0.10] rounded-lg p-5 shadow-2xl shadow-black/60 relative animate-[modalIn_0.15s_ease-out]">
         <button
           onClick={onClose}
-          className="absolute top-3.5 right-3.5 text-white/30 hover:text-white/70 transition-colors p-1 rounded hover:bg-white/[0.06]"
+          className="absolute top-3.5 right-3.5 text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 p-1.5 rounded-lg active:scale-95"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
@@ -86,7 +86,7 @@ export default function MembersModal({ boardId, onClose }) {
               <button
                 type="submit"
                 disabled={loading || !email}
-                className="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-medium rounded-md disabled:opacity-50 transition-colors"
+                className="px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-lg disabled:opacity-50 transition-all duration-200 hover:shadow-[0_0_12px_rgba(99,102,241,0.25)] active:scale-[0.96]"
               >
                 Invite
               </button>
@@ -124,7 +124,7 @@ export default function MembersModal({ boardId, onClose }) {
                 {isOwner && m.role !== 'owner' && (
                   <button
                     onClick={() => handleRemove(m.user._id)}
-                    className="text-white/15 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all p-1 rounded hover:bg-white/[0.04]"
+                    className="text-white/15 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all duration-200 p-1.5 rounded-lg active:scale-[0.92]"
                     title="Remove member"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>

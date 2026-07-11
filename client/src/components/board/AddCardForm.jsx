@@ -37,15 +37,16 @@ export default function AddCardForm({ onAdd, onCancel }) {
         <button
           type="submit"
           disabled={!title.trim() || loading}
-          className="px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs
-            font-medium rounded-md transition-colors disabled:opacity-50"
+          className="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs
+            font-semibold rounded-lg transition-all duration-200 disabled:opacity-50
+            hover:shadow-[0_0_12px_rgba(99,102,241,0.25)] active:scale-[0.96]"
         >
           Add card
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-2.5 py-1.5 text-white/40 hover:text-white text-xs transition-colors"
+          className="px-2.5 py-1.5 text-white/40 hover:text-white hover:bg-white/[0.06] text-xs transition-all duration-200 rounded-lg"
         >
           Cancel
         </button>

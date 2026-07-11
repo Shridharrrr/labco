@@ -29,9 +29,9 @@ export default function FilesTab() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 flex justify-center">
-      <div className="max-w-5xl w-full">
-        <div className="flex items-center justify-between mb-8">
+    <div className="flex-1 overflow-y-auto p-5">
+      <div className="w-full px-5 py-2">
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-xl font-bold text-white tracking-tight">Board Files</h1>
             <p className="text-xs text-white/40 mt-1">
@@ -51,7 +51,7 @@ export default function FilesTab() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {allFiles.map((file, i) => (
               <div key={i} className="group flex flex-col bg-white/[0.02] border border-white/[0.06] rounded-lg overflow-hidden hover:bg-white/[0.04] transition-all hover:border-white/[0.12]">
-                
+
                 {/* Preview Thumbnail */}
                 <a href={file.url} target="_blank" rel="noopener noreferrer" className="aspect-square bg-black/20 flex items-center justify-center relative overflow-hidden group-hover:bg-black/40 transition-colors">
                   {isImage(file.url) ? (
@@ -74,7 +74,7 @@ export default function FilesTab() {
                   </p>
                   <div className="flex items-center justify-between text-[9px] text-white/40">
                     <span>{new Date(file.uploadedAt).toLocaleDateString()}</span>
-                    <button 
+                    <button
                       onClick={() => openCard(file.cardId)}
                       className="hover:text-brand-400 transition-colors truncate max-w-[50%]"
                       title={`Go to card: ${file.cardTitle}`}

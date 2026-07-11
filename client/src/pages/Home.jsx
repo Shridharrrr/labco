@@ -45,7 +45,7 @@ export default function Home() {
       setNewTitle('');
       setShowCreate(false);
       navigate(`/boards/${data._id}`);
-    } catch {}
+    } catch { }
     finally { setCreating(false); }
   };
 
@@ -62,7 +62,8 @@ export default function Home() {
             id="create-board-btn"
             onClick={() => setShowCreate(true)}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-500
-              text-white text-xs font-medium rounded-md transition-colors"
+              text-white text-xs font-semibold rounded-lg transition-all duration-200
+              hover:shadow-[0_0_20px_rgba(99,102,241,0.3)] active:scale-[0.96]"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
             New board
@@ -73,30 +74,40 @@ export default function Home() {
       <div className="px-8 py-6">
         {/* Create board inline form */}
         {showCreate && (
-          <form onSubmit={handleCreate} className="mb-5 flex gap-3 items-center p-3.5 bg-white/[0.02] border border-white/[0.08] rounded-lg">
-            <input
-              autoFocus
-              type="text"
-              value={newTitle}
-              onChange={e => setNewTitle(e.target.value)}
-              onKeyDown={e => e.key === 'Escape' && setShowCreate(false)}
-              placeholder="Board name..."
-              className="flex-1 bg-[#111114] border border-white/[0.10] rounded-md px-3.5 py-2 text-sm
-                text-white placeholder-white/25 outline-none focus:border-brand-500/60 transition-all"
-            />
-            <button
-              type="submit"
-              disabled={creating || !newTitle.trim()}
-              className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white text-sm
-                font-medium rounded-md transition-colors disabled:opacity-50 flex items-center gap-2"
-            >
-              {creating ? <Spinner size="sm" /> : null}
-              Create
-            </button>
-            <button type="button" onClick={() => setShowCreate(false)}
-              className="px-3 py-2 text-white/35 hover:text-white text-sm transition-colors rounded-md hover:bg-white/[0.04]">
-              Cancel
-            </button>
+          <form
+            onSubmit={handleCreate}
+            className="mb-8 flex flex-col sm:flex-row gap-3 items-center p-2 pl-4 bg-[#161619] border border-white/[0.12] shadow-2xl shadow-brand-500/5 rounded-xl relative overflow-hidden transition-all group hover:border-brand-500/30"
+            style={{ animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
+          >
+            {/* Subtle glow */}
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            <div className="flex-1 w-full relative z-10 flex items-center gap-3">
+              <input
+                autoFocus
+                type="text"
+                value={newTitle}
+                onChange={e => setNewTitle(e.target.value)}
+                onKeyDown={e => e.key === 'Escape' && setShowCreate(false)}
+                placeholder="Give your board a title..."
+                className="w-full bg-transparent border-none px-0 py-2 text-[15px] font-medium
+                  text-white placeholder-white/30 outline-none ring-0 focus:ring-0"
+              />
+            </div>
+            <div className="flex items-center gap-2 shrink-0 z-10 w-full sm:w-auto">
+              <button type="button" onClick={() => setShowCreate(false)}
+                className="flex-1 sm:flex-none px-4 py-2 text-white/40 hover:text-white hover:bg-white/[0.06] text-sm font-medium transition-all duration-200 rounded-lg">
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={creating || !newTitle.trim()}
+                className="flex-1 sm:flex-none px-5 py-2 bg-brand-600 hover:bg-brand-500 shadow-[0_0_15px_rgba(99,102,241,0.25)] text-white text-sm
+                  font-semibold rounded-lg transition-all disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2 active:scale-[0.98]"
+              >
+                {creating ? <Spinner size="sm" /> : 'Create Board'}
+              </button>
+            </div>
           </form>
         )}
 
@@ -115,20 +126,20 @@ export default function Home() {
               <Link
                 key={board._id}
                 to={`/boards/${board._id}`}
-                className={`group relative h-36 rounded-lg bg-gradient-to-br ${BG_GRADIENTS[i % BG_GRADIENTS.length]}
-                  p-4 flex flex-col justify-end overflow-hidden hover:scale-[1.02] active:scale-[0.99]
-                  transition-transform shadow-md cursor-pointer`}
+                className={`group relative h-36 rounded-xl bg-gradient-to-br ${BG_GRADIENTS[i % BG_GRADIENTS.length]}
+                  p-4 flex flex-col justify-end overflow-hidden hover:scale-[1.03] active:scale-[0.98]
+                  transition-all duration-200 shadow-md hover:shadow-xl hover:shadow-black/40 cursor-pointer`}
               >
-                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/15 transition-colors" />
+                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors duration-200" />
                 {/* Decorative geometric shapes */}
-                <div className="absolute -top-6 -right-6 w-20 h-20 rounded-lg bg-white/[0.07] rotate-12" />
-                <div className="absolute top-2 -right-2 w-10 h-10 rounded-lg bg-white/[0.05] rotate-12" />
+                <div className="absolute -top-6 -right-6 w-20 h-20 rounded-lg bg-white/[0.07] rotate-12 group-hover:rotate-[18deg] transition-transform duration-300" />
+                <div className="absolute top-2 -right-2 w-10 h-10 rounded-lg bg-white/[0.05] rotate-12 group-hover:rotate-[20deg] transition-transform duration-300" />
                 <div className="relative">
                   <h2 className="font-semibold text-white text-sm leading-snug truncate">{board.title}</h2>
                   {board.description && (
                     <p className="text-white/50 text-[11px] mt-0.5 truncate">{board.description}</p>
                   )}
-                  <p className="text-white/35 text-[11px] mt-1.5 font-medium">
+                  <p className="text-white/35 group-hover:text-white/50 text-[11px] mt-1.5 font-medium transition-colors">
                     {board.members?.length} member{board.members?.length !== 1 ? 's' : ''}
                   </p>
                 </div>
@@ -138,13 +149,14 @@ export default function Home() {
             {/* Create new board card */}
             <button
               onClick={() => setShowCreate(true)}
-              className="group h-36 rounded-lg border border-dashed border-white/[0.08] hover:border-brand-500/30
-                flex flex-col items-center justify-center gap-2 transition-all hover:bg-brand-500/[0.04] cursor-pointer"
+              className="group h-36 rounded-xl border border-dashed border-white/[0.08] hover:border-white/[0.15]
+                flex flex-col items-center justify-center gap-2.5 transition-all duration-200
+                hover:bg-white/[0.06] cursor-pointer active:scale-[0.98]"
             >
-              <div className="w-9 h-9 rounded-lg bg-white/[0.04] group-hover:bg-brand-500/10 flex items-center justify-center transition-colors border border-white/[0.06]">
-                <svg className="w-4 h-4 text-white/25 group-hover:text-brand-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+              <div className="w-10 h-10 rounded-lg bg-white/[0.04] group-hover:bg-white/[0.06] flex items-center justify-center transition-all duration-200 border border-white/[0.06] group-hover:border-white/[0.12] group-hover:scale-110">
+                <svg className="w-4 h-4 text-white/25 group-hover:text-white/80 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
               </div>
-              <span className="text-xs text-white/25 group-hover:text-white/50 transition-colors font-medium">New board</span>
+              <span className="text-xs text-white/25 group-hover:text-white/70 transition-colors duration-200 font-medium">New board</span>
             </button>
           </div>
         )}

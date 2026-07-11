@@ -54,7 +54,7 @@ export default function ActivityDrawer({ boardId, onClose }) {
         <h3 className="text-[12px] font-semibold text-white">Activity Log</h3>
         <button
           onClick={onClose}
-          className="text-white/25 hover:text-white/70 transition-colors p-1 rounded hover:bg-white/[0.06]"
+          className="text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 p-1.5 rounded-lg active:scale-95"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
@@ -94,7 +94,7 @@ export default function ActivityDrawer({ boardId, onClose }) {
           <button
             onClick={() => load(page + 1)}
             disabled={loading}
-            className="w-full py-2 text-xs text-brand-400 hover:text-brand-300 transition-colors"
+            className="w-full py-2.5 text-xs font-medium text-brand-400 hover:text-brand-300 hover:bg-brand-500/10 rounded-lg transition-all duration-200 active:scale-[0.98]"
           >
             {loading ? 'Loading…' : 'Load more'}
           </button>

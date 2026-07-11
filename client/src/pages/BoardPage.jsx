@@ -119,10 +119,10 @@ export default function BoardPage() {
             <button
               onClick={handleToggleStar}
               title={isStarred ? "Remove from favorites" : "Add to favorites"}
-              className={`shrink-0 ml-1 p-1.5 rounded-md transition-colors ${
+              className={`shrink-0 ml-1 p-1.5 rounded-lg transition-all duration-200 ${
                 isStarred 
                   ? 'text-yellow-400 hover:bg-yellow-400/10' 
-                  : 'text-white/25 hover:text-white/60 hover:bg-white/[0.04]'
+                  : 'text-white/40 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
               <svg className={`w-3.5 h-3.5 ${isStarred ? 'fill-current' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
@@ -131,7 +131,7 @@ export default function BoardPage() {
             </button>
             <button
               onClick={() => setIsMembersOpen(true)}
-              className="shrink-0 ml-1 flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium bg-white/[0.04] hover:bg-white/[0.08] text-white/40 hover:text-white/80 transition-all border border-white/[0.06]"
+              className="shrink-0 ml-1 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-[0.96]"
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -149,14 +149,14 @@ export default function BoardPage() {
                 <button
                   onClick={() => setViewMode('kanban')}
                   title="Kanban view"
-                  className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-all ${viewMode === 'kanban' ? 'bg-white/[0.08] text-white' : 'text-white/35 hover:text-white/60'}`}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all duration-200 ${viewMode === 'kanban' ? 'bg-white/[0.10] text-white shadow-sm' : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
                 >
                   <KanbanIcon /> Board
                 </button>
                 <button
                   onClick={() => setViewMode('table')}
                   title="Table view"
-                  className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-all ${viewMode === 'table' ? 'bg-white/[0.08] text-white' : 'text-white/35 hover:text-white/60'}`}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all duration-200 ${viewMode === 'table' ? 'bg-white/[0.10] text-white shadow-sm' : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
                 >
                   <TableIcon /> Table
                 </button>
@@ -167,10 +167,10 @@ export default function BoardPage() {
             {activeTab === 'tasks' && (
               <button
                 onClick={() => setShowFilters(v => !v)}
-                className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-md transition-all
+                className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-all duration-200
                   ${showFilters || filterActive
-                    ? 'bg-brand-600/15 text-brand-400 border border-brand-500/25'
-                    : 'bg-white/[0.03] text-white/40 hover:text-white/70 hover:bg-white/[0.06] border border-white/[0.06]'}`}
+                    ? 'bg-brand-600/15 text-brand-400 border border-brand-500/25 shadow-[0_0_10px_rgba(99,102,241,0.1)]'
+                    : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -182,10 +182,10 @@ export default function BoardPage() {
             {/* Activity */}
             <button
               onClick={toggleActivity}
-              className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-md transition-all
+              className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-all duration-200
                 ${isActivityOpen
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-white/[0.03] text-white/40 hover:text-white/70 hover:bg-white/[0.06] border border-white/[0.06]'}`}
+                  ? 'bg-brand-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.25)]'
+                  : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -196,10 +196,10 @@ export default function BoardPage() {
             {/* Chat / Members Panel */}
             <button
               onClick={toggleRightPanel}
-              className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-md transition-all
+              className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-all duration-200
                 ${isRightPanelOpen
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-white/[0.03] text-white/40 hover:text-white/70 hover:bg-white/[0.06] border border-white/[0.06]'}`}
+                  ? 'bg-brand-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.25)]'
+                  : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -218,10 +218,10 @@ export default function BoardPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(key)}
-                className={`px-3 py-2 text-[12px] font-medium border-b-2 transition-all -mb-px ${
+                className={`px-3.5 py-2 text-[12px] font-medium border-b-2 transition-all duration-200 -mb-px ${
                   isActive
                     ? 'text-white border-brand-500'
-                    : 'text-white/30 border-transparent hover:text-white/55 hover:border-white/10'
+                    : 'text-white/30 border-transparent hover:text-white/65 hover:border-white/15'
                 }`}
               >
                 {tab}

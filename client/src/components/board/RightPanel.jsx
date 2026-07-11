@@ -84,7 +84,7 @@ export default function RightPanel({ boardId, onClose }) {
             Members
           </button>
         </div>
-        <button onClick={onClose} className="pb-2.5 text-white/25 hover:text-white/70 transition-colors">
+        <button onClick={onClose} className="mb-2.5 p-1 rounded-md text-white/25 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-95">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
