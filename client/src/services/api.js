@@ -31,6 +31,11 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
+    // Skip token refresh logic for login/register/refresh endpoints themselves
+    if (original.url.includes('/auth/login') || original.url.includes('/auth/register') || original.url.includes('/auth/refresh') || original.url.includes('/auth/verify-email') || original.url.includes('/auth/google')) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !original._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {

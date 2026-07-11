@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import * as authService from '../../services/authService';
 import useAuthStore from '../../store/authSlice';
 import Spinner from '../ui/Spinner';
@@ -76,6 +77,7 @@ export default function RegisterForm() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -83,11 +85,25 @@ export default function RegisterForm() {
     setError('');
     setLoading(true);
     try {
-      const { data } = await authService.register(form);
+      // Registration only triggers email, don't login immediately
+      setSuccessMsg(data.message || 'Registration successful! Please check your email to verify your account.');
+      setForm({ name: '', email: '', password: '' });
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setLoading(true);
+      setError('');
+      const { data } = await authService.googleAuth(credentialResponse.credential);
       setAuth({ user: data.user, accessToken: data.accessToken });
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || 'Google signup failed');
     } finally {
       setLoading(false);
     }
@@ -191,6 +207,34 @@ export default function RegisterForm() {
               {error}
             </div>
           )}
+
+          {successMsg && (
+            <div className="mb-5 px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-sm flex items-center gap-2">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+              {successMsg}
+            </div>
+          )}
+
+          <div className="mb-6 flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google Login Failed')}
+              theme="filled_black"
+              shape="rectangular"
+              text="signup_with"
+            />
+          </div>
+
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/[0.08]"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-[#09090b] px-2 text-white/40">Or register with email</span>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import * as authService from '../../services/authService';
 import useAuthStore from '../../store/authSlice';
 import Spinner from '../ui/Spinner';
@@ -76,6 +77,20 @@ export default function LoginForm() {
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setLoading(true);
+      setError('');
+      const { data } = await authService.googleAuth(credentialResponse.credential);
+      setAuth({ user: data.user, accessToken: data.accessToken });
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Google Login failed');
     } finally {
       setLoading(false);
     }
@@ -179,6 +194,25 @@ export default function LoginForm() {
               {error}
             </div>
           )}
+
+          <div className="mb-6 flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google Login Failed')}
+              theme="filled_black"
+              shape="rectangular"
+              text="signin_with"
+            />
+          </div>
+
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/[0.08]"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-[#09090b] px-2 text-white/40">Or continue with email</span>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
