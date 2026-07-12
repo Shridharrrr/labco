@@ -15,6 +15,10 @@ api.interceptors.request.use((config) => {
       config.headers.Authorization = `Bearer ${state.accessToken}`;
     }
   }
+  // Let FormData set its own Content-Type (preserves multipart boundary)
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
   return config;
 });
 

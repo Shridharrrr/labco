@@ -6,6 +6,7 @@ import api from '../../services/api';
 import Avatar from '../ui/Avatar';
 import Spinner from '../ui/Spinner';
 import { getSocket } from '../../hooks/useSocket';
+import { isImage, FileTypeIcon, formatBytes, fileColor } from '../../utils/fileHelpers';
 
 export default function RightPanel({ boardId, onClose }) {
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'members'
@@ -13,8 +14,15 @@ export default function RightPanel({ boardId, onClose }) {
   const { user } = useAuthStore();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Chat state
   const [text, setText] = useState('');
+  const [stagedFiles, setStagedFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+  
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Load initial messages
   useEffect(() => {
@@ -31,7 +39,7 @@ export default function RightPanel({ boardId, onClose }) {
     const socket = getSocket();
     if (!socket) return;
     const handleMessage = ({ message }) => {
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => prev.find(m => m._id === message._id) ? prev : [...prev, message]);
     };
     socket.on('chat:message', handleMessage);
     return () => socket.off('chat:message', handleMessage);
@@ -40,25 +48,79 @@ export default function RightPanel({ boardId, onClose }) {
   // Scroll to bottom on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, stagedFiles]);
+
+  const stageFiles = (incoming) => {
+    const newFiles = Array.from(incoming).map(file => ({
+      file,
+      preview: isImage(file.name) ? URL.createObjectURL(file) : null,
+    }));
+    setStagedFiles(prev => [...prev, ...newFiles]);
+    setError('');
+  };
+
+  const removeStaged = (idx) => {
+    setStagedFiles(prev => {
+      const copy = [...prev];
+      if (copy[idx].preview) URL.revokeObjectURL(copy[idx].preview);
+      copy.splice(idx, 1);
+      return copy;
+    });
+  };
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim() && stagedFiles.length === 0) return;
+    
     const tempText = text;
+    const tempFiles = stagedFiles;
+    
     setText('');
+    setStagedFiles([]);
+    setError('');
+    setUploading(true);
+    
     try {
-      const { data } = await api.post(`/boards/${boardId}/messages`, { text: tempText });
+      const formData = new FormData();
+      if (tempText.trim()) formData.append('text', tempText);
+      tempFiles.forEach(({ file }) => formData.append('files', file));
+
+      const { data } = await api.post(`/boards/${boardId}/messages`, formData);
       setMessages((prev) => [...prev, data]);
       getSocket()?.emit('chat:message', { boardId, message: data });
-    } catch {
+    } catch (err) {
       setText(tempText); // restore on fail
+      setStagedFiles(tempFiles);
+      setError(err?.response?.data?.message || 'Failed to send');
+    } finally {
+      setUploading(false);
     }
   };
 
   const timeAgo = (date) => {
     const d = new Date(date);
     return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  };
+
+  // Unique color generator for names
+  const nameColor = (name) => {
+    if (!name) return '#a1a1aa';
+    return `hsl(${(name.charCodeAt(0) * 5) % 360}, 65%, 65%)`;
+  };
+
+  // Markdown rendering
+  const renderMarkdown = (msgText) => {
+    if (!msgText) return null;
+    let html = msgText
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    html = html
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g,     '<em>$1</em>')
+      .replace(/`([^`]+)`/g,    '<code class="bg-white/10 text-brand-300 px-1 py-0.5 rounded text-[11px] font-mono">$1</code>')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-brand-400 hover:underline">$1</a>')
+      .replace(/(?<!href=")(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-brand-400 hover:underline">$1</a>')
+      .replace(/\n/g, '<br />');
+    return <span dangerouslySetInnerHTML={{ __html: html }} />;
   };
 
   return (
@@ -93,7 +155,7 @@ export default function RightPanel({ boardId, onClose }) {
       <div className="flex-1 overflow-hidden flex flex-col relative">
         {activeTab === 'chat' ? (
           <>
-            <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5">
+            <div className="flex-1 overflow-y-auto p-3.5 space-y-4">
               {loading ? (
                 <div className="flex justify-center py-10"><Spinner /></div>
               ) : messages.length === 0 ? (
@@ -101,54 +163,114 @@ export default function RightPanel({ boardId, onClose }) {
               ) : (
                 messages.map((msg, i) => {
                   const isMe = msg.user._id === user.userId;
-                  const showAvatar = i === 0 || messages[i-1].user._id !== msg.user._id;
+                  const prevMsg = messages[i-1];
+                  const isGrouped = prevMsg && prevMsg.user._id === msg.user._id && (new Date(msg.createdAt) - new Date(prevMsg.createdAt)) < 5 * 60000;
+                  const uName = msg.user.name || msg.user.email?.split('@')[0];
 
                   return (
-                    <div key={msg._id} className={`flex gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>
-                      {showAvatar ? (
-                        <div className="shrink-0 pt-1">
-                          <Avatar name={msg.user.name || msg.user.email} src={msg.user.avatar} size="sm" />
-                        </div>
-                      ) : (
-                        <div className="w-7 shrink-0" />
-                      )}
-                      <div className={`flex flex-col max-w-[75%] ${isMe ? 'items-end' : 'items-start'}`}>
-                        {showAvatar && (
-                          <span className="text-[9px] text-white/25 mb-0.5 px-1">
-                            {isMe ? 'You' : (msg.user.name || msg.user.email?.split('@')[0])}
+                    <div key={msg._id} className={`flex flex-col ${isGrouped ? 'mt-0' : 'mt-4'}`}>
+                      {!isGrouped && (
+                        <div className="flex items-baseline gap-2 mb-1 pl-1">
+                          <span className="text-[11px] font-semibold" style={{ color: nameColor(uName) }}>
+                            {uName}
                           </span>
-                        )}
-                        <div className={`px-3 py-1.5 rounded-lg text-[12px] leading-relaxed ${
-                          isMe ? 'bg-brand-600 text-white' : 'bg-white/[0.05] text-white/85'
-                        }`}>
-                          {msg.text}
+                          <span className="text-[9px] text-white/25">{timeAgo(msg.createdAt)}</span>
                         </div>
-                        <span className="text-[8px] text-white/15 mt-0.5 px-1">{timeAgo(msg.createdAt)}</span>
-                      </div>
+                      )}
+                      
+                      {msg.text && (
+                        <div className="px-1 text-[12px] leading-relaxed text-white/85 break-words">
+                          {renderMarkdown(msg.text)}
+                        </div>
+                      )}
+
+                      {/* Attachments */}
+                      {msg.attachments?.length > 0 && (
+                        <div className="flex flex-col gap-1.5 mt-1.5 px-1">
+                          {msg.attachments.map((att, idx) => (
+                            isImage(att.filename) ? (
+                              <a key={idx} href={att.url} target="_blank" rel="noopener noreferrer" className="block max-w-[90%] rounded-lg overflow-hidden border border-white/[0.08] hover:border-white/20 transition-all">
+                                <img src={att.url} alt={att.filename} className="object-cover w-full max-h-[160px]" />
+                              </a>
+                            ) : (
+                              <a key={idx} href={att.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 max-w-[90%] bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/[0.15] rounded-lg px-2 py-2 transition-all">
+                                <FileTypeIcon name={att.filename} className="w-6 h-6 shrink-0" />
+                                <div className="min-w-0">
+                                  <p className="text-[10px] font-medium text-white/80 truncate">{att.filename}</p>
+                                </div>
+                              </a>
+                            )
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })
               )}
-              <div ref={messagesEndRef} />
+              <div ref={messagesEndRef} className="h-2" />
             </div>
 
             {/* Chat Input */}
             <form onSubmit={handleSend} className="p-3 border-t border-white/[0.06] bg-[#0c0c0f] shrink-0">
-              <div className="relative flex items-center">
-                <input
-                  type="text"
+              {error && <div className="text-[10px] text-rose-400 mb-2 px-1">{error}</div>}
+              
+              {/* Staged files */}
+              {stagedFiles.length > 0 && (
+                <div className="flex flex-col gap-1.5 mb-2.5 px-1">
+                  {stagedFiles.map(({ file, preview }, i) => (
+                    <div key={i} className="flex items-center justify-between bg-white/[0.04] border border-white/[0.08] rounded-md px-2 py-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {preview ? <img src={preview} className="w-5 h-5 object-cover rounded-sm" /> : <FileTypeIcon name={file.name} className="w-4 h-4" />}
+                        <span className={`text-[10px] truncate ${fileColor(file.name)}`}>{file.name}</span>
+                      </div>
+                      <button type="button" onClick={() => removeStaged(i)} className="text-white/40 hover:text-white">✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="relative flex flex-col bg-white/[0.04] border border-white/[0.08] rounded-lg focus-within:border-brand-500/40 transition-colors">
+                <textarea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(e); }
+                  }}
                   placeholder="Type a message..."
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg pl-3 pr-9 py-2 text-xs text-white placeholder-white/25 outline-none focus:border-brand-500/40 transition-colors"
+                  className="w-full bg-transparent p-2.5 text-xs text-white placeholder-white/25 outline-none resize-none min-h-[40px] max-h-32"
+                  rows={1}
                 />
-                <button
-                  type="submit"
-                  disabled={!text.trim()}
-                  className="absolute right-1.5 p-1 rounded-md bg-brand-600 text-white hover:bg-brand-500 disabled:opacity-0 disabled:scale-75 transition-all"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                </button>
+                
+                <input
+                  type="file"
+                  multiple
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={e => {
+                    if (e.target.files) stageFiles(e.target.files);
+                    e.target.value = '';
+                  }}
+                />
+
+                <div className="flex items-center justify-between px-2 pb-2">
+                  <button type="button" onClick={() => fileInputRef.current?.click()} className="p-1.5 text-white/30 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors" title="Attach file">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={(!text.trim() && stagedFiles.length === 0) || uploading}
+                    className="p-1.5 rounded-md bg-brand-600 text-white hover:bg-brand-500 disabled:opacity-30 disabled:scale-95 transition-all"
+                  >
+                    {uploading ? (
+                      <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </>

@@ -3,6 +3,7 @@ import useBoardStore from '../../store/boardSlice';
 import useAuthStore from '../../store/authSlice';
 import * as boardService from '../../services/boardService';
 import Spinner from '../ui/Spinner';
+import Avatar from '../ui/Avatar';
 
 export default function OverviewTab({ boardId }) {
   const { board, cards, columns } = useBoardStore();
@@ -341,13 +342,8 @@ export default function OverviewTab({ boardId }) {
             <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-4">Team Members ({board?.members?.length || 0})</h2>
             <div className="flex flex-wrap gap-2">
               {board?.members?.map((m) => (
-                <div
-                  key={m.user._id}
-                  title={`${m.user.name || m.user.email} (${m.role})`}
-                  className="w-7 h-7 rounded-md border border-[#0c0c0f] flex items-center justify-center text-[10px] font-bold uppercase"
-                  style={{ background: `hsl(${(m.user.name?.charCodeAt(0) || 200) * 5 % 360}, 55%, 32%)`, color: '#fff' }}
-                >
-                  {(m.user.name || m.user.email)?.[0]}
+                <div key={m.user._id} title={`${m.user.name || m.user.email} (${m.role})`} className="w-7 h-7 rounded-md border border-[#0c0c0f]">
+                  <Avatar name={m.user.name || m.user.email} src={m.user.avatar} size="sm" />
                 </div>
               ))}
             </div>
