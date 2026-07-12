@@ -3,6 +3,34 @@ const Column = require('../models/Column');
 const Card = require('../models/Card');
 const User = require('../models/User');
 const { writeActivity } = require('../services/activity.service');
+const { sendInviteEmail } = require('../services/email.service');
+const crypto = require('crypto');
+
+// GET /api/boards/invitations/pending — get invitations for current user
+exports.getPendingInvitations = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    const boards = await Board.find({ 'invitations.email': user.email })
+      .select('title invitations owner')
+      .populate('owner', 'name email avatar');
+
+    const pending = boards.map(b => {
+      const inv = b.invitations.find(i => i.email === user.email);
+      return {
+        boardId: b._id,
+        boardTitle: b.title,
+        owner: b.owner,
+        role: inv?.role,
+        token: inv?.token,
+        createdAt: inv?.createdAt
+      };
+    }).filter(i => i.token); // ensure we found it
+
+    return res.json(pending);
+  } catch (err) {
+    next(err);
+  }
+};
 
 // GET /api/boards — all boards for current user
 exports.getBoards = async (req, res, next) => {
@@ -104,26 +132,107 @@ exports.inviteMember = async (req, res, next) => {
     const { email, role = 'editor' } = req.body;
     if (!email) return res.status(400).json({ message: 'email is required' });
 
-    const invitee = await User.findOne({ email });
-    if (!invitee) return res.status(404).json({ message: 'User not found' });
-
     const board = req.board;
-    const alreadyMember = board.members.find(
-      (m) => m.user.toString() === invitee._id.toString()
-    );
-    if (alreadyMember) return res.status(409).json({ message: 'User is already a member' });
 
-    board.members.push({ user: invitee._id, role });
+    // Check if already member
+    const invitee = await User.findOne({ email });
+    if (invitee) {
+      const alreadyMember = board.members.find(
+        (m) => m.user.toString() === invitee._id.toString()
+      );
+      if (alreadyMember) return res.status(409).json({ message: 'User is already a member' });
+    }
+
+    // Check if already invited
+    const alreadyInvited = board.invitations?.find(i => i.email === email);
+    if (alreadyInvited) return res.status(409).json({ message: 'User is already invited' });
+
+    // Generate token
+    const token = crypto.randomBytes(20).toString('hex');
+
+    if (!board.invitations) board.invitations = [];
+    board.invitations.push({ email, role, token });
     await board.save();
-    await board.populate('members.user', 'name email avatar');
+
+    // Send email
+    const inviter = await User.findById(req.user.userId);
+    await sendInviteEmail({
+      to: email,
+      inviterName: inviter.name || inviter.email,
+      boardTitle: board.title,
+      boardId: board._id,
+      token
+    });
+
+    return res.json({ message: 'Invitation sent' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// POST /api/boards/:boardId/accept-invite
+exports.acceptInvite = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ message: 'token is required' });
+
+    const board = await Board.findById(req.params.boardId);
+    if (!board) return res.status(404).json({ message: 'Board not found' });
+
+    const invitationIndex = board.invitations.findIndex(i => i.token === token);
+    if (invitationIndex === -1) {
+      return res.status(400).json({ message: 'Invalid or expired invitation token' });
+    }
+
+    const invitation = board.invitations[invitationIndex];
+    
+    // User must be logged in with the same email (or any email? Let's say any logged in user can accept if they have the token, to allow signing up with a different email, but checking email is safer)
+    const user = await User.findById(req.user.userId);
+    if (user.email !== invitation.email) {
+      return res.status(403).json({ message: 'This invitation was sent to a different email address' });
+    }
+
+    const alreadyMember = board.members.find(
+      (m) => m.user.toString() === user._id.toString()
+    );
+
+    if (!alreadyMember) {
+      board.members.push({ user: user._id, role: invitation.role });
+    }
+    
+    // Remove invitation
+    board.invitations.splice(invitationIndex, 1);
+    await board.save();
 
     await writeActivity({
       boardId: board._id,
-      userId: req.user.userId,
+      userId: user._id,
       type: 'member.added',
-      payload: { inviteeId: invitee._id, role },
+      payload: { inviteeId: user._id, role: invitation.role },
     });
 
+    return res.json({ message: 'Invitation accepted successfully' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// DELETE /api/boards/:boardId/invitations/:email (owner only)
+exports.revokeInvitation = async (req, res, next) => {
+  try {
+    const board = req.board;
+    const { email } = req.params;
+
+    const initialLength = board.invitations?.length || 0;
+    board.invitations = board.invitations?.filter((i) => i.email !== email) || [];
+
+    if (board.invitations.length === initialLength) {
+      return res.status(404).json({ message: 'Invitation not found' });
+    }
+
+    await board.save();
+    await board.populate('members.user', 'name email avatar');
+    
     return res.json(board);
   } catch (err) {
     next(err);

@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as boardService from '../services/boardService';
 import Spinner from '../components/ui/Spinner';
 import { notifyBoardCreated } from '../components/layout/AppShell';
+import useUIStore from '../store/uiSlice';
+import Avatar from '../components/ui/Avatar';
+import NotificationsModal from '../components/layout/NotificationsModal';
 
 const BG_GRADIENTS = [
   'from-indigo-600 to-indigo-800',
@@ -13,24 +16,31 @@ const BG_GRADIENTS = [
   'from-violet-600 to-violet-800',
 ];
 
-/**
- * Home page — board grid.
- * NOTE: Board list state is now owned by AppShell → Sidebar.
- * This component receives nothing from parent; it has its own local copy
- * to render the grid. Both fetch from the same API so they stay in sync.
- */
 export default function Home() {
   const navigate = useNavigate();
   const [boards, setBoards] = useState(null); // null = loading
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [showCreate, setShowCreate] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [invitations, setInvitations] = useState([]);
 
   // Fetch on mount
+  const fetchData = async () => {
+    try {
+      const [boardsRes, invitesRes] = await Promise.all([
+        boardService.getBoards(),
+        boardService.getPendingInvitations()
+      ]);
+      setBoards(boardsRes.data);
+      setInvitations(invitesRes.data || []);
+    } catch {
+      setBoards([]);
+    }
+  };
+
   useEffect(() => {
-    boardService.getBoards()
-      .then(({ data }) => setBoards(data))
-      .catch(() => setBoards([]));
+    fetchData();
   }, []);
 
   const handleCreate = async (e) => {
@@ -40,7 +50,6 @@ export default function Home() {
     try {
       const { data } = await boardService.createBoard({ title: newTitle.trim() });
       setBoards(prev => [...(prev || []), data]);
-      // Immediately push new board into the sidebar
       notifyBoardCreated(data);
       setNewTitle('');
       setShowCreate(false);
@@ -58,20 +67,34 @@ export default function Home() {
             <h1 className="text-xl font-bold text-white tracking-tight">My Boards</h1>
             <p className="text-white/35 text-xs mt-1">Pick a board or create a new one</p>
           </div>
-          <button
-            id="create-board-btn"
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-500
-              text-white text-xs font-semibold rounded-lg transition-all duration-200
-              hover:shadow-[0_0_20px_rgba(99,102,241,0.3)] active:scale-[0.96]"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-            New board
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowNotifications(true)}
+              className="relative flex items-center justify-center w-8 h-8 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-95"
+              title="Notifications"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              {invitations.length > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.8)] border border-[#0c0c0f]"></span>
+              )}
+            </button>
+            <button
+              id="create-board-btn"
+              onClick={() => setShowCreate(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-500
+                text-white text-xs font-semibold rounded-lg transition-all duration-200
+                hover:shadow-[0_0_20px_rgba(99,102,241,0.3)] active:scale-[0.96]"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+              New board
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="px-8 py-6">
+      <div className="px-8 py-6 max-w-7xl">
         {/* Create board inline form */}
         {showCreate && (
           <form
@@ -161,6 +184,17 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {showNotifications && (
+        <NotificationsModal 
+          onClose={() => setShowNotifications(false)} 
+          invitations={invitations}
+          onAccept={(token) => {
+            setInvitations(prev => prev.filter(i => i.token !== token));
+            fetchData();
+          }}
+        />
+      )}
     </div>
   );
 }

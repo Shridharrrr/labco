@@ -50,6 +50,7 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
   const [search, setSearch] = useState('');
   const [showNewBoard, setShowNewBoard] = useState(false);
   const [newTitle, setNewTitle] = useState('');
+
   const toggleFavorite = async (boardId, e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -106,25 +107,26 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
       }`}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-3.5 h-12 border-b border-white/[0.06] shrink-0">
-        <div className="w-7 h-7 rounded-md bg-brand-600 flex items-center justify-center font-bold text-white text-xs shrink-0">
-          L
-        </div>
-        {!collapsed && <span className="font-bold text-white text-[14px] tracking-tight">LabCo</span>}
-        {!collapsed && (
-          <button
-            onClick={() => setCollapsed(true)}
-            className="ml-auto text-white/40 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg active:scale-95 transition-all duration-200"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
-          </button>
-        )}
-        {collapsed && (
+      <div className={`flex items-center h-12 border-b border-white/[0.06] shrink-0 ${collapsed ? 'justify-center' : 'gap-2.5 px-3.5'}`}>
+        {!collapsed ? (
+          <>
+            <div className="w-7 h-7 rounded-md bg-brand-600 flex items-center justify-center font-bold text-white text-xs shrink-0">
+              L
+            </div>
+            <span className="font-bold text-white text-[14px] tracking-tight">LabCo</span>
+            <button
+              onClick={() => setCollapsed(true)}
+              className="ml-auto text-white/40 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg active:scale-95 transition-all duration-200"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
+            </button>
+          </>
+        ) : (
           <button
             onClick={() => setCollapsed(false)}
-            className="text-white/40 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg active:scale-95 transition-all duration-200 mx-auto"
+            className="text-white/40 hover:text-white hover:bg-white/[0.06] w-8 h-8 flex items-center justify-center rounded-lg active:scale-95 transition-all duration-200"
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
           </button>
         )}
       </div>
@@ -152,17 +154,19 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
         {!collapsed && favoriteBoards.length > 0 && (
           <div className="px-2.5 pt-2">
             <p className="text-[9px] font-semibold text-white/25 uppercase tracking-[0.12em] mb-1 px-2">Favorites</p>
-            {favoriteBoards.map((board, i) => (
-              <BoardItem
-                key={board._id}
-                board={board}
-                color={BG_DOTS[i % BG_DOTS.length]}
-                active={board._id === activeBoardId}
-                isFav={true}
-                onFav={toggleFavorite}
-                collapsed={false}
-              />
-            ))}
+            <div className="space-y-[1px]">
+              {favoriteBoards.map((board, i) => (
+                <BoardItem
+                  key={board._id}
+                  board={board}
+                  color={BG_DOTS[i % BG_DOTS.length]}
+                  active={board._id === activeBoardId}
+                  isFav={true}
+                  onFav={toggleFavorite}
+                  collapsed={false}
+                />
+              ))}
+            </div>
           </div>
         )}
 
@@ -173,17 +177,19 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
               All Boards
             </p>
           )}
-          {allBoards.map((board, i) => (
-            <BoardItem
-              key={board._id}
-              board={board}
-              color={BG_DOTS[i % BG_DOTS.length]}
-              active={board._id === activeBoardId}
-              isFav={board.stars?.includes(user?.userId)}
-              onFav={toggleFavorite}
-              collapsed={collapsed}
-            />
-          ))}
+          <div className="space-y-[1px]">
+            {allBoards.map((board, i) => (
+              <BoardItem
+                key={board._id}
+                board={board}
+                color={BG_DOTS[i % BG_DOTS.length]}
+                active={board._id === activeBoardId}
+                isFav={board.stars?.includes(user?.userId)}
+                onFav={toggleFavorite}
+                collapsed={collapsed}
+              />
+            ))}
+          </div>
 
           {/* New board inline form */}
           {!collapsed && showNewBoard && (

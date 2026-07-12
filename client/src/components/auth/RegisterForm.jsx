@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import * as authService from '../../services/authService';
 import useAuthStore from '../../store/authSlice';
@@ -73,6 +73,8 @@ const EyeOffIcon = (props) => (
 
 export default function RegisterForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/';
   const { setAuth } = useAuthStore();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -101,7 +103,7 @@ export default function RegisterForm() {
       setError('');
       const { data } = await authService.googleAuth(credentialResponse.credential);
       setAuth({ user: data.user, accessToken: data.accessToken });
-      navigate('/');
+      navigate(redirectUrl, { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Google signup failed');
     } finally {
@@ -319,7 +321,7 @@ export default function RegisterForm() {
 
           <p className="mt-6 text-center text-sm text-white/35 font-medium">
             Already have an account?{' '}
-            <Link to="/login" className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
+            <Link to={`/login?redirect=${encodeURIComponent(redirectUrl)}`} className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
               Sign in
             </Link>
           </p>

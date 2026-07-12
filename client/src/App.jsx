@@ -3,6 +3,7 @@ import useAuthStore from './store/authSlice';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import VerifyEmail from './components/auth/VerifyEmail';
+import AcceptInvite from './components/auth/AcceptInvite';
 import Home from './pages/Home';
 import BoardPage from './pages/BoardPage';
 import Toast from './components/ui/Toast';
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/login" element={<GuestRoute><LoginForm /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><RegisterForm /></GuestRoute>} />
         <Route path="/verify-email" element={<GuestRoute><VerifyEmail /></GuestRoute>} />
+        <Route path="/accept-invite" element={<AcceptInvite />} />
 
         {/* Protected — all wrapped in AppShell (sidebar) */}
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />

@@ -3,6 +3,7 @@ import * as boardService from '../../services/boardService';
 import useBoardStore from '../../store/boardSlice';
 import useUIStore from '../../store/uiSlice';
 import useAuthStore from '../../store/authSlice';
+import Avatar from '../ui/Avatar';
 
 export default function MembersModal({ boardId, onClose }) {
   const { board, setBoard } = useBoardStore();
@@ -12,7 +13,8 @@ export default function MembersModal({ boardId, onClose }) {
   const [role, setRole] = useState('editor');
   const [loading, setLoading] = useState(false);
 
-  const isOwner = board?.members?.find((m) => m.user._id === user._id)?.role === 'owner';
+  const isOwner = board?.members?.find((m) => m.user._id === user.userId || m.user._id === user._id)?.role === 'owner';
+  const pendingInvitations = board?.invitations || [];
 
   const handleInvite = async (e) => {
     e.preventDefault();
@@ -20,9 +22,11 @@ export default function MembersModal({ boardId, onClose }) {
     setLoading(true);
     try {
       const { data } = await boardService.inviteMember(boardId, { email, role });
-      setBoard({ board: data, columns: Object.values(useBoardStore.getState().columns), cards: Object.values(useBoardStore.getState().cards) });
-      addToast({ message: 'Member invited successfully', type: 'success' });
+      addToast({ message: data.message || 'Invitation sent successfully', type: 'success' });
       setEmail('');
+      // Refresh board data to show pending invitations (we might need to refetch or assume data returns board state if backend is modified, but currently it returns { message: 'Invitation sent' }, so we should ideally refetch the board, or just manually append if we don't return the full board. Wait, the modified backend returns `{ message: 'Invitation sent' }`, so we need to fetch board to see pending invites.)
+      const res = await boardService.getBoard(boardId);
+      setBoard({ board: res.data.board, columns: res.data.columns, cards: res.data.cards });
     } catch (err) {
       addToast({ message: err.response?.data?.message || 'Failed to invite member', type: 'error' });
     } finally {
@@ -41,6 +45,17 @@ export default function MembersModal({ boardId, onClose }) {
     }
   };
 
+  const handleRevoke = async (inviteEmail) => {
+    if (!confirm('Revoke this invitation?')) return;
+    try {
+      const { data } = await boardService.revokeInvitation(boardId, inviteEmail);
+      setBoard({ board: data, columns: Object.values(useBoardStore.getState().columns), cards: Object.values(useBoardStore.getState().cards) });
+      addToast({ message: 'Invitation revoked', type: 'success' });
+    } catch (err) {
+      addToast({ message: err.response?.data?.message || 'Failed to revoke invitation', type: 'error' });
+    }
+  };
+
   const handleChangeRole = async (userId, newRole) => {
     try {
       const { data } = await boardService.changeMemberRole(boardId, userId, { role: newRole });
@@ -53,86 +68,150 @@ export default function MembersModal({ boardId, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-[#111114] border border-white/[0.10] rounded-lg p-5 shadow-2xl shadow-black/60 relative animate-[modalIn_0.15s_ease-out]">
+      <div className="w-full max-w-lg bg-[#111114] border border-white/[0.08] rounded-xl p-6 shadow-2xl shadow-black/80 relative animate-[modalIn_0.15s_ease-out] flex flex-col max-h-[85vh]">
         <button
           onClick={onClose}
-          className="absolute top-3.5 right-3.5 text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 p-1.5 rounded-lg active:scale-95"
+          className="absolute top-4 right-4 text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 p-2 rounded-lg active:scale-95"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
 
-        <h2 className="text-base font-semibold text-white mb-5">Manage Members</h2>
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-white tracking-tight">Manage Members</h2>
+          <p className="text-xs text-white/40 mt-1">Invite team members to collaborate on this board.</p>
+        </div>
 
         {isOwner && (
-          <form onSubmit={handleInvite} className="mb-5 bg-white/[0.03] p-3.5 rounded-lg border border-white/[0.06]">
-            <h3 className="text-[11px] font-semibold text-white/50 uppercase tracking-wider mb-3">Invite new member</h3>
+          <form onSubmit={handleInvite} className="mb-8">
+            <label className="block text-[11px] font-semibold text-white/50 uppercase tracking-widest mb-2">Invite People</label>
             <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Email address..."
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 bg-[#0c0c0f] border border-white/[0.10] rounded-md px-3 py-1.5 text-sm text-white placeholder-white/25 focus:border-brand-500/50 focus:outline-none"
-                required
-              />
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="bg-[#0c0c0f] border border-white/[0.10] rounded-md px-2 py-1.5 text-xs text-white/80 outline-none"
-              >
-                <option value="editor" className="bg-[#111114]">Editor</option>
-                <option value="viewer" className="bg-[#111114]">Viewer</option>
-              </select>
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/30">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                </div>
+                <input
+                  type="email"
+                  placeholder="name@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-[#0c0c0f] border border-white/[0.10] rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-white/25 focus:border-brand-500/50 focus:bg-white/[0.02] outline-none transition-colors"
+                  required
+                />
+              </div>
+              <div className="relative">
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="appearance-none bg-[#0c0c0f] border border-white/[0.10] rounded-lg pl-3 pr-8 py-2 text-sm text-white/80 outline-none focus:border-brand-500/50 transition-colors"
+                >
+                  <option value="editor" className="bg-[#111114]">Editor</option>
+                  <option value="viewer" className="bg-[#111114]">Viewer</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-white/40">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                </div>
+              </div>
               <button
                 type="submit"
                 disabled={loading || !email}
-                className="px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-lg disabled:opacity-50 transition-all duration-200 hover:shadow-[0_0_12px_rgba(99,102,241,0.25)] active:scale-[0.96]"
+                className="px-5 py-2 bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold rounded-lg disabled:opacity-50 transition-all duration-200 hover:shadow-[0_0_12px_rgba(99,102,241,0.25)] active:scale-[0.96]"
               >
-                Invite
+                Send Invite
               </button>
             </div>
           </form>
         )}
 
-        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
-          {board?.members?.map((m) => (
-            <div key={m.user._id} className="flex items-center justify-between group py-1">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-md bg-brand-600/20 text-brand-400 flex items-center justify-center font-bold text-[10px] uppercase">
-                  {m.user.name?.[0] || m.user.email?.[0]}
-                </div>
-                <div>
-                  <p className="text-[13px] text-white font-medium">{m.user.name || 'Unnamed'}</p>
-                  <p className="text-[11px] text-white/35">{m.user.email}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                {isOwner && m.role !== 'owner' ? (
-                  <select
-                    value={m.role}
-                    onChange={(e) => handleChangeRole(m.user._id, e.target.value)}
-                    className="bg-transparent border border-white/[0.08] rounded-md px-2 py-1 text-[11px] text-white/50 hover:text-white transition-colors cursor-pointer outline-none"
-                  >
-                    <option value="editor" className="bg-[#111114]">Editor</option>
-                    <option value="viewer" className="bg-[#111114]">Viewer</option>
-                  </select>
-                ) : (
-                  <span className="text-[11px] text-white/40 capitalize px-2">{m.role}</span>
-                )}
+        <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-6">
+          {/* Active Members Section */}
+          <section>
+            <h3 className="text-[11px] font-semibold text-white/50 uppercase tracking-widest mb-3 border-b border-white/[0.06] pb-2">Active Members ({board?.members?.length || 0})</h3>
+            <div className="space-y-1">
+              {board?.members?.map((m) => (
+                <div key={m.user._id} className="flex items-center justify-between group p-2 hover:bg-white/[0.03] rounded-lg transition-colors">
+                  <div className="flex items-center gap-3">
+                    <Avatar name={m.user.name || m.user.email} src={m.user.avatar} size="md" />
+                    <div className="min-w-0">
+                      <p className="text-[13px] text-white font-medium truncate flex items-center gap-2">
+                        {m.user.name || 'Unnamed'}
+                        {m.user._id === user.userId && <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/60 uppercase">You</span>}
+                      </p>
+                      <p className="text-[11px] text-white/40 truncate">{m.user.email}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    {isOwner && m.role !== 'owner' ? (
+                      <div className="relative">
+                        <select
+                          value={m.role}
+                          onChange={(e) => handleChangeRole(m.user._id, e.target.value)}
+                          className="appearance-none bg-transparent border border-white/[0.08] rounded-md pl-2 pr-6 py-1 text-[11px] font-medium text-white/60 hover:text-white hover:border-white/[0.15] transition-colors cursor-pointer outline-none"
+                        >
+                          <option value="editor" className="bg-[#111114]">Editor</option>
+                          <option value="viewer" className="bg-[#111114]">Viewer</option>
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-1.5 pointer-events-none text-white/40">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-[11px] font-medium text-white/40 capitalize px-2">{m.role}</span>
+                    )}
 
-                {isOwner && m.role !== 'owner' && (
-                  <button
-                    onClick={() => handleRemove(m.user._id)}
-                    className="text-white/15 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all duration-200 p-1.5 rounded-lg active:scale-[0.92]"
-                    title="Remove member"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                  </button>
-                )}
-              </div>
+                    {isOwner && m.role !== 'owner' && (
+                      <button
+                        onClick={() => handleRemove(m.user._id)}
+                        className="text-white/20 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all duration-200 p-1.5 rounded-md active:scale-95"
+                        title="Remove member"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </section>
+
+          {/* Pending Invitations Section */}
+          {pendingInvitations.length > 0 && (
+            <section>
+              <h3 className="text-[11px] font-semibold text-white/50 uppercase tracking-widest mb-3 border-b border-white/[0.06] pb-2">Pending Invitations ({pendingInvitations.length})</h3>
+              <div className="space-y-1">
+                {pendingInvitations.map((inv) => (
+                  <div key={inv.token} className="flex items-center justify-between group p-2 hover:bg-white/[0.03] rounded-lg transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.08] border-dashed flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[13px] text-white/80 font-medium truncate flex items-center gap-2">
+                          {inv.email}
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-brand-500/10 text-brand-400 font-semibold uppercase tracking-wider">Pending</span>
+                        </p>
+                        <p className="text-[10px] text-white/35 mt-0.5 truncate">Invited on {new Date(inv.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <span className="text-[11px] font-medium text-white/40 capitalize px-2">{inv.role}</span>
+                      
+                      {isOwner && (
+                        <button
+                          onClick={() => handleRevoke(inv.email)}
+                          className="text-[11px] font-medium text-red-400/60 hover:text-red-400 hover:bg-red-500/10 px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-all duration-200 active:scale-95"
+                          title="Revoke invitation"
+                        >
+                          Revoke
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </div>

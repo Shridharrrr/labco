@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import * as authService from '../../services/authService';
 import useAuthStore from '../../store/authSlice';
@@ -61,6 +61,8 @@ const EyeOffIcon = (props) => (
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/';
   const { setAuth } = useAuthStore();
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -74,7 +76,7 @@ export default function LoginForm() {
     try {
       const { data } = await authService.login(form);
       setAuth({ user: data.user, accessToken: data.accessToken });
-      navigate('/');
+      navigate(redirectUrl, { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -88,7 +90,7 @@ export default function LoginForm() {
       setError('');
       const { data } = await authService.googleAuth(credentialResponse.credential);
       setAuth({ user: data.user, accessToken: data.accessToken });
-      navigate('/');
+      navigate(redirectUrl, { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Google Login failed');
     } finally {
