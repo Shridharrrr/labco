@@ -114,7 +114,7 @@ export default function MembersModal({ boardId, onClose }) {
               <button
                 type="submit"
                 disabled={loading || !email}
-                className="px-5 py-2 bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold rounded-lg disabled:opacity-50 transition-all duration-200 hover:shadow-[0_0_12px_rgba(99,102,241,0.25)] active:scale-[0.96]"
+                className="group relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-200 text-white/45 hover:text-white/80 hover:bg-white/[0.06] disabled:opacity-50 active:scale-[0.96]"
               >
                 Send Invite
               </button>

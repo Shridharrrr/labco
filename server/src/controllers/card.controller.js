@@ -48,6 +48,7 @@ exports.createCard = async (req, res, next) => {
 exports.getCard = async (req, res, next) => {
   try {
     const card = await Card.findById(req.params.cardId)
+      .populate('column', 'title')
       .populate('assignees', 'name email avatar')
       .populate('comments.author', 'name email avatar');
     if (!card || card.isArchived) return res.status(404).json({ message: 'Card not found' });

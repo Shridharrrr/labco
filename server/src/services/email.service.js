@@ -1,21 +1,38 @@
-const axios = require('axios');
+const nodemailer = require('nodemailer');
+
+const getTransporter = () => {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    return null;
+  }
+  
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT || 587,
+    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+};
 
 /**
- * Send a board invitation email using Resend.
+ * Send a board invitation email using Nodemailer.
  */
 const sendInviteEmail = async ({ to, inviterName, boardTitle, boardId, token }) => {
-  if (!process.env.RESEND_API_KEY) {
-    console.log('RESEND_API_KEY not configured — skipping invite email');
-    console.log(`Invite link would have been: ${process.env.CLIENT_URL}/accept-invite?token=${token}&boardId=${boardId}`);
+  const transporter = getTransporter();
+  const inviteUrl = `${process.env.CLIENT_URL}/accept-invite?token=${token}&boardId=${boardId}`;
+
+  if (!transporter) {
+    console.log('SMTP configuration missing — skipping invite email');
+    console.log(`Invite link would have been: ${inviteUrl}`);
     return;
   }
 
-  const inviteUrl = `${process.env.CLIENT_URL}/accept-invite?token=${token}&boardId=${boardId}`;
-
   try {
-    await axios.post('https://api.resend.com/emails', {
-      from: 'LabCo <onboarding@resend.dev>',
-      to: [to],
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || '"LabCo" <noreply@labco.com>',
+      to,
       subject: `${inviterName} invited you to "${boardTitle}" on LabCo`,
       html: `
         <h2>You've been invited to a board!</h2>
@@ -29,32 +46,28 @@ const sendInviteEmail = async ({ to, inviterName, boardTitle, boardId, token }) 
           If you don't have an account yet, you will be asked to create one before joining.
         </p>
       `
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
     });
   } catch (error) {
-    console.error('Failed to send invite email via Resend:', error?.response?.data || error.message);
+    console.error('Failed to send invite email via Nodemailer:', error.message);
   }
 };
 
 /**
- * Send an email verification link using Resend.
+ * Send an email verification link using Nodemailer.
  */
 const sendVerificationEmail = async ({ to, name, token }) => {
-  if (!process.env.RESEND_API_KEY) {
-    console.log(`RESEND_API_KEY not configured — skipping verification email for ${to}. Token: ${token}`);
+  const transporter = getTransporter();
+  const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
+
+  if (!transporter) {
+    console.log(`SMTP configuration missing — skipping verification email for ${to}. Token: ${token}`);
     return;
   }
 
-  const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
-
   try {
-    await axios.post('https://api.resend.com/emails', {
-      from: 'LabCo <onboarding@resend.dev>',
-      to: [to],
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || '"LabCo" <noreply@labco.com>',
+      to,
       subject: `Verify your email address for LabCo`,
       html: `
         <h2>Welcome to LabCo, ${name}!</h2>
@@ -67,14 +80,9 @@ const sendVerificationEmail = async ({ to, name, token }) => {
           If you did not create this account, you can safely ignore this email.
         </p>
       `
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
     });
   } catch (error) {
-    console.error('Failed to send verification email via Resend:', error?.response?.data || error.message);
+    console.error('Failed to send verification email via Nodemailer:', error.message);
   }
 };
 

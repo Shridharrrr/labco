@@ -83,9 +83,7 @@ export default function Home() {
             <button
               id="create-board-btn"
               onClick={() => setShowCreate(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-500
-                text-white text-xs font-semibold rounded-lg transition-all duration-200
-                hover:shadow-[0_0_20px_rgba(99,102,241,0.3)] active:scale-[0.96]"
+              className="group relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-200 text-white/45 hover:text-white/80 hover:bg-white/[0.06]"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
               New board

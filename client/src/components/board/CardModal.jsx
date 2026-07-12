@@ -10,8 +10,8 @@ const COVER_COLORS = [
 ];
 
 const STATUS_BADGE = {
-  started:   { label: 'Started',   cls: 'bg-blue-500/10 text-blue-400' },
-  completed: { label: 'Done',      cls: 'bg-emerald-500/10 text-emerald-400' },
+  started: { label: 'Started', cls: 'bg-blue-500/10 text-blue-400' },
+  completed: { label: 'Done', cls: 'bg-emerald-500/10 text-emerald-400' },
 };
 
 export default function CardModal({ boardId }) {
@@ -295,8 +295,7 @@ export default function CardModal({ boardId }) {
                         placeholder-white/15 outline-none focus:border-white/[0.12] transition-colors"
                     />
                     <button type="submit" disabled={!newCheckItem.trim()}
-                      className="px-2.5 py-1.5 text-[11px] font-medium text-white/40 hover:text-white/70 bg-white/[0.04]
-                        hover:bg-white/[0.08] rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                      className="group relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-200 text-white/45 hover:text-white hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed">
                       Add
                     </button>
                   </div>
