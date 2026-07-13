@@ -88,6 +88,7 @@ export default function RegisterForm() {
     setLoading(true);
     try {
       // Registration only triggers email, don't login immediately
+      const { data } = await authService.register(form);
       setSuccessMsg(data.message || 'Registration successful! Please check your email to verify your account.');
       setForm({ name: '', email: '', password: '' });
     } catch (err) {
@@ -112,97 +113,92 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#09090b] relative overflow-hidden">
+    <div className="min-h-screen flex bg-[#050505] relative overflow-hidden font-sans">
       {/* Background Grids & Glows */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff01_1px,transparent_1px),linear-gradient(to_bottom,#ffffff01_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-      <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+      <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-brand-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-brand-500/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Left - Branding Panel */}
-      <div className="hidden lg:flex w-[480px] flex-col justify-between p-10 pr-16
-        bg-gradient-to-br from-[#0c0c0f] to-[#121217] border-r border-white/[0.04] relative overflow-hidden shrink-0">
+      <div className="hidden lg:flex w-[480px] flex-col justify-between p-12 pr-16
+        bg-[#0a0a0a] border-r border-white/[0.04] relative overflow-hidden shrink-0 z-10">
         
         {/* Subtle branding background grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
         
         {/* Decorative sloped divider */}
-        <div className="absolute top-0 right-0 bottom-0 w-24 bg-[#09090b] translate-x-12 -skew-x-[6deg] origin-top-right border-l border-white/[0.08] pointer-events-none" />
+        <div className="absolute top-0 right-0 bottom-0 w-24 bg-[#050505] translate-x-12 -skew-x-[6deg] origin-top-right border-l border-white/[0.04] pointer-events-none" />
         {/* Sloped border glow line */}
-        <div className="absolute top-0 right-0 bottom-0 w-[1px] bg-gradient-to-b from-brand-500/0 via-brand-500/25 to-brand-500/0 translate-x-[36px] -skew-x-[6deg] origin-top pointer-events-none" />
+        <div className="absolute top-0 right-0 bottom-0 w-[1px] bg-gradient-to-b from-brand-500/0 via-brand-500/30 to-brand-500/0 translate-x-[36px] -skew-x-[6deg] origin-top pointer-events-none" />
 
         {/* Logo */}
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-black border border-white/[0.08] flex items-center justify-center font-bold text-white text-sm">
-            L
+        <Link to="/" className="relative z-10 flex items-center gap-2 group w-fit cursor-pointer">
+          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-bold text-black text-sm shadow-[0_0_15px_rgba(255,255,255,0.2)] group-hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><path d="M8 7v7M16 7v4M12 7v10" /></svg>
           </div>
-          <span className="text-xl font-bold text-white tracking-tight">LabCo</span>
-        </div>
+          <span className="font-bold text-[16px] tracking-tight text-white/90 group-hover:text-white transition-colors">LabCo</span>
+        </Link>
 
         {/* Feature highlights */}
-        <div className="relative z-10 space-y-8">
+        <div className="relative z-10 space-y-10">
           <div>
-            <h2 className="text-[28px] font-bold text-white leading-tight">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-white/70 text-xs font-medium mb-5 backdrop-blur-md">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+              </span>
+              Start your journey
+            </div>
+            <h2 className="text-[32px] font-extrabold text-white leading-[1.1] tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
               Start building<br />your workspace.
             </h2>
-            <p className="text-white/40 text-sm mt-3 leading-relaxed max-w-xs">
+            <p className="text-white/40 text-[15px] mt-4 leading-relaxed max-w-[280px] font-light">
               Free to start. Create boards, invite your team, and ship together in real-time.
             </p>
           </div>
 
           <div className="space-y-4">
             {[
-              {
-                icon: <RocketIcon className="w-5 h-5 text-brand-400" />,
-                title: 'Get started in seconds',
-                desc: 'No complex setup. Sign up and start organizing.'
-              },
-              {
-                icon: <ShieldIcon className="w-5 h-5 text-brand-400" />,
-                title: 'Secure by default',
-                desc: 'Your data is encrypted and backed up securely.'
-              },
-              {
-                icon: <SparklesIcon className="w-5 h-5 text-brand-400" />,
-                title: 'Unlimited boards & members',
-                desc: 'Grow your team without artificial boundaries.'
-              },
+              { icon: <RocketIcon className="w-5 h-5 text-brand-400" />, title: 'Get started in seconds', desc: 'No complex setup. Sign up and start.' },
+              { icon: <ShieldIcon className="w-5 h-5 text-brand-400" />, title: 'Secure by default', desc: 'Your data is encrypted securely.' },
+              { icon: <SparklesIcon className="w-5 h-5 text-brand-400" />, title: 'Unlimited boards', desc: 'Grow without artificial boundaries.' },
             ].map((f, i) => (
-              <div key={i} className="flex gap-4 items-start text-sm">
-                <div className="w-10 h-10 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center shrink-0 shadow-inner">
+              <div key={i} className="flex gap-4 items-start text-sm group hover:bg-white/[0.02] p-2 -ml-2 rounded-xl transition-colors border border-transparent hover:border-white/[0.04]">
+                <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 group-hover:bg-brand-500/10 group-hover:border-brand-500/30 transition-all">
                   {f.icon}
                 </div>
-                <div className="space-y-1">
-                  <h4 className="font-semibold text-white/80">{f.title}</h4>
-                  <p className="text-xs text-white/40 leading-relaxed">{f.desc}</p>
+                <div className="space-y-1 pt-0.5">
+                  <h4 className="font-semibold text-white/90 tracking-tight">{f.title}</h4>
+                  <p className="text-xs text-white/40 leading-relaxed font-light">{f.desc}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="relative z-10 text-[11px] text-white/20">© 2026 LabCo. All rights reserved.</p>
+        <p className="relative z-10 text-[12px] text-white/30 font-light tracking-wide">© {new Date().getFullYear()} LabCo. All rights reserved.</p>
       </div>
 
       {/* Right - Register Form */}
       <div className="flex-1 flex items-center justify-center px-6 relative z-10">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-[360px]">
           {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="inline-flex items-center gap-2.5 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-black border border-white/[0.08] flex items-center justify-center font-bold text-white text-sm">
-                L
+          <div className="lg:hidden text-center mb-10">
+            <Link to="/" className="inline-flex items-center gap-2 group cursor-pointer">
+              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-bold text-black text-sm shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><path d="M8 7v7M16 7v4M12 7v10" /></svg>
               </div>
-              <span className="text-xl font-bold text-white tracking-tight">LabCo</span>
-            </div>
+              <span className="font-bold text-[16px] tracking-tight text-white">LabCo</span>
+            </Link>
           </div>
 
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">Create account</h1>
-            <p className="text-white/40 text-sm mt-1.5 font-medium">Create your free workspace</p>
+          <div className="mb-10 text-center">
+            <h1 className="text-2xl font-bold text-white tracking-tight">Create account</h1>
+            <p className="text-white/40 text-[13px] mt-2 font-light tracking-wide">Create your free workspace</p>
           </div>
 
           {error && (
-            <div className="mb-5 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm flex items-center gap-2">
+            <div className="mb-6 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-2">
               <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -211,7 +207,7 @@ export default function RegisterForm() {
           )}
 
           {successMsg && (
-            <div className="mb-5 px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-sm flex items-center gap-2">
+            <div className="mb-6 px-4 py-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm flex items-center gap-2">
               <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
@@ -220,29 +216,33 @@ export default function RegisterForm() {
           )}
 
           <div className="mb-6 flex justify-center">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google Login Failed')}
-              theme="filled_black"
-              shape="rectangular"
-              text="signup_with"
-            />
+            <div className="w-full relative overflow-hidden rounded-xl border border-white/[0.08] hover:border-white/[0.15] transition-colors bg-white/[0.02]">
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-10 pointer-events-none transition-opacity bg-white" />
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError('Google Login Failed')}
+                theme="filled_black"
+                shape="rectangular"
+                text="signup_with"
+                width="360"
+              />
+            </div>
           </div>
 
-          <div className="relative mb-6">
+          <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/[0.08]"></div>
+              <div className="w-full border-t border-white/[0.06]"></div>
             </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-[#09090b] px-2 text-white/40">Or register with email</span>
+            <div className="relative flex justify-center text-[11px] uppercase tracking-widest font-semibold">
+              <span className="bg-[#050505] px-3 text-white/30">Or</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-[13px] font-medium text-white/60 mb-2">Name</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30">
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30 group-focus-within:text-white/70 transition-colors">
                   <UserIcon className="w-4 h-4" />
                 </div>
                 <input
@@ -252,17 +252,17 @@ export default function RegisterForm() {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="Your name"
-                  className="w-full bg-white/[0.02] border border-white/[0.08] hover:border-white/[0.12] rounded-lg pl-10 pr-4 py-2.5
-                    text-white placeholder-white/20 text-sm outline-none focus:bg-white/[0.04]
-                    focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200"
+                  className="w-full bg-[#0a0a0a] border border-white/[0.08] hover:border-white/[0.15] rounded-xl pl-10 pr-4 py-3
+                    text-white placeholder-white/20 text-sm outline-none focus:bg-[#0a0a0a]
+                    focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200 shadow-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[13px] font-medium text-white/60 mb-2">Email</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30">
+              <label className="block text-[13px] font-medium text-white/60 mb-2">Email address</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30 group-focus-within:text-white/70 transition-colors">
                   <MailIcon className="w-4 h-4" />
                 </div>
                 <input
@@ -272,17 +272,17 @@ export default function RegisterForm() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="you@example.com"
-                  className="w-full bg-white/[0.02] border border-white/[0.08] hover:border-white/[0.12] rounded-lg pl-10 pr-4 py-2.5
-                    text-white placeholder-white/20 text-sm outline-none focus:bg-white/[0.04]
-                    focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200"
+                  className="w-full bg-[#0a0a0a] border border-white/[0.08] hover:border-white/[0.15] rounded-xl pl-10 pr-4 py-3
+                    text-white placeholder-white/20 text-sm outline-none focus:bg-[#0a0a0a]
+                    focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200 shadow-sm"
                 />
               </div>
             </div>
             
             <div>
               <label className="block text-[13px] font-medium text-white/60 mb-2">Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30">
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30 group-focus-within:text-white/70 transition-colors">
                   <LockIcon className="w-4 h-4" />
                 </div>
                 <input
@@ -293,14 +293,14 @@ export default function RegisterForm() {
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   placeholder="Min. 6 characters"
-                  className="w-full bg-white/[0.02] border border-white/[0.08] hover:border-white/[0.12] rounded-lg pl-10 pr-10 py-2.5
-                    text-white placeholder-white/20 text-sm outline-none focus:bg-white/[0.04]
-                    focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200"
+                  className="w-full bg-[#0a0a0a] border border-white/[0.08] hover:border-white/[0.15] rounded-xl pl-10 pr-10 py-3
+                    text-white placeholder-white/20 text-sm outline-none focus:bg-[#0a0a0a]
+                    focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200 shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/35 hover:text-white/60 focus:outline-none"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-white/30 hover:text-white/70 focus:outline-none transition-colors"
                 >
                   {showPassword ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
                 </button>
@@ -311,17 +311,17 @@ export default function RegisterForm() {
               id="register-submit"
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 mt-2
-                bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm rounded-lg
-                transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 py-3 mt-4
+                bg-white text-black font-semibold text-[14px] rounded-full
+                transition-all duration-200 hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]"
             >
-              {loading ? <Spinner size="sm" /> : 'Create account'}
+              {loading ? <Spinner size="sm" className="text-black" /> : 'Create account'}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-white/35 font-medium">
+          <p className="mt-8 text-center text-[13px] text-white/40 font-light">
             Already have an account?{' '}
-            <Link to={`/login?redirect=${encodeURIComponent(redirectUrl)}`} className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
+            <Link to={`/login?redirect=${encodeURIComponent(redirectUrl)}`} className="text-white hover:text-brand-300 font-medium transition-colors border-b border-white/20 hover:border-brand-300 pb-0.5">
               Sign in
             </Link>
           </p>

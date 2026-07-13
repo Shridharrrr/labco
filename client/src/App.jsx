@@ -6,6 +6,7 @@ import VerifyEmail from './components/auth/VerifyEmail';
 import AcceptInvite from './components/auth/AcceptInvite';
 import Home from './pages/Home';
 import BoardPage from './pages/BoardPage';
+import LandingPage from './pages/LandingPage';
 import Toast from './components/ui/Toast';
 import AppShell from './components/layout/AppShell';
 
@@ -19,6 +20,11 @@ function GuestRoute({ children }) {
   return !isAuthenticated ? children : <Navigate to="/" replace />;
 }
 
+function RootRoute() {
+  const { isAuthenticated } = useAuthStore();
+  return isAuthenticated ? <AppShell><Home /></AppShell> : <LandingPage />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -29,8 +35,10 @@ export default function App() {
         <Route path="/verify-email" element={<GuestRoute><VerifyEmail /></GuestRoute>} />
         <Route path="/accept-invite" element={<AcceptInvite />} />
 
-        {/* Protected — all wrapped in AppShell (sidebar) */}
-        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        {/* Root handles both authenticated and unauthenticated appropriately */}
+        <Route path="/" element={<RootRoute />} />
+        
+        {/* Protected */}
         <Route path="/boards/:boardId" element={<ProtectedRoute><BoardPage /></ProtectedRoute>} />
 
         {/* Fallback */}

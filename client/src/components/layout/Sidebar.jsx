@@ -216,7 +216,7 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
               
               <div className="relative z-10 flex gap-1.5">
                 <button type="submit" disabled={creating || !newTitle.trim()}
-                  className="flex-1 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-[11px] rounded-md disabled:opacity-50 transition-colors font-medium shadow-[0_2px_10px_rgba(99,102,241,0.2)]">
+                  className="flex-1 py-1.5 text-white/40 hover:text-white hover:bg-white/[0.06] text-[11px] rounded-lg transition-all duration-200">
                   Create
                 </button>
                 <button type="button" onClick={() => setShowNewBoard(false)}
