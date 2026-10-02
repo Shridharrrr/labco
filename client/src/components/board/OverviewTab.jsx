@@ -122,17 +122,7 @@ export default function OverviewTab({ boardId }) {
     (c) => !c.isArchived && c.assignees?.some((a) => (a._id || a) === (user?._id || user?.userId))
   ).sort((a, b) => new Date(a.dueDate || '2099') - new Date(b.dueDate || '2099'));
 
-  // Compute progress: cards in 'final' type column(s) vs total
-  const finalColumns = columns ? Object.values(columns).filter(c => c.columnType === 'final') : [];
-  const doneColumn = finalColumns.length > 0
-    ? finalColumns[0]
-    : (columns ? Object.values(columns).find(c => c.title?.toLowerCase().includes('done')) : null);
-  const allActiveCards = cards ? Object.values(cards).filter(c => !c.isArchived) : [];
-  const totalCardsCount = allActiveCards.length;
-  const doneCardsCount = finalColumns.length > 0
-    ? finalColumns.reduce((sum, col) => sum + (col.cards?.length || 0), 0)
-    : (doneColumn ? doneColumn.cards.length : 0);
-  const progressPercent = totalCardsCount === 0 ? 0 : Math.round((doneCardsCount / totalCardsCount) * 100);
+  // Progress calculation removed
 
   const parseMarkdown = (text) => {
     if (!text) return '';
@@ -322,20 +312,7 @@ export default function OverviewTab({ boardId }) {
         {/* Right Column - Sidebar Widgets */}
         <div className="space-y-8">
 
-          {/* Progress Widget */}
-          <section className="bg-gradient-to-b from-brand-900/15 to-transparent border border-brand-500/15 rounded-lg p-5 relative overflow-hidden">
-            <h2 className="text-[11px] font-bold text-brand-400 uppercase tracking-widest mb-1 relative z-10">Board Progress</h2>
-            <div className="flex items-end gap-2 mb-4 relative z-10">
-              <span className="text-4xl font-black text-white tracking-tighter">{progressPercent}%</span>
-              <span className="text-sm text-white/40 mb-1.5">completed</span>
-            </div>
-            <div className="w-full bg-black/40 rounded-full h-2.5 relative z-10 overflow-hidden border border-white/5">
-              <div className="bg-gradient-to-r from-brand-600 to-brand-400 h-2.5 rounded-full transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }} />
-            </div>
-            <p className="text-xs text-white/40 mt-3 relative z-10">
-              {doneCardsCount} of {totalCardsCount} cards{doneColumn ? ` in "${doneColumn.title}"` : ''}
-            </p>
-          </section>
+
 
           {/* Members Summary */}
           <section className="bg-white/[0.02] border border-white/[0.06] rounded-lg p-5">

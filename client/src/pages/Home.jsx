@@ -157,9 +157,6 @@ export default function Home() {
                 <div className="absolute top-2 -right-2 w-10 h-10 rounded-lg bg-white/[0.05] rotate-12 group-hover:rotate-[20deg] transition-transform duration-300" />
                 <div className="relative">
                   <h2 className="font-semibold text-white text-sm leading-snug truncate">{board.title}</h2>
-                  {board.description && (
-                    <p className="text-white/50 text-[11px] mt-0.5 truncate">{board.description}</p>
-                  )}
                   <p className="text-white/35 group-hover:text-white/50 text-[11px] mt-1.5 font-medium transition-colors">
                     {board.members?.length} member{board.members?.length !== 1 ? 's' : ''}
                   </p>

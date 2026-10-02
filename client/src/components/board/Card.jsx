@@ -86,22 +86,20 @@ export default function Card({ card, boardId }) {
               {card.checklist.map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex items-start gap-2 select-none"
+                  className="flex items-center gap-2 select-none"
                 >
-                  <div className="pt-[2px]">
-                    <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
-                      item.completed
-                        ? 'bg-brand-500/20 border-brand-500/30 text-brand-400'
-                        : 'border-white/15'
-                    }`}>
-                      {item.completed && (
-                        <svg className="w-2 h-2" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
+                  <div className={`shrink-0 w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
+                    item.completed
+                      ? 'bg-brand-500/20 border-brand-500/30 text-brand-400'
+                      : 'border-white/15'
+                  }`}>
+                    {item.completed && (
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
                   </div>
-                  <span className={`text-[11px] leading-tight flex-1 transition-colors ${item.completed ? 'text-white/20 line-through' : 'text-white/45'}`}>
+                  <span className={`text-[11px] truncate flex-1 transition-colors ${item.completed ? 'text-white/20 line-through' : 'text-white/45'}`}>
                     {item.text}
                   </span>
                 </div>
