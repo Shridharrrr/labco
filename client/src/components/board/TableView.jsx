@@ -18,22 +18,22 @@ export default function TableView() {
 
   if (allCards.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-white/20 gap-3">
-        <svg className="w-10 h-10 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="flex flex-col items-center justify-center h-full text-zinc-400 gap-3">
+        <svg className="w-10 h-10 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 10h18M3 6h18M3 14h18M3 18h18" />
         </svg>
-        <span className="text-sm">No cards match the current filters</span>
+        <span className="text-sm font-medium">No cards match the current filters</span>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-auto p-6">
-      <table className="w-full border-collapse text-sm">
+    <div className="flex-1 overflow-auto p-3 sm:p-6">
+      <table className="w-full min-w-[560px] border-collapse text-sm">
         <thead>
-          <tr className="border-b border-white/[0.06]">
+          <tr className="border-b border-white/[0.08]">
             {['Title', 'Column', 'Due Date', 'Checklist', 'Assignees'].map((h) => (
-              <th key={h} className="text-left text-[11px] font-semibold text-white/30 uppercase tracking-wider pb-3 px-3 first:pl-0">
+              <th key={h} className="text-left text-[11px] font-semibold text-zinc-400 uppercase tracking-wider pb-3 px-3 first:pl-0">
                 {h}
               </th>
             ))}
@@ -57,18 +57,18 @@ export default function TableView() {
                     {card.coverColor && (
                       <span className="w-2 h-2 rounded-sm shrink-0" style={{ background: card.coverColor }} />
                     )}
-                    <span className="text-white/85 font-medium group-hover:text-white transition-colors truncate">
+                    <span className="text-zinc-100 font-medium group-hover:text-white transition-colors truncate">
                       {card.title}
                     </span>
                   </div>
                   {card.description && (
-                    <p className="text-[11px] text-white/30 mt-0.5 truncate pl-4">{card.description}</p>
+                    <p className="text-[11px] text-zinc-400 mt-0.5 truncate pl-4">{card.description}</p>
                   )}
                 </td>
 
                 {/* Column */}
                 <td className="py-3 px-3">
-                  <span className="flex items-center gap-1.5 text-white/50 text-xs">
+                  <span className="flex items-center gap-1.5 text-zinc-300 text-xs font-medium">
                     <span className="w-1.5 h-1.5 rounded-sm" style={{ background: card._columnColor }} />
                     {card._columnTitle}
                   </span>
@@ -80,12 +80,12 @@ export default function TableView() {
                     <span className={`text-[11px] font-medium px-2 py-0.5 rounded ${
                       isDueOverdue ? 'bg-red-500/12 text-red-400' :
                       isDueSoon    ? 'bg-amber-500/12 text-amber-400' :
-                                     'text-white/40'
+                                     'text-zinc-300 bg-white/[0.04]'
                     }`}>
                       {new Date(card.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                   ) : (
-                    <span className="text-white/15 text-xs">—</span>
+                    <span className="text-zinc-500 text-xs">—</span>
                   )}
                 </td>
 
@@ -102,12 +102,12 @@ export default function TableView() {
                           }}
                         />
                       </div>
-                      <span className={`text-[11px] ${checkedCount === card.checklist.length ? 'text-emerald-400' : 'text-white/35'}`}>
+                      <span className={`text-[11px] font-medium ${checkedCount === card.checklist.length ? 'text-emerald-400' : 'text-zinc-400'}`}>
                         {checkedCount}/{card.checklist.length}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-white/15 text-xs">—</span>
+                    <span className="text-zinc-500 text-xs">—</span>
                   )}
                 </td>
 
@@ -126,13 +126,13 @@ export default function TableView() {
                         </div>
                       ))}
                       {card.assignees.length > 4 && (
-                        <div className="w-6 h-6 rounded-md border border-[#0c0c0f] bg-white/10 flex items-center justify-center text-[8px] text-white/45">
+                        <div className="w-6 h-6 rounded-md border border-[#0c0c0f] bg-white/10 flex items-center justify-center text-[8px] text-zinc-300">
                           +{card.assignees.length - 4}
                         </div>
                       )}
                     </div>
                   ) : (
-                    <span className="text-white/20 text-xs">—</span>
+                    <span className="text-zinc-500 text-xs">—</span>
                   )}
                 </td>
               </tr>

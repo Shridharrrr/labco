@@ -163,41 +163,41 @@ export default function OverviewTab({ boardId }) {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-5">
-      <div className="w-full px-4 py-2 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="flex-1 overflow-y-auto p-3 sm:p-5">
+      <div className="w-full px-1 sm:px-4 py-1 sm:py-2 grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
 
         {/* Left Column - Main Content */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-2 space-y-6 sm:space-y-8">
           {/* Board Description */}
-          <section className="bg-white/[0.02] border border-white/[0.06] rounded-lg p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[11px] font-semibold text-white/50 uppercase tracking-[0.12em]">Board README</h2>
+          <section className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 sm:p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <h2 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-[0.12em]">Board README</h2>
               {!isEditingDesc ? (
                 <button
                   onClick={() => setIsEditingDesc(true)}
-                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-95"
+                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-95"
                 >
                   Edit
                 </button>
               ) : (
-                <div className="flex gap-2 items-center">
-                  <div className="flex bg-black/40 rounded p-1 mr-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 items-center">
+                  <div className="flex bg-black/40 rounded p-1 mr-1 sm:mr-2">
                     <button
                       onClick={() => setEditMode('write')}
-                      className={`px-3 py-1 rounded text-[11px] font-medium transition-colors ${editMode === 'write' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/80'}`}
+                      className={`px-2.5 sm:px-3 py-1 rounded text-[11px] font-medium transition-colors ${editMode === 'write' ? 'bg-white/10 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
                     >
                       Write
                     </button>
                     <button
                       onClick={() => setEditMode('preview')}
-                      className={`px-3 py-1 rounded text-[11px] font-medium transition-colors ${editMode === 'preview' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/80'}`}
+                      className={`px-2.5 sm:px-3 py-1 rounded text-[11px] font-medium transition-colors ${editMode === 'preview' ? 'bg-white/10 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
                     >
                       Preview
                     </button>
                   </div>
                   <button
                     onClick={() => { setIsEditingDesc(false); setDescription(board.description || ''); setEditMode('write'); }}
-                    className="px-2 py-1.5 rounded-lg text-[11px] font-semibold text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200"
+                    className="px-2 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200"
                   >
                     Cancel
                   </button>
@@ -213,38 +213,38 @@ export default function OverviewTab({ boardId }) {
 
             {isEditingDesc ? (
               editMode === 'write' ? (
-                <div className="flex flex-col border border-white/[0.08] bg-black/25 rounded-lg overflow-hidden focus-within:border-brand-500/40 focus-within:bg-white/[0.01] transition-all duration-200">
+                <div className="flex flex-col border border-white/[0.08] bg-black/25 rounded-lg overflow-hidden focus-within:border-brand-500/50 focus-within:bg-white/[0.01] transition-all duration-200">
                   {/* Toolbar */}
-                  <div className="flex items-center gap-2 px-2 py-2 border-b border-white/[0.06] bg-[#0c0c0f]/50 select-none">
+                  <div className="flex items-center flex-wrap gap-1 sm:gap-2 px-2 py-2 border-b border-white/[0.06] bg-[#0c0c0f]/50 select-none">
                     <button type="button" onClick={() => insertMarkdown('heading')} className="group p-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200" title="Heading">
-                      <span className="font-medium text-[15px] leading-none text-white/40 group-hover:text-white transition-colors flex items-center justify-center w-4 h-4">H</span>
+                      <span className="font-semibold text-[15px] leading-none text-zinc-400 group-hover:text-white transition-colors flex items-center justify-center w-4 h-4">H</span>
                     </button>
                     <button type="button" onClick={() => insertMarkdown('bold')} className="group p-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200" title="Bold">
-                      <span className="font-bold text-[14px] leading-none text-white/40 group-hover:text-white transition-colors flex items-center justify-center w-4 h-4">B</span>
+                      <span className="font-bold text-[14px] leading-none text-zinc-400 group-hover:text-white transition-colors flex items-center justify-center w-4 h-4">B</span>
                     </button>
                     <button type="button" onClick={() => insertMarkdown('italic')} className="group p-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200" title="Italic">
-                      <span className="italic font-serif text-[15px] leading-none text-white/40 group-hover:text-white transition-colors flex items-center justify-center w-4 h-4">I</span>
+                      <span className="italic font-serif text-[15px] leading-none text-zinc-400 group-hover:text-white transition-colors flex items-center justify-center w-4 h-4">I</span>
                     </button>
                     <button type="button" onClick={() => insertMarkdown('quote')} className="group p-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200" title="Quote">
-                      <svg className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 4v16M10 8h8M10 12h6M10 16h8" /></svg>
+                      <svg className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 4v16M10 8h8M10 12h6M10 16h8" /></svg>
                     </button>
                     <button type="button" onClick={() => insertMarkdown('code')} className="group p-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200" title="Code">
-                      <svg className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 9l-3 3 3 3m8-6l3 3-3 3" /></svg>
+                      <svg className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 9l-3 3 3 3m8-6l3 3-3 3" /></svg>
                     </button>
                     <button type="button" onClick={() => insertMarkdown('link')} className="group p-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200" title="Link">
-                      <svg className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+                      <svg className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
                     </button>
 
                     <div className="w-px h-5 bg-white/[0.08] mx-2" />
 
                     <button type="button" onClick={() => insertMarkdown('ordered')} className="group p-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200" title="Numbered List">
-                      <svg className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 6h10M10 12h10M10 18h10M5 6v4m-1-4h2M5 14h-1v1.5c0 .3.2.5.5.5h1" /></svg>
+                      <svg className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 6h10M10 12h10M10 18h10M5 6v4m-1-4h2M5 14h-1v1.5c0 .3.2.5.5.5h1" /></svg>
                     </button>
                     <button type="button" onClick={() => insertMarkdown('unordered')} className="group p-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200" title="Bulleted List">
-                      <svg className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 6h11M9 12h11M9 18h11M5 6v.01M5 12v.01M5 18v.01" /></svg>
+                      <svg className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 6h11M9 12h11M9 18h11M5 6v.01M5 12v.01M5 18v.01" /></svg>
                     </button>
                     <button type="button" onClick={() => insertMarkdown('checklist')} className="group p-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200" title="Checklist">
-                      <svg className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 6h11M9 12h11M9 18h11" />
                         <rect x="3.5" y="4.5" width="3" height="3" rx="0.5" />
                         <rect x="3.5" y="10.5" width="3" height="3" rx="0.5" />
@@ -259,28 +259,28 @@ export default function OverviewTab({ boardId }) {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Write a description, board goals, or helpful links here... (Markdown supported)"
-                    className="w-full h-48 bg-transparent p-4 text-sm text-white/85 placeholder-white/25 outline-none resize-y font-mono"
+                    className="w-full h-48 bg-transparent p-4 text-sm text-zinc-100 placeholder-zinc-500 outline-none resize-y font-mono"
                   />
                 </div>
               ) : (
                 <div
-                  className="w-full min-h-[12rem] bg-[#09090b] border border-white/[0.04] rounded-lg p-4 text-sm text-white/70 leading-relaxed overflow-y-auto"
-                  dangerouslySetInnerHTML={{ __html: description ? parseMarkdown(description) : '<span class="italic opacity-50">Nothing to preview</span>' }}
+                  className="w-full min-h-[12rem] bg-[#09090b] border border-white/[0.06] rounded-lg p-4 text-sm text-zinc-200 leading-relaxed overflow-y-auto"
+                  dangerouslySetInnerHTML={{ __html: description ? parseMarkdown(description) : '<span class="italic text-zinc-500">Nothing to preview</span>' }}
                 />
               )
             ) : (
               <div
-                className="min-h-[8rem] text-sm text-white/70 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: board?.description ? parseMarkdown(board.description) : '<span class="italic opacity-50">No description provided. Click Edit to add one.</span>' }}
+                className="min-h-[8rem] text-sm text-zinc-300 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: board?.description ? parseMarkdown(board.description) : '<span class="italic text-zinc-500">No description provided. Click Edit to add one.</span>' }}
               />
             )}
           </section>
 
           {/* My Tasks */}
           <section className="bg-white/[0.02] border border-white/[0.06] rounded-lg p-5">
-            <h2 className="text-[11px] font-semibold text-white/50 uppercase tracking-[0.12em] mb-3">My Pending Tasks</h2>
+            <h2 className="text-[11px] font-semibold text-zinc-300 uppercase tracking-[0.12em] mb-3">My Pending Tasks</h2>
             {myCards.length === 0 ? (
-              <div className="text-center py-6 text-white/25 text-xs border border-dashed border-white/[0.08] rounded-lg">
+              <div className="text-center py-6 text-zinc-400 text-xs border border-dashed border-white/[0.08] rounded-lg">
                 You have no tasks assigned.
               </div>
             ) : (
@@ -293,11 +293,11 @@ export default function OverviewTab({ boardId }) {
                         <div className="w-2 h-2 rounded-sm" style={{ background: card.coverColor || '#4b5563' }} />
                         <div>
                           <p className="text-sm font-medium text-white/90">{card.title}</p>
-                          <p className="text-[11px] text-white/40 mt-0.5">In {col?.title || 'Unknown Column'}</p>
+                          <p className="text-[11px] text-zinc-400 mt-0.5">In {col?.title || 'Unknown Column'}</p>
                         </div>
                       </div>
                       {card.dueDate && (
-                        <div className="text-[11px] font-medium px-2 py-1 rounded-md bg-white/5 text-white/50">
+                        <div className="text-[11px] font-medium px-2 py-1 rounded-md bg-white/5 text-zinc-300">
                           Due {new Date(card.dueDate).toLocaleDateString()}
                         </div>
                       )}
@@ -316,7 +316,7 @@ export default function OverviewTab({ boardId }) {
 
           {/* Members Summary */}
           <section className="bg-white/[0.02] border border-white/[0.06] rounded-lg p-5">
-            <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-4">Team Members ({board?.members?.length || 0})</h2>
+            <h2 className="text-[11px] font-bold text-zinc-300 uppercase tracking-widest mb-4">Team Members ({board?.members?.length || 0})</h2>
             <div className="flex flex-wrap gap-2">
               {board?.members?.map((m) => (
                 <div key={m.user._id} title={`${m.user.name || m.user.email} (${m.role})`} className="w-7 h-7 rounded-md border border-[#0c0c0f]">

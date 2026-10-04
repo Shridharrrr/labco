@@ -47,25 +47,33 @@ export default function ActivityDrawer({ boardId, onClose }) {
   };
 
   return (
-    <div className="fixed right-0 top-0 bottom-0 w-80 bg-[#0c0c0f] border-l border-white/[0.06]
-      z-40 flex flex-col shadow-2xl shadow-black/60 animate-[slideIn_0.2s_ease-out]">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/[0.06]">
-        <h3 className="text-[12px] font-semibold text-white">Activity Log</h3>
-        <button
-          onClick={onClose}
-          className="text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 p-1.5 rounded-lg active:scale-95"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
-      </div>
+    <>
+      {/* Mobile backdrop */}
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 sm:hidden"
+        onClick={onClose}
+      />
+
+      <div className="fixed right-0 top-0 bottom-0 w-full sm:w-80 bg-[#0c0c0f] border-l border-white/[0.06]
+        z-50 sm:z-40 flex flex-col shadow-2xl shadow-black/80 animate-[slideIn_0.2s_ease-out]">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/[0.06]">
+          <h3 className="text-[12px] font-semibold text-white">Activity Log</h3>
+          <button
+            onClick={onClose}
+            className="text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200 p-1.5 rounded-lg active:scale-95"
+            title="Close"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
 
       {/* Feed */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {loading && page === 1 ? (
           <div className="flex justify-center py-8"><Spinner /></div>
         ) : activities.length === 0 ? (
-          <p className="text-center text-white/30 text-sm py-8">No activity yet</p>
+          <p className="text-center text-zinc-400 text-sm py-8 font-medium">No activity yet</p>
         ) : (
           activities.map((act) => (
             <div key={act._id} className="flex gap-3 animate-[fadeIn_0.2s_ease-out]">
@@ -75,8 +83,8 @@ export default function ActivityDrawer({ boardId, onClose }) {
                 size="sm"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-white/70 leading-snug">
-                  <span className="font-medium text-white/90">
+                <p className="text-xs text-zinc-200 leading-snug">
+                  <span className="font-semibold text-white">
                     {act.user?.name || act.user?.email?.split('@')[0]}
                   </span>{' '}
                   {TYPE_LABELS[act.type] || act.type}
@@ -84,7 +92,7 @@ export default function ActivityDrawer({ boardId, onClose }) {
                     <span className="text-brand-400"> "{act.payload.title}"</span>
                   )}
                 </p>
-                <p className="text-[10px] text-white/30 mt-0.5">{timeAgo(act.createdAt)}</p>
+                <p className="text-[10px] text-zinc-400 mt-0.5">{timeAgo(act.createdAt)}</p>
               </div>
             </div>
           ))
@@ -101,5 +109,6 @@ export default function ActivityDrawer({ boardId, onClose }) {
         )}
       </div>
     </div>
+    </>
   );
 }

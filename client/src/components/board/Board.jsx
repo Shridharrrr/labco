@@ -57,7 +57,7 @@ export default function Board({ boardId }) {
           items={orderedColumns.map((c) => c._id)}
           strategy={horizontalListSortingStrategy}
         >
-          <div className="flex gap-4 items-start p-5 overflow-x-auto h-full pb-8">
+          <div className="flex gap-3 sm:gap-4 items-start p-3 sm:p-5 overflow-x-auto h-full pb-8">
             {orderedColumns.map((col) => (
               <Column key={col._id} column={col} boardId={boardId} />
             ))}
@@ -69,12 +69,12 @@ export default function Board({ boardId }) {
               <button
                 id="add-column-btn"
                 onClick={() => setAddingColumn(true)}
-                className="shrink-0 w-64 flex items-center gap-2.5 px-4 py-3
-                  border border-dashed border-white/[0.08] hover:border-white/[0.15]
-                  text-white/40 hover:text-white rounded-xl transition-all duration-200 text-xs font-semibold group
-                  hover:bg-white/[0.06] active:scale-[0.98]"
+                className="shrink-0 w-[84vw] sm:w-64 flex items-center gap-2 px-3 py-2.5
+                  border border-dashed border-zinc-800 hover:border-zinc-700
+                  text-zinc-500 hover:text-zinc-300 rounded-lg transition-colors text-xs font-medium cursor-pointer
+                  hover:bg-zinc-900/50"
               >
-                <svg className="w-3.5 h-3.5 text-white/20 group-hover:text-white/80 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
                 Add column
               </button>
             )}

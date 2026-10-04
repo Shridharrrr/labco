@@ -33,7 +33,7 @@ export default function NotificationsModal({ onClose, onAccept, invitations }) {
           </h2>
           <button
             onClick={onClose}
-            className="text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 p-1.5 rounded-lg active:scale-95"
+            className="text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200 p-1.5 rounded-lg active:scale-95"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
@@ -42,10 +42,10 @@ export default function NotificationsModal({ onClose, onAccept, invitations }) {
         <div className="max-h-[60vh] overflow-y-auto p-2">
           {invitations.length === 0 ? (
             <div className="py-10 text-center flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-white/[0.03] flex items-center justify-center mb-3">
-                <svg className="w-5 h-5 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+              <div className="w-10 h-10 rounded-full bg-white/[0.04] flex items-center justify-center mb-3">
+                <svg className="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
               </div>
-              <p className="text-white/30 text-[11px] font-medium uppercase tracking-wider">No new notifications</p>
+              <p className="text-zinc-400 text-[11px] font-semibold uppercase tracking-wider">No new notifications</p>
             </div>
           ) : (
             <div className="space-y-1">
@@ -54,10 +54,10 @@ export default function NotificationsModal({ onClose, onAccept, invitations }) {
                   <div className="flex gap-3">
                     <Avatar name={inv.owner?.name || inv.owner?.email} src={inv.owner?.avatar} size="md" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] text-white/80 leading-snug">
+                      <p className="text-[12px] text-zinc-200 leading-snug">
                         <span className="font-semibold text-white">{inv.owner?.name || inv.owner?.email?.split('@')[0]}</span> invited you to <span className="font-semibold text-white">{inv.boardTitle}</span>
                       </p>
-                      <p className="text-[10px] text-white/35 mt-0.5">
+                      <p className="text-[10px] text-zinc-400 mt-0.5">
                         {new Date(inv.createdAt).toLocaleDateString()}
                       </p>
                       
@@ -70,7 +70,7 @@ export default function NotificationsModal({ onClose, onAccept, invitations }) {
                           {loadingId === inv.token ? 'Accepting...' : 'Accept'}
                         </button>
                         <button
-                          className="flex-none px-3 bg-white/[0.06] hover:bg-white/[0.1] text-white/50 hover:text-white text-[11px] font-semibold rounded-md transition-colors"
+                          className="flex-none px-3 bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 hover:text-white text-[11px] font-semibold rounded-md transition-colors"
                         >
                           Ignore
                         </button>

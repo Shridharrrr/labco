@@ -146,7 +146,7 @@ export default function DiscussionTab({ boardId }) {
     <div className="flex-1 flex flex-col bg-[#0c0c0f] overflow-hidden">
 
       {/* Header */}
-      <div className="px-5 py-3.5 border-b border-white/[0.06] bg-[#111114] shrink-0 z-10 flex items-center justify-between">
+      <div className="px-3 sm:px-5 py-3 sm:py-3.5 border-b border-white/[0.06] bg-[#111114] shrink-0 z-10 flex items-center justify-between">
         <div>
           <h2 className="text-sm font-semibold text-white tracking-tight flex items-center gap-2">
             <svg className="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,7 +182,7 @@ export default function DiscussionTab({ boardId }) {
           </div>
         ) : (
           messages.map((msg, i) => {
-            const isMe     = msg.user._id === user.userId;
+            const isMe     = msg.user._id === (user?.userId || user?._id);
             const prevMsg  = messages[i - 1];
             const isGrouped = prevMsg &&
               prevMsg.user._id === msg.user._id &&
@@ -193,28 +193,28 @@ export default function DiscussionTab({ boardId }) {
             return (
               <div key={msg._id}>
                 {showDate && (
-                  <div className="flex items-center gap-4 my-5 px-5">
+                  <div className="flex items-center gap-4 my-5 px-3 sm:px-5">
                     <div className="flex-1 border-b border-white/[0.06]" />
-                    <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-white/25">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-zinc-400">
                       {dateStr(msg.createdAt)}
                     </span>
                     <div className="flex-1 border-b border-white/[0.06]" />
                   </div>
                 )}
 
-                <div className={`group flex gap-3 px-5 py-1 hover:bg-[#111114] transition-colors relative ${isGrouped ? 'mt-0' : 'mt-4'}`}>
+                <div className={`group flex gap-2.5 sm:gap-3 px-3 sm:px-5 py-1 hover:bg-[#111114] transition-colors relative ${isGrouped ? 'mt-0' : 'mt-4'}`}>
 
                   {/* Hover Actions */}
-                  <div className="absolute right-5 -top-3 opacity-0 group-hover:opacity-100 transition-opacity bg-[#161619] border border-white/[0.10] rounded-md shadow-xl flex items-center px-0.5 z-10">
+                  <div className="absolute right-2 sm:right-5 -top-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity bg-[#161619] border border-white/[0.10] rounded-md shadow-xl flex items-center px-0.5 z-10">
                     <button onClick={() => handleReply(msg.user)}
-                      className="p-1.5 text-white/35 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95" title="Reply">
+                      className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95" title="Reply">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                       </svg>
                     </button>
                     {msg.text && (
                       <button onClick={() => navigator.clipboard.writeText(msg.text)}
-                        className="p-1.5 text-white/35 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95" title="Copy text">
+                        className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95" title="Copy text">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                             d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -236,15 +236,15 @@ export default function DiscussionTab({ boardId }) {
                   <div className="flex flex-col flex-1 min-w-0 pb-1">
                     {!isGrouped && (
                       <div className="flex items-baseline gap-2 mb-0.5">
-                        <span className={`text-[13px] font-semibold ${isMe ? 'text-brand-400' : 'text-white/85'}`}>
+                        <span className={`text-[13px] font-semibold ${isMe ? 'text-brand-400' : 'text-white/90'}`}>
                           {msg.user.name || msg.user.email?.split('@')[0]}
                         </span>
-                        <span className="text-[10px] text-white/25">{timeStr(msg.createdAt)}</span>
+                        <span className="text-[10px] text-zinc-400">{timeStr(msg.createdAt)}</span>
                       </div>
                     )}
 
                     {msg.text && (
-                      <div className="text-[13px] leading-[1.6] text-white/75 break-words whitespace-pre-wrap">
+                      <div className="text-[13px] leading-[1.6] text-zinc-200 break-words whitespace-pre-wrap">
                         {renderMarkdown(msg.text)}
                       </div>
                     )}
@@ -264,14 +264,14 @@ export default function DiscussionTab({ boardId }) {
                               className="flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/[0.15] rounded-lg px-3 py-2.5 transition-all group/doc max-w-[280px]">
                               <FileTypeIcon name={att.filename} className="w-8 h-8 shrink-0" />
                               <div className="min-w-0">
-                                <p className="text-[12px] font-medium text-white/80 truncate group-hover/doc:text-white transition-colors">
+                                <p className="text-[12px] font-medium text-zinc-200 truncate group-hover/doc:text-white transition-colors">
                                   {att.filename}
                                 </p>
-                                <p className="text-[10px] text-white/30 mt-0.5">
+                                <p className="text-[10px] text-zinc-400 mt-0.5">
                                   {att.filename.split('.').pop()?.toUpperCase()} · Click to open
                                 </p>
                               </div>
-                              <svg className="w-4 h-4 text-white/20 shrink-0 group-hover/doc:text-white/50 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-4 h-4 text-zinc-400 shrink-0 group-hover/doc:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                               </svg>
                             </a>
@@ -289,7 +289,7 @@ export default function DiscussionTab({ boardId }) {
       </div>
 
       {/* Composer */}
-      <div className="px-5 pb-5 pt-2 bg-[#0c0c0f] shrink-0">
+      <div className="px-3 sm:px-5 pb-3 sm:pb-5 pt-2 bg-[#0c0c0f] shrink-0">
 
         {/* Error */}
         {error && (
@@ -303,7 +303,7 @@ export default function DiscussionTab({ boardId }) {
         )}
 
         <form onSubmit={handleSend}
-          className="relative flex flex-col bg-[#111114] border border-white/[0.08] rounded-xl transition-all focus-within:border-brand-500/25 focus-within:bg-[#141418]">
+          className="relative flex flex-col bg-[#111114] border border-white/[0.08] rounded-xl transition-all focus-within:border-brand-500/50 focus-within:bg-[#141418]">
 
           {/* Staged file previews */}
           {stagedFiles.length > 0 && (
@@ -324,7 +324,7 @@ export default function DiscussionTab({ boardId }) {
                     <p className={`text-[10px] font-medium truncate ${fileColor(file.name)}`}>
                       {file.name}
                     </p>
-                    <p className="text-[9px] text-white/25 mt-0.5">{formatBytes(file.size)}</p>
+                    <p className="text-[9px] text-zinc-400 mt-0.5">{formatBytes(file.size)}</p>
                   </div>
                   <button type="button" onClick={() => removeStaged(i)}
                     className="absolute right-1.5 top-1.5 w-4 h-4 rounded-full bg-black/50 flex items-center justify-center text-white/50 hover:text-white hover:bg-black/80 transition-colors text-[10px] leading-none">
@@ -341,7 +341,7 @@ export default function DiscussionTab({ boardId }) {
             onChange={e => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={`Message #${board?.title?.replace(/\s+/g, '-').toLowerCase() || 'general'}`}
-            className="w-full max-h-48 min-h-[44px] bg-transparent text-[13px] text-white placeholder-white/20 outline-none resize-none px-4 pt-3 pb-1"
+            className="w-full max-h-48 min-h-[44px] bg-transparent text-[13px] text-zinc-100 placeholder-zinc-500 outline-none resize-none px-4 pt-3 pb-1"
             rows={1}
           />
 
@@ -371,7 +371,7 @@ export default function DiscussionTab({ boardId }) {
             <div className="flex items-center gap-1">
               {/* Attachment button */}
               <button type="button" onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-white/30 hover:text-white hover:bg-white/[0.06] transition-all duration-200 rounded-lg active:scale-95 text-[11px]"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200 rounded-lg active:scale-95 text-[11px]"
                 title="Attach files (images, PDFs, docs)">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
@@ -385,7 +385,7 @@ export default function DiscussionTab({ boardId }) {
 
             <div className="flex items-center gap-2">
               {uploading && (
-                <span className="text-[10px] text-white/40">
+                <span className="text-[10px] text-zinc-400 font-medium">
                   {uploadProgress < 100 ? `Uploading ${uploadProgress}%…` : 'Processing…'}
                 </span>
               )}
@@ -412,7 +412,7 @@ export default function DiscussionTab({ boardId }) {
           </div>
         </form>
 
-        <p className="text-[10px] text-white/15 mt-1.5 px-1">
+        <p className="hidden sm:block text-[10px] text-zinc-500 mt-1.5 px-1">
           Attach up to 5 files · 10 MB each · Images, PDFs, Docs · Press <kbd className="px-1 py-0.5 bg-white/[0.06] rounded text-[9px]">Enter</kbd> to send
         </p>
       </div>

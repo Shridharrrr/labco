@@ -6,6 +6,7 @@ const useUIStore = create((set) => ({
   activeCardId: null,
   isActivityOpen: false,
   isRightPanelOpen: false,
+  isMobileSidebarOpen: false,
   toasts: [],
   isAddingCard: {},
   isAddingColumn: false,
@@ -31,6 +32,8 @@ const useUIStore = create((set) => ({
 
   toggleActivity: () => set((s) => ({ isActivityOpen: !s.isActivityOpen })),
   toggleRightPanel: () => set((s) => ({ isRightPanelOpen: !s.isRightPanelOpen })),
+  toggleMobileSidebar: () => set((s) => ({ isMobileSidebarOpen: !s.isMobileSidebarOpen })),
+  setMobileSidebarOpen: (bool) => set({ isMobileSidebarOpen: bool }),
 
   addToast: ({ message, type = 'info' }) =>
     set((s) => {

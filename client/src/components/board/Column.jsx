@@ -131,7 +131,7 @@ export default function Column({ column, boardId }) {
     <div
       ref={setRef}
       style={style}
-      className="shrink-0 w-72 flex flex-col max-h-[calc(100vh-10rem)] select-none"
+      className="shrink-0 w-[84vw] sm:w-72 flex flex-col max-h-[calc(100vh-10rem)] select-none"
     >
       {/* Column header */}
       <div className="flex items-center justify-between px-1 pt-1 pb-2.5 group">
@@ -141,9 +141,9 @@ export default function Column({ column, boardId }) {
           {...listeners}
           className="flex items-center gap-2 flex-1 cursor-grab active:cursor-grabbing min-w-0"
         >
-          {/* Color dot — purely decorative now */}
+          {/* Color dot */}
           <span
-            className="w-2 h-2 rounded-sm shrink-0"
+            className="w-1.5 h-1.5 rounded-full shrink-0"
             style={{ background: dotColor }}
           />
           {isRenaming ? (
@@ -153,12 +153,12 @@ export default function Column({ column, boardId }) {
               onChange={e => setRenameValue(e.target.value)}
               onBlur={handleRename}
               onKeyDown={e => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') setIsRenaming(false); }}
-              className="flex-1 bg-white/[0.05] border border-brand-500/50 rounded px-2 py-0.5 text-sm font-medium text-white outline-none"
+              className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-2 py-0.5 text-xs font-medium text-zinc-100 outline-none"
               onClick={e => e.stopPropagation()}
             />
           ) : (
             <h3
-              className="text-[13px] font-semibold text-white/80 truncate tracking-wide uppercase"
+              className="text-xs font-semibold text-zinc-300 truncate tracking-wider uppercase"
               onDoubleClick={() => { setRenameValue(column.title); setIsRenaming(true); }}
             >
               {column.title}
@@ -173,17 +173,17 @@ export default function Column({ column, boardId }) {
             </span>
           )}
 
-          <span className={`text-[10px] shrink-0 font-mono ${isFiltered ? 'text-brand-400 font-semibold' : 'text-white/25'}`}>
+          <span className="text-[11px] shrink-0 font-mono text-zinc-300 bg-zinc-800/80 px-1.5 py-0.5 rounded font-medium">
             {isFiltered ? `${columnCards.length}/${rawColumnCards.length}` : rawColumnCards.length}
           </span>
         </div>
 
         {/* Right actions */}
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all">
+        <div className="flex items-center gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all">
           {/* Quick add card */}
           <button
             onClick={(e) => { e.stopPropagation(); setAddingCard(column._id, true); }}
-            className="text-white/40 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg transition-all duration-200 cursor-pointer active:scale-95"
+            className="text-zinc-400 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg transition-all duration-200 cursor-pointer active:scale-95"
             title="Add card"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,7 +199,7 @@ export default function Column({ column, boardId }) {
               className={`p-1.5 rounded-lg transition-all duration-200 cursor-pointer active:scale-95
                 ${showMenu
                   ? 'bg-white/[0.08] text-white'
-                  : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
+                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.06]'}`}
             >
               <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                 <circle cx="5" cy="12" r="1.5" />
@@ -216,7 +216,7 @@ export default function Column({ column, boardId }) {
                 {/* Rename */}
                 <button
                   onClick={(e) => { e.stopPropagation(); setShowMenu(false); setRenameValue(column.title); setIsRenaming(true); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] text-white/60 hover:text-white hover:bg-white/[0.05] transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] text-zinc-200 hover:text-white hover:bg-white/[0.05] transition-colors"
                 >
                   <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -229,7 +229,7 @@ export default function Column({ column, boardId }) {
 
                 {/* Color label */}
                 <div className="px-3 pt-2 pb-1">
-                  <p className="text-[9px] font-semibold text-white/25 uppercase tracking-wider mb-2">Color</p>
+                  <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Color</p>
                   <div className="flex gap-2">
                     {COLUMN_COLORS.map(c => (
                       <button
@@ -257,10 +257,10 @@ export default function Column({ column, boardId }) {
 
                 {/* Column type */}
                 <div className="px-3 py-2">
-                  <p className="text-[9px] font-semibold text-white/25 uppercase tracking-wider mb-1.5">Column Type</p>
+                  <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">Column Type</p>
                   <div className="flex gap-1">
                     {[
-                      { key: 'none', label: 'Standard', active: 'bg-white/10 text-white/70' },
+                      { key: 'none', label: 'Standard', active: 'bg-white/10 text-white/90' },
                       { key: 'initial', label: 'Start', active: 'bg-blue-500/20 text-blue-400' },
                       { key: 'final', label: 'Final', active: 'bg-emerald-500/20 text-emerald-400' },
                     ].map(({ key, label, active }) => (
@@ -270,7 +270,7 @@ export default function Column({ column, boardId }) {
                         className={`flex-1 py-1.5 text-[10px] font-semibold rounded-md transition-all
                           ${column.columnType === key || (!column.columnType && key === 'none')
                             ? active
-                            : 'text-white/30 hover:bg-white/[0.05] hover:text-white/60'}`}
+                            : 'text-zinc-400 hover:bg-white/[0.05] hover:text-white'}`}
                       >
                         {label}
                       </button>

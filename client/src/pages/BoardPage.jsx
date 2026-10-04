@@ -42,7 +42,7 @@ export default function BoardPage() {
   const { boardId } = useParams();
   const navigate = useNavigate();
   const { setBoard, clearBoard, board } = useBoardStore();
-  const { isActivityOpen, toggleActivity, isRightPanelOpen, toggleRightPanel, addToast, filters, clearFilters } = useUIStore();
+  const { isActivityOpen, toggleActivity, isRightPanelOpen, toggleRightPanel, isMobileSidebarOpen, toggleMobileSidebar, addToast, filters, clearFilters } = useUIStore();
   const { user } = useAuthStore();
   const socket = useSocket();
   const lastCursor = useRef(0);
@@ -64,18 +64,40 @@ export default function BoardPage() {
     return () => { clearBoard(); clearFilters(); };
   }, [boardId]);
 
-  const isStarred = board?.stars?.includes(user?.userId);
+  const currentUserId = user?.userId || user?._id || user?.id;
+  const isStarred = Boolean(
+    board?.stars?.some((id) => (id?._id || id)?.toString() === currentUserId?.toString())
+  );
 
   const handleToggleStar = async () => {
+    if (!board || !currentUserId) return;
+    const prevStars = board.stars || [];
+    const isCurrentlyStarred = prevStars.some(
+      (id) => (id?._id || id)?.toString() === currentUserId.toString()
+    );
+    const newStars = isCurrentlyStarred
+      ? prevStars.filter((id) => (id?._id || id)?.toString() !== currentUserId.toString())
+      : [...prevStars, currentUserId];
+
+    useBoardStore.getState().updateBoardInfo({ stars: newStars });
+
+    window.dispatchEvent(
+      new CustomEvent('board:starred', { detail: { boardId, stars: newStars } })
+    );
+
     try {
-      const newStars = isStarred
-        ? board.stars.filter(id => id !== user.userId)
-        : [...(board.stars || []), user.userId];
-        
-      useBoardStore.getState().updateBoardInfo({ stars: newStars });
-      await boardService.toggleStar(boardId);
+      const { data } = await boardService.toggleStar(boardId);
+      if (data?.stars) {
+        useBoardStore.getState().updateBoardInfo({ stars: data.stars });
+        window.dispatchEvent(
+          new CustomEvent('board:starred', { detail: { boardId, stars: data.stars } })
+        );
+      }
     } catch {
-      useBoardStore.getState().updateBoardInfo({ stars: board.stars }); // Revert on failure
+      useBoardStore.getState().updateBoardInfo({ stars: prevStars }); // Revert on failure
+      window.dispatchEvent(
+        new CustomEvent('board:starred', { detail: { boardId, stars: prevStars } })
+      );
     }
   };
 
@@ -100,65 +122,79 @@ export default function BoardPage() {
     <div className="flex flex-col flex-1 overflow-hidden bg-[#0c0c0f]" onMouseMove={handleMouseMove}>
 
       {/* ── Top bar ─────────────────────────────────────────────────── */}
-      <header className="shrink-0 border-b border-white/[0.06]">
+      <header className="shrink-0 border-b border-zinc-800/80 bg-[#09090c]">
 
         {/* Row 1: breadcrumb + actions */}
-        <div className="flex items-center justify-between px-5 pt-3 pb-0">
-          <div className="flex items-center gap-2 text-xs min-w-0">
-            <div className="text-white/25 shrink-0 select-none">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+        <div className="flex items-center justify-between px-3 sm:px-5 pt-2.5 sm:pt-3 pb-1 gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 text-xs min-w-0">
+            {/* Mobile Sidebar Hamburger */}
+            <button
+              onClick={toggleMobileSidebar}
+              className="md:hidden p-1 -ml-1 text-zinc-400 hover:text-white hover:bg-zinc-800/60 rounded-md transition-colors cursor-pointer shrink-0"
+              title="Open sidebar"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
+            </button>
+
+            <div className="hidden sm:flex items-center gap-1.5 shrink-0 select-none">
+              <div className="text-zinc-500 shrink-0">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+              </div>
+              <span className="text-zinc-600">/</span>
+              <Link to="/" className="text-zinc-400 hover:text-zinc-200 transition-colors">Boards</Link>
+              <span className="text-zinc-600">/</span>
             </div>
-            <span className="text-white/15 shrink-0">/</span>
-            <Link to="/" className="text-white/30 hover:text-white/60 transition-colors text-[11px] shrink-0">Boards</Link>
-            <span className="text-white/15 shrink-0">/</span>
-            <span className="text-white font-semibold text-[13px] truncate">{board.title}</span>
+            <span className="text-zinc-100 font-medium text-xs truncate max-w-[110px] sm:max-w-[200px] md:max-w-xs">{board.title}</span>
 
             {/* Star Button */}
             <button
               onClick={handleToggleStar}
               title={isStarred ? "Remove from favorites" : "Add to favorites"}
-              className={`shrink-0 ml-1 p-1.5 rounded-lg transition-all duration-200 ${
+              className={`shrink-0 ml-0.5 sm:ml-1 p-1 rounded-md transition-colors cursor-pointer ${
                 isStarred 
-                  ? 'text-yellow-400 hover:bg-yellow-400/10' 
-                  : 'text-white/40 hover:text-white hover:bg-white/[0.06]'
+                  ? 'text-amber-400 bg-amber-400/10 hover:bg-amber-400/20' 
+                  : 'text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/60'
               }`}
             >
-              <svg className={`w-3.5 h-3.5 ${isStarred ? 'fill-current' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5" fill={isStarred ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
               </svg>
             </button>
             <button
               onClick={() => setIsMembersOpen(true)}
-              className="shrink-0 ml-1 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-[0.96]"
+              className="shrink-0 ml-0.5 sm:ml-1 flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-md text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60 transition-colors active:scale-95 cursor-pointer"
+              title="Share & Members"
             >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
-              Share
+              <span className="hidden sm:inline">Share</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <OnlineAvatars />
 
             {/* View switcher */}
             {activeTab === 'tasks' && (
-              <div className="flex items-center bg-white/[0.03] border border-white/[0.06] rounded-md p-0.5">
+              <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-md p-0.5">
                 <button
                   onClick={() => setViewMode('kanban')}
                   title="Kanban view"
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all duration-200 ${viewMode === 'kanban' ? 'bg-white/[0.10] text-white shadow-sm' : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
+                  className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${viewMode === 'kanban' ? 'bg-zinc-800 text-zinc-100 shadow-xs' : 'text-zinc-400 hover:text-zinc-200'}`}
                 >
-                  <KanbanIcon /> Board
+                  <KanbanIcon /> <span className="hidden sm:inline">Board</span>
                 </button>
                 <button
                   onClick={() => setViewMode('table')}
                   title="Table view"
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all duration-200 ${viewMode === 'table' ? 'bg-white/[0.10] text-white shadow-sm' : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
+                  className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${viewMode === 'table' ? 'bg-zinc-800 text-zinc-100 shadow-xs' : 'text-zinc-400 hover:text-zinc-200'}`}
                 >
-                  <TableIcon /> Table
+                  <TableIcon /> <span className="hidden sm:inline">Table</span>
                 </button>
               </div>
             )}
@@ -167,50 +203,53 @@ export default function BoardPage() {
             {activeTab === 'tasks' && (
               <button
                 onClick={() => setShowFilters(v => !v)}
-                className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-all duration-200
+                title="Filter tasks"
+                className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 text-xs font-medium rounded-md transition-colors border
                   ${showFilters || filterActive
-                    ? 'bg-brand-600/15 text-brand-400 border border-brand-500/25 shadow-[0_0_10px_rgba(99,102,241,0.1)]'
-                    : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
+                    ? 'bg-zinc-800 text-zinc-100 border-zinc-700'
+                    : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'}`}
               >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
-                Filter{filterActive ? ' ●' : ''}
+                <span className="hidden sm:inline">Filter{filterActive ? ' •' : ''}</span>
               </button>
             )}
 
             {/* Activity */}
             <button
               onClick={toggleActivity}
-              className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-all duration-200
+              title="Activity Log"
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 text-xs font-medium rounded-md transition-colors border
                 ${isActivityOpen
-                  ? 'bg-brand-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.25)]'
-                  : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
+                  ? 'bg-zinc-800 text-zinc-100 border-zinc-700'
+                  : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'}`}
             >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              Activity
+              <span className="hidden sm:inline">Activity</span>
             </button>
 
             {/* Chat / Members Panel */}
             <button
               onClick={toggleRightPanel}
-              className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-all duration-200
+              title="Board Chat"
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 text-xs font-medium rounded-md transition-colors border
                 ${isRightPanelOpen
-                  ? 'bg-brand-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.25)]'
-                  : 'text-white/40 hover:text-white hover:bg-white/[0.06]'}`}
+                  ? 'bg-zinc-800 text-zinc-100 border-zinc-700'
+                  : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'}`}
             >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
-              Chat
+              <span className="hidden sm:inline">Chat</span>
             </button>
           </div>
         </div>
 
-        {/* Row 2: tabs */}
-        <div className="flex items-center gap-0 px-5 pt-1.5">
+        {/* Row 2: tabs with smooth horizontal scroll on mobile */}
+        <div className="flex items-center gap-1 px-3 sm:px-5 pt-1 overflow-x-auto no-scrollbar scroll-smooth">
           {TABS.map((tab) => {
             const key = tab.toLowerCase();
             const isActive = activeTab === key;
@@ -218,16 +257,13 @@ export default function BoardPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(key)}
-                className={`px-3.5 py-2 text-[12px] font-medium border-b-2 transition-all duration-200 -mb-px ${
+                className={`px-3 py-1.5 text-xs font-medium border-b-2 transition-colors duration-150 -mb-px cursor-pointer shrink-0 ${
                   isActive
-                    ? 'text-white border-brand-500'
-                    : 'text-white/30 border-transparent hover:text-white/65 hover:border-white/15'
+                    ? 'text-zinc-100 border-zinc-100 font-semibold'
+                    : 'text-zinc-400 border-transparent hover:text-zinc-200 hover:border-zinc-700'
                 }`}
               >
                 {tab}
-                {tab === 'Tasks' && (
-                  <span className="ml-1.5 text-[8px] font-bold px-1 py-px bg-brand-500/20 text-brand-400 rounded">●</span>
-                )}
               </button>
             );
           })}

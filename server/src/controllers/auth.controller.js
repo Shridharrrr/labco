@@ -83,7 +83,7 @@ exports.login = async (req, res, next) => {
 
     return res.json({
       accessToken,
-      user: { _id: user._id, name: user.name, email: user.email, avatar: user.avatar },
+      user: { _id: user._id, userId: user._id, name: user.name, email: user.email, avatar: user.avatar },
     });
   } catch (err) {
     next(err);
@@ -157,7 +157,9 @@ exports.getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.userId).select('-passwordHash -refreshToken');
     if (!user) return res.status(404).json({ message: 'User not found' });
-    return res.json(user);
+    const userObj = user.toObject();
+    userObj.userId = user._id;
+    return res.json(userObj);
   } catch (err) {
     next(err);
   }
@@ -250,7 +252,7 @@ exports.googleAuth = async (req, res, next) => {
 
     return res.json({
       accessToken,
-      user: { _id: user._id, name: user.name, email: user.email, avatar: user.avatar },
+      user: { _id: user._id, userId: user._id, name: user.name, email: user.email, avatar: user.avatar },
     });
   } catch (err) {
     next(err);

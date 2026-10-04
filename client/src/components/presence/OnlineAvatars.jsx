@@ -20,12 +20,12 @@ export default function OnlineAvatars() {
         ))}
         {onlineUsers.length > 6 && (
           <div className="w-7 h-7 rounded-md bg-white/10 border border-[#09090b]
-            flex items-center justify-center text-[9px] text-white/50 font-semibold">
+            flex items-center justify-center text-[10px] text-zinc-300 font-semibold">
             +{onlineUsers.length - 6}
           </div>
         )}
       </div>
-      <span className="ml-2 text-xs text-white/40 hidden sm:block">
+      <span className="ml-2 text-xs text-zinc-400 font-medium hidden sm:block">
         {onlineUsers.length} online
       </span>
     </div>

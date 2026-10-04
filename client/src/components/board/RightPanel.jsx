@@ -124,15 +124,22 @@ export default function RightPanel({ boardId, onClose }) {
   };
 
   return (
-    <div className="fixed right-0 top-0 bottom-0 w-80 bg-[#0c0c0f] border-l border-white/[0.06]
-      z-40 flex flex-col shadow-2xl shadow-black/60 animate-[slideIn_0.2s_ease-out]">
-      {/* Header Tabs */}
-      <div className="flex items-center justify-between px-4 pt-3.5 border-b border-white/[0.06] shrink-0">
+    <>
+      {/* Mobile backdrop */}
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 sm:hidden"
+        onClick={onClose}
+      />
+
+      <div className="fixed right-0 top-0 bottom-0 w-full sm:w-80 bg-[#0c0c0f] border-l border-white/[0.06]
+        z-50 sm:z-40 flex flex-col shadow-2xl shadow-black/80 animate-[slideIn_0.2s_ease-out]">
+        {/* Header Tabs */}
+        <div className="flex items-center justify-between px-4 pt-3.5 border-b border-white/[0.06] shrink-0">
         <div className="flex gap-4">
           <button
             onClick={() => setActiveTab('chat')}
             className={`pb-2.5 text-[12px] font-medium border-b-2 transition-colors ${
-              activeTab === 'chat' ? 'border-brand-500 text-white' : 'border-transparent text-white/35 hover:text-white/70'
+              activeTab === 'chat' ? 'border-brand-500 text-white' : 'border-transparent text-zinc-400 hover:text-white'
             }`}
           >
             Board Chat
@@ -140,13 +147,13 @@ export default function RightPanel({ boardId, onClose }) {
           <button
             onClick={() => setActiveTab('members')}
             className={`pb-2.5 text-[12px] font-medium border-b-2 transition-colors ${
-              activeTab === 'members' ? 'border-brand-500 text-white' : 'border-transparent text-white/35 hover:text-white/70'
+              activeTab === 'members' ? 'border-brand-500 text-white' : 'border-transparent text-zinc-400 hover:text-white'
             }`}
           >
             Members
           </button>
         </div>
-        <button onClick={onClose} className="mb-2.5 p-1 rounded-md text-white/25 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-95">
+        <button onClick={onClose} className="mb-2.5 p-1 rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-95">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
@@ -159,10 +166,10 @@ export default function RightPanel({ boardId, onClose }) {
               {loading ? (
                 <div className="flex justify-center py-10"><Spinner /></div>
               ) : messages.length === 0 ? (
-                <div className="text-center py-10 text-white/25 text-xs">No messages yet.<br/>Start the conversation!</div>
+                <div className="text-center py-10 text-zinc-400 text-xs">No messages yet.<br/>Start the conversation!</div>
               ) : (
                 messages.map((msg, i) => {
-                  const isMe = msg.user._id === user.userId;
+                  const isMe = msg.user._id === (user?.userId || user?._id);
                   const prevMsg = messages[i-1];
                   const isGrouped = prevMsg && prevMsg.user._id === msg.user._id && (new Date(msg.createdAt) - new Date(prevMsg.createdAt)) < 5 * 60000;
                   const uName = msg.user.name || msg.user.email?.split('@')[0];
@@ -174,7 +181,7 @@ export default function RightPanel({ boardId, onClose }) {
                           <span className="text-[11px] font-semibold" style={{ color: nameColor(uName) }}>
                             {uName}
                           </span>
-                          <span className="text-[9px] text-white/25">{timeAgo(msg.createdAt)}</span>
+                          <span className="text-[10px] text-zinc-400">{timeAgo(msg.createdAt)}</span>
                         </div>
                       )}
                       
@@ -229,7 +236,7 @@ export default function RightPanel({ boardId, onClose }) {
                 </div>
               )}
 
-              <div className="relative flex flex-col bg-white/[0.04] border border-white/[0.08] rounded-lg focus-within:border-brand-500/40 transition-colors">
+              <div className="relative flex flex-col bg-white/[0.04] border border-white/[0.08] rounded-lg focus-within:border-brand-500/50 transition-colors">
                 <textarea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
@@ -237,7 +244,7 @@ export default function RightPanel({ boardId, onClose }) {
                     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(e); }
                   }}
                   placeholder="Type a message..."
-                  className="w-full bg-transparent p-2.5 text-xs text-white placeholder-white/25 outline-none resize-none min-h-[40px] max-h-32"
+                  className="w-full bg-transparent p-2.5 text-xs text-zinc-100 placeholder-zinc-500 outline-none resize-none min-h-[40px] max-h-32"
                   rows={1}
                 />
                 
@@ -253,7 +260,7 @@ export default function RightPanel({ boardId, onClose }) {
                 />
 
                 <div className="flex items-center justify-between px-2 pb-2">
-                  <button type="button" onClick={() => fileInputRef.current?.click()} className="p-1.5 text-white/30 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors" title="Attach file">
+                  <button type="button" onClick={() => fileInputRef.current?.click()} className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors" title="Attach file">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                   </button>
                   <button
@@ -277,32 +284,32 @@ export default function RightPanel({ boardId, onClose }) {
         ) : (
           <div className="flex-1 overflow-y-auto p-4 space-y-5">
             <div>
-              <h4 className="text-[9px] font-semibold text-white/25 uppercase tracking-[0.12em] mb-2.5">Board Owner</h4>
+              <h4 className="text-[10px] font-semibold text-zinc-400 uppercase tracking-[0.12em] mb-2.5">Board Owner</h4>
               {board.members.filter(m => m.role === 'owner').map(m => (
                 <div key={m._id} className="flex items-center gap-2.5">
                   <Avatar name={m.user.name || m.user.email} src={m.user.avatar} />
                   <div>
-                    <p className="text-[13px] font-medium text-white/85">{m.user.name || m.user.email?.split('@')[0]}</p>
-                    <p className="text-[11px] text-white/35">{m.user.email}</p>
+                    <p className="text-[13px] font-medium text-white/90">{m.user.name || m.user.email?.split('@')[0]}</p>
+                    <p className="text-[11px] text-zinc-400">{m.user.email}</p>
                   </div>
                 </div>
               ))}
             </div>
             
             <div>
-              <h4 className="text-[9px] font-semibold text-white/25 uppercase tracking-[0.12em] mb-2.5 mt-4">Editors & Viewers</h4>
+              <h4 className="text-[10px] font-semibold text-zinc-400 uppercase tracking-[0.12em] mb-2.5 mt-4">Editors & Viewers</h4>
               <div className="space-y-3">
                 {board.members.filter(m => m.role !== 'owner').map(m => (
                   <div key={m._id} className="flex items-center gap-2.5">
                     <Avatar name={m.user.name || m.user.email} src={m.user.avatar} size="sm" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] font-medium text-white/75 truncate">{m.user.name || m.user.email?.split('@')[0]}</p>
-                      <p className="text-[10px] text-white/35 capitalize">{m.role}</p>
+                      <p className="text-[12px] font-medium text-zinc-200 truncate">{m.user.name || m.user.email?.split('@')[0]}</p>
+                      <p className="text-[10px] text-zinc-400 capitalize">{m.role}</p>
                     </div>
                   </div>
                 ))}
                 {board.members.length === 1 && (
-                  <p className="text-[11px] text-white/25 italic">No other members</p>
+                  <p className="text-[11px] text-zinc-500 italic">No other members</p>
                 )}
               </div>
             </div>
@@ -310,5 +317,6 @@ export default function RightPanel({ boardId, onClose }) {
         )}
       </div>
     </div>
+    </>
   );
 }

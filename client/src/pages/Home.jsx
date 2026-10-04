@@ -18,6 +18,7 @@ const BG_GRADIENTS = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const { toggleMobileSidebar } = useUIStore();
   const [boards, setBoards] = useState(null); // null = loading
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -61,16 +62,27 @@ export default function Home() {
   return (
     <div className="flex-1 overflow-y-auto bg-[#0c0c0f]">
       {/* Page header */}
-      <div className="px-8 pt-7 pb-5 border-b border-white/[0.06]">
-        <div className="flex items-end justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-white tracking-tight">My Boards</h1>
-            <p className="text-white/35 text-xs mt-1">Pick a board or create a new one</p>
-          </div>
+      <div className="px-4 sm:px-8 pt-5 sm:pt-7 pb-4 sm:pb-5 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
+              onClick={toggleMobileSidebar}
+              className="md:hidden p-1.5 -ml-1 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors cursor-pointer"
+              title="Open sidebar"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-xl font-bold text-white tracking-tight">My Boards</h1>
+              <p className="text-zinc-400 text-xs mt-0.5">Pick a board or create a new one</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
               onClick={() => setShowNotifications(true)}
-              className="relative flex items-center justify-center w-8 h-8 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-95"
+              className="relative flex items-center justify-center w-8 h-8 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-95"
               title="Notifications"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,16 +95,16 @@ export default function Home() {
             <button
               id="create-board-btn"
               onClick={() => setShowCreate(true)}
-              className="group relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-200 text-white/45 hover:text-white/80 hover:bg-white/[0.06]"
+              className="group relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-all duration-200 text-zinc-300 hover:text-white hover:bg-white/[0.06]"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-              New board
+              <span>New board</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div className="px-8 py-6 max-w-7xl">
+      <div className="px-4 sm:px-8 py-5 sm:py-6 max-w-7xl">
         {/* Create board inline form */}
         {showCreate && (
           <form
@@ -112,12 +124,12 @@ export default function Home() {
                 onKeyDown={e => e.key === 'Escape' && setShowCreate(false)}
                 placeholder="Give your board a title..."
                 className="w-full bg-transparent border-none px-0 py-2 text-[15px] font-medium
-                  text-white placeholder-white/30 outline-none ring-0 focus:ring-0"
+                  text-zinc-100 placeholder-zinc-500 outline-none ring-0 focus:ring-0"
               />
             </div>
             <div className="flex items-center gap-2 shrink-0 z-10 w-full sm:w-auto">
               <button type="button" onClick={() => setShowCreate(false)}
-                className="flex-1 sm:flex-none px-4 py-2 text-white/40 hover:text-white hover:bg-white/[0.06] text-sm font-medium transition-all duration-200 rounded-lg">
+                className="flex-1 sm:flex-none px-4 py-2 text-zinc-400 hover:text-white hover:bg-white/[0.06] text-sm font-medium transition-all duration-200 rounded-lg">
                 Cancel
               </button>
               <button
@@ -137,9 +149,9 @@ export default function Home() {
         ) : boards.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-14 h-14 rounded-lg bg-white/[0.04] flex items-center justify-center mx-auto mb-4 border border-white/[0.06]">
-              <svg className="w-7 h-7 text-white/15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" /></svg>
+              <svg className="w-7 h-7 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" /></svg>
             </div>
-            <p className="text-white/35 text-sm">No boards yet. Create your first one!</p>
+            <p className="text-zinc-400 text-sm font-medium">No boards yet. Create your first one!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -157,7 +169,7 @@ export default function Home() {
                 <div className="absolute top-2 -right-2 w-10 h-10 rounded-lg bg-white/[0.05] rotate-12 group-hover:rotate-[20deg] transition-transform duration-300" />
                 <div className="relative">
                   <h2 className="font-semibold text-white text-sm leading-snug truncate">{board.title}</h2>
-                  <p className="text-white/35 group-hover:text-white/50 text-[11px] mt-1.5 font-medium transition-colors">
+                  <p className="text-zinc-300 group-hover:text-white text-[11px] mt-1.5 font-medium transition-colors">
                     {board.members?.length} member{board.members?.length !== 1 ? 's' : ''}
                   </p>
                 </div>
@@ -167,14 +179,14 @@ export default function Home() {
             {/* Create new board card */}
             <button
               onClick={() => setShowCreate(true)}
-              className="group h-36 rounded-xl border border-dashed border-white/[0.08] hover:border-white/[0.15]
+              className="group h-36 rounded-xl border border-dashed border-white/[0.12] hover:border-white/[0.25]
                 flex flex-col items-center justify-center gap-2.5 transition-all duration-200
                 hover:bg-white/[0.06] cursor-pointer active:scale-[0.98]"
             >
               <div className="w-10 h-10 rounded-lg bg-white/[0.04] group-hover:bg-white/[0.06] flex items-center justify-center transition-all duration-200 border border-white/[0.06] group-hover:border-white/[0.12] group-hover:scale-110">
-                <svg className="w-4 h-4 text-white/25 group-hover:text-white/80 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                <svg className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
               </div>
-              <span className="text-xs text-white/25 group-hover:text-white/70 transition-colors duration-200 font-medium">New board</span>
+              <span className="text-xs text-zinc-300 group-hover:text-white transition-colors duration-200 font-medium">New board</span>
             </button>
           </div>
         )}

@@ -138,7 +138,7 @@ export default function LoginForm() {
             <h2 className="text-[32px] font-extrabold text-white leading-[1.1] tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
               Manage boards<br />with clarity.
             </h2>
-            <p className="text-white/40 text-[15px] mt-4 leading-relaxed max-w-[280px] font-light">
+            <p className="text-zinc-400 text-[15px] mt-4 leading-relaxed max-w-[280px] font-light">
               Kanban boards, real-time collaboration, and task tracking. Built for teams that ship fast.
             </p>
           </div>
@@ -155,18 +155,18 @@ export default function LoginForm() {
                 </div>
                 <div className="space-y-1 pt-0.5">
                   <h4 className="font-semibold text-white/90 tracking-tight">{f.title}</h4>
-                  <p className="text-xs text-white/40 leading-relaxed font-light">{f.desc}</p>
+                  <p className="text-xs text-zinc-400 leading-relaxed font-light">{f.desc}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="relative z-10 text-[12px] text-white/30 font-light tracking-wide">© {new Date().getFullYear()} LabCo. All rights reserved.</p>
+        <p className="relative z-10 text-[12px] text-zinc-400 font-light tracking-wide">© {new Date().getFullYear()} LabCo. All rights reserved.</p>
       </div>
 
       {/* Right - Login Form */}
-      <div className="flex-1 flex items-center justify-center px-6 relative z-10">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 relative z-10">
         <div className="w-full max-w-[360px]">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-10">
@@ -180,7 +180,7 @@ export default function LoginForm() {
 
           <div className="mb-10 text-center">
             <h1 className="text-2xl font-bold text-white tracking-tight">Welcome back</h1>
-            <p className="text-white/40 text-[13px] mt-2 font-light tracking-wide">Sign in to your workspace</p>
+            <p className="text-zinc-400 text-[13px] mt-2 font-light tracking-wide">Sign in to your workspace</p>
           </div>
 
           {error && (
@@ -208,18 +208,18 @@ export default function LoginForm() {
 
           <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/[0.06]"></div>
+              <div className="w-full border-t border-white/[0.08]"></div>
             </div>
             <div className="relative flex justify-center text-[11px] uppercase tracking-widest font-semibold">
-              <span className="bg-[#050505] px-3 text-white/30">Or</span>
+              <span className="bg-[#050505] px-3 text-zinc-400">Or</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-[13px] font-medium text-white/60 mb-2">Email address</label>
+              <label className="block text-[13px] font-medium text-zinc-300 mb-2">Email address</label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30 group-focus-within:text-white/70 transition-colors">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-zinc-200 transition-colors">
                   <MailIcon className="w-4 h-4" />
                 </div>
                 <input
@@ -229,17 +229,17 @@ export default function LoginForm() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="you@example.com"
-                  className="w-full bg-[#0a0a0a] border border-white/[0.08] hover:border-white/[0.15] rounded-xl pl-10 pr-4 py-3
-                    text-white placeholder-white/20 text-sm outline-none focus:bg-[#0a0a0a]
+                  className="w-full bg-[#0a0a0a] border border-white/[0.1] hover:border-white/[0.18] rounded-xl pl-10 pr-4 py-3
+                    text-zinc-100 placeholder-zinc-500 text-sm outline-none focus:bg-[#0a0a0a]
                     focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200 shadow-sm"
                 />
               </div>
             </div>
             
             <div>
-              <label className="block text-[13px] font-medium text-white/60 mb-2">Password</label>
+              <label className="block text-[13px] font-medium text-zinc-300 mb-2">Password</label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/30 group-focus-within:text-white/70 transition-colors">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-zinc-200 transition-colors">
                   <LockIcon className="w-4 h-4" />
                 </div>
                 <input
@@ -249,14 +249,14 @@ export default function LoginForm() {
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   placeholder="••••••••"
-                  className="w-full bg-[#0a0a0a] border border-white/[0.08] hover:border-white/[0.15] rounded-xl pl-10 pr-10 py-3
-                    text-white placeholder-white/20 text-sm outline-none focus:bg-[#0a0a0a]
+                  className="w-full bg-[#0a0a0a] border border-white/[0.1] hover:border-white/[0.18] rounded-xl pl-10 pr-10 py-3
+                    text-zinc-100 placeholder-zinc-500 text-sm outline-none focus:bg-[#0a0a0a]
                     focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all duration-200 shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-white/30 hover:text-white/70 focus:outline-none transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-white focus:outline-none transition-colors"
                 >
                   {showPassword ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
                 </button>
@@ -275,7 +275,7 @@ export default function LoginForm() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-[13px] text-white/40 font-light">
+          <p className="mt-8 text-center text-[13px] text-zinc-400 font-light">
             Don't have an account?{' '}
             <Link to="/register" className="text-white hover:text-brand-300 font-medium transition-colors border-b border-white/20 hover:border-brand-300 pb-0.5">
               Sign up

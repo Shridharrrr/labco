@@ -76,38 +76,38 @@ export default function CardModal({ boardId }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 animate-[fadeIn_0.1s_ease-out]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-3 sm:p-4 animate-[fadeIn_0.1s_ease-out]"
       onClick={(e) => e.target === e.currentTarget && closeCard()}
     >
-      <div className={`bg-[#111114] border border-white/[0.08] rounded-lg shadow-2xl shadow-black/50
-        w-full mx-4 flex flex-col overflow-hidden transition-[max-width] duration-200
+      <div className={`bg-[#111114] border border-white/[0.08] rounded-xl shadow-2xl shadow-black/80
+        w-full flex flex-col overflow-hidden transition-[max-width] duration-200
         ${showChecklist ? 'max-w-[760px]' : 'max-w-[520px]'}`}>
 
         {/* Cover line */}
         {detail?.coverColor && <div className="h-1" style={{ background: detail.coverColor }} />}
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06]">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <h2 className="text-[15px] font-semibold text-white truncate">{card.title}</h2>
+        <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 border-b border-white/[0.06]">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+            <h2 className="text-[14px] sm:text-[15px] font-semibold text-white truncate">{card.title}</h2>
             {badge && (
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${badge.cls} shrink-0`}>
+              <span className={`text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded ${badge.cls} shrink-0`}>
                 {badge.label}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1 shrink-0 ml-3">
+          <div className="flex items-center gap-1 shrink-0 ml-2 sm:ml-3">
             <button
               onClick={() => setShowChecklist(v => !v)}
-              className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium transition-colors
-                ${showChecklist ? 'bg-white/[0.08] text-white/70' : 'text-white/30 hover:text-white/60 hover:bg-white/[0.04]'}`}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors
+                ${showChecklist ? 'bg-white/[0.08] text-zinc-200' : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.05]'}`}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
               {totalCount > 0 ? `${checkedCount}/${totalCount}` : 'Checklist'}
             </button>
-            <button onClick={closeCard} className="text-white/25 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg transition-all duration-200 active:scale-95">
+            <button onClick={closeCard} className="text-zinc-400 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg transition-all duration-200 active:scale-95" title="Close">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -118,35 +118,35 @@ export default function CardModal({ boardId }) {
         {loading ? (
           <div className="flex justify-center py-16"><Spinner /></div>
         ) : (
-          <div className="flex flex-1 overflow-hidden max-h-[65vh]">
+          <div className="flex flex-col md:flex-row flex-1 overflow-y-auto md:overflow-hidden max-h-[82vh] md:max-h-[68vh]">
 
             {/* Left — main content */}
             <div className="flex-1 overflow-y-auto">
 
               {/* Meta row */}
-              <div className="px-5 py-3 border-b border-white/[0.06] flex items-center gap-5 text-[11px]">
+              <div className="px-4 sm:px-5 py-3 border-b border-white/[0.06] flex flex-wrap items-center gap-4 sm:gap-6 text-[11px]">
                 {/* Column */}
-                <div className="flex items-center gap-1.5 text-white/30">
-                  <span className="text-white/20">Column</span>
-                  <span className="font-medium text-white/55">{detail?.column?.title || '—'}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-zinc-400 font-medium">Column</span>
+                  <span className="font-medium text-zinc-200">{detail?.column?.title || '—'}</span>
                 </div>
                 {/* Due */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-white/20">Due</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-zinc-400 font-medium">Due</span>
                   <input
                     type="date"
                     value={detail?.dueDate ? new Date(detail.dueDate).toISOString().split('T')[0] : ''}
                     onChange={(e) => patch({ dueDate: e.target.value || null })}
-                    className="bg-transparent text-[11px] text-white/55 font-medium outline-none cursor-pointer"
+                    className="bg-transparent text-[11px] text-zinc-200 font-medium outline-none cursor-pointer hover:text-white transition-colors"
                   />
                 </div>
               </div>
 
               {/* Properties */}
-              <div className="px-5 py-3 border-b border-white/[0.06] space-y-3">
+              <div className="px-4 sm:px-5 py-3 border-b border-white/[0.06] space-y-3">
                 {/* Cover */}
                 <div className="flex items-center gap-3">
-                  <span className="text-[11px] text-white/20 w-16 shrink-0">Cover</span>
+                  <span className="text-[11px] text-zinc-400 font-medium w-16 shrink-0">Cover</span>
                   <div className="flex gap-1.5">
                     {COVER_COLORS.map(c => (
                       <button
@@ -160,7 +160,7 @@ export default function CardModal({ boardId }) {
                 </div>
                 {/* Assignees */}
                 <div className="flex items-center gap-3">
-                  <span className="text-[11px] text-white/20 w-16 shrink-0">Assign</span>
+                  <span className="text-[11px] text-zinc-400 font-medium w-16 shrink-0">Assign</span>
                   <div className="flex gap-1">
                     {board?.members?.map(m => {
                       const isAssigned = detail?.assignees?.find(a => a._id === m.user._id);
@@ -177,7 +177,7 @@ export default function CardModal({ boardId }) {
                           }}
                           title={m.user.name || m.user.email}
                           className={`w-6 h-6 rounded flex items-center justify-center text-[9px] font-bold transition-all
-                            ${isAssigned ? 'ring-1.5 ring-brand-500 ring-offset-1 ring-offset-[#111114]' : 'opacity-30 hover:opacity-70'}`}
+                            ${isAssigned ? 'ring-1.5 ring-brand-500 ring-offset-1 ring-offset-[#111114] opacity-100' : 'opacity-40 hover:opacity-90 ring-1 ring-white/10'}`}
                           style={{ background: `hsl(${(m.user.name?.charCodeAt(0) || 200) * 5 % 360}, 50%, 30%)`, color: '#fff' }}
                         >
                           {initial}
@@ -191,9 +191,9 @@ export default function CardModal({ boardId }) {
               {/* Description */}
               <div className="px-5 py-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] text-white/20 font-medium uppercase tracking-wider">Description</span>
+                  <span className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Description</span>
                   {!editingDesc && (
-                    <button onClick={() => setEditingDesc(true)} className="px-2 py-1 text-[10px] text-white/40 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95">
+                    <button onClick={() => setEditingDesc(true)} className="px-2 py-1 text-[11px] text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95 font-medium">
                       {description ? 'Edit' : 'Add'}
                     </button>
                   )}
@@ -204,20 +204,20 @@ export default function CardModal({ boardId }) {
                     <textarea
                       autoFocus rows={3} value={description}
                       onChange={e => setDescription(e.target.value)}
-                      className="w-full bg-white/[0.03] border border-white/[0.08] rounded px-3 py-2 text-sm text-white/80
-                        outline-none focus:border-brand-500/40 resize-y placeholder-white/15 transition-colors"
+                      className="w-full bg-white/[0.03] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-zinc-100
+                        outline-none focus:border-brand-500/50 resize-y placeholder-zinc-500 transition-colors"
                       placeholder="Add description..."
                     />
                     <div className="flex gap-2 mt-2">
                       <button onClick={saveDescription} className="px-3 py-1 bg-brand-600 hover:bg-brand-500 text-white text-[11px] font-medium rounded transition-colors">Save</button>
-                      <button onClick={() => { setEditingDesc(false); setDescription(detail?.description || ''); }} className="px-3 py-1.5 text-white/40 hover:text-white hover:bg-white/[0.06] text-[11px] rounded-lg transition-all duration-200">Cancel</button>
+                      <button onClick={() => { setEditingDesc(false); setDescription(detail?.description || ''); }} className="px-3 py-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.06] text-[11px] rounded-lg transition-all duration-200">Cancel</button>
                     </div>
                   </div>
                 ) : (
                   <div
                     onClick={() => setEditingDesc(true)}
                     className={`rounded px-3 py-2 text-sm cursor-pointer transition-colors
-                      ${description ? 'text-white/60 leading-relaxed hover:bg-white/[0.03]' : 'text-white/15 italic border border-dashed border-white/[0.06] hover:border-white/[0.10]'}`}
+                      ${description ? 'text-zinc-300 leading-relaxed hover:bg-white/[0.03]' : 'text-zinc-500 italic border border-dashed border-white/[0.1] hover:border-white/[0.2]'}`}
                   >
                     {description || 'No description'}
                   </div>
@@ -227,20 +227,20 @@ export default function CardModal({ boardId }) {
 
             {/* Right — checklist panel */}
             {showChecklist && (
-              <div className="w-64 shrink-0 border-l border-white/[0.06] flex flex-col bg-[#0c0c0f]">
+              <div className="w-full md:w-64 shrink-0 border-t md:border-t-0 md:border-l border-white/[0.06] flex flex-col bg-[#0c0c0f]">
 
                 {/* Header */}
                 <div className="px-3.5 py-3 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-white/20 font-medium uppercase tracking-wider">Checklist</span>
+                    <span className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Checklist</span>
                     {totalCount > 0 && (
-                      <span className={`text-[10px] font-mono font-semibold ${allDone ? 'text-emerald-400' : 'text-white/25'}`}>
+                      <span className={`text-[10px] font-mono font-semibold ${allDone ? 'text-emerald-400' : 'text-zinc-400'}`}>
                         {checkedCount}/{totalCount}
                       </span>
                     )}
                   </div>
                   {totalCount > 0 && (
-                    <div className="mt-2 w-full bg-white/[0.04] rounded-sm h-1 overflow-hidden">
+                    <div className="mt-2 w-full bg-white/[0.06] rounded-sm h-1 overflow-hidden">
                       <div
                         className={`h-full transition-all duration-300 ${allDone ? 'bg-emerald-500' : 'bg-brand-500'}`}
                         style={{ width: `${(checkedCount / totalCount) * 100}%` }}
@@ -250,7 +250,7 @@ export default function CardModal({ boardId }) {
                 </div>
 
                 {/* Items */}
-                <div className="flex-1 overflow-y-auto py-1">
+                <div className="flex-1 overflow-y-auto py-1 max-h-48 md:max-h-none">
                   {detail?.checklist?.map((item, idx) => (
                     <div
                       key={idx}
@@ -260,7 +260,7 @@ export default function CardModal({ boardId }) {
                       <div className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center shrink-0 transition-all
                         ${item.completed
                           ? 'bg-brand-600 border-brand-500 text-white'
-                          : 'border-white/15 group-hover:border-white/30'}`}
+                          : 'border-white/25 group-hover:border-white/40'}`}
                       >
                         {item.completed && (
                           <svg className="w-2 h-2" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
@@ -269,12 +269,12 @@ export default function CardModal({ boardId }) {
                         )}
                       </div>
                       <span className={`text-[12px] flex-1 transition-colors select-none
-                        ${item.completed ? 'line-through text-white/15' : 'text-white/60 group-hover:text-white/80'}`}>
+                        ${item.completed ? 'line-through text-zinc-500' : 'text-zinc-200 group-hover:text-white'}`}>
                         {item.text}
                       </span>
                       <button
                         onClick={e => { e.stopPropagation(); deleteCheckItem(idx); }}
-                        className="opacity-0 group-hover:opacity-100 text-white/15 hover:text-red-400 transition-all shrink-0"
+                        className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-zinc-400 hover:text-red-400 transition-all shrink-0 p-1"
                       >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -291,11 +291,11 @@ export default function CardModal({ boardId }) {
                       type="text" value={newCheckItem}
                       onChange={e => setNewCheckItem(e.target.value)}
                       placeholder="Add item..."
-                      className="flex-1 bg-white/[0.03] border border-white/[0.06] rounded px-2.5 py-1.5 text-[12px] text-white
-                        placeholder-white/15 outline-none focus:border-white/[0.12] transition-colors"
+                      className="flex-1 bg-white/[0.03] border border-white/[0.1] rounded px-2.5 py-1.5 text-[12px] text-zinc-100
+                        placeholder-zinc-500 outline-none focus:border-brand-500/50 transition-colors"
                     />
                     <button type="submit" disabled={!newCheckItem.trim()}
-                      className="group relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-200 text-white/45 hover:text-white hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed">
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded text-xs transition-all duration-200 text-zinc-300 hover:text-white hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed font-medium">
                       Add
                     </button>
                   </div>
@@ -306,7 +306,7 @@ export default function CardModal({ boardId }) {
         )}
 
         {saving && (
-          <div className="absolute bottom-3 right-3 bg-[#111114] border border-white/[0.08] px-2.5 py-1 rounded text-[10px] text-white/30 shadow-lg">
+          <div className="absolute bottom-3 right-3 bg-[#111114] border border-white/[0.1] px-2.5 py-1 rounded text-[10px] text-zinc-300 shadow-lg">
             Saving…
           </div>
         )}
