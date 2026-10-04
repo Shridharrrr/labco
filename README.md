@@ -27,6 +27,7 @@ The application combines a React frontend with an Express and Socket.io backend,
   - Server Environment Variables
   - Client Environment Variables
 - Roles and Permissions
+- Model Context Protocol (MCP) for Claude & AI Agents
 - Socket.io Events
 - REST API Reference
 - Common Issues and Troubleshooting
@@ -357,6 +358,51 @@ LabCo supports three membership roles on each board. Permissions are enforced by
 | Invite new members via email | Restricted | Restricted | Allowed |
 | Change member roles or remove members | Restricted | Restricted | Allowed |
 | Archive or delete the board | Restricted | Restricted | Allowed |
+
+---
+
+## Model Context Protocol (MCP) for Claude & AI Agents
+
+LabCo includes a first-class **Model Context Protocol (MCP)** server under [`mcp/`](./mcp). This allows **Claude Desktop**, **Claude Code**, **Cursor**, **Zed**, and other MCP-compatible AI clients to connect directly to your boards.
+
+Claude can:
+- List and inspect boards, columns, and cards with subtasks and due dates
+- Create, update, and move cards across columns autonomously
+- Check off subtasks and update checklists
+- Search cards across boards
+- Post daily standup updates and read discussions
+- **Live Sync**: Any card or column created/moved by Claude triggers real-time Socket.io broadcasts, updating open browser windows instantly without refreshing!
+
+### Quick Start for Claude Desktop
+
+1. Navigate to the `mcp` directory and install dependencies:
+   ```bash
+   cd mcp
+   npm install
+   ```
+
+2. Generate a 1-year authentication token:
+   ```bash
+   npm run generate-token -- your_email@example.com
+   ```
+
+3. Add the generated configuration block to `%APPDATA%\Claude\claude_desktop_config.json` (or `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+   ```json
+   {
+     "mcpServers": {
+       "labco": {
+         "command": "node",
+         "args": ["c:/Users/shrid/OneDrive/Documents/NextJS/nextjs-projects/labco/mcp/src/index.js"],
+         "env": {
+           "LABCO_API_URL": "http://localhost:5000/api",
+           "LABCO_TOKEN": "YOUR_GENERATED_JWT_TOKEN"
+         }
+       }
+     }
+   }
+   ```
+
+4. Restart Claude Desktop. You will see the 13 LabCo tools available under the hammer icon. For detailed tool documentation and prompt examples, see [`mcp/README.md`](./mcp/README.md).
 
 ---
 

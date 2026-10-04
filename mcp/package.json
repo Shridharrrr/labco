@@ -1,0 +1,31 @@
+{
+  "name": "labco-mcp-server",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) server for LabCo Kanban - Connect Claude to your boards",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "labco-mcp": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "generate-token": "node src/generate-token.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "claude-desktop",
+    "kanban",
+    "labco"
+  ],
+  "author": "LabCo",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.0",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.3",
+    "socket.io-client": "^4.7.5",
+    "zod": "^3.24.2"
+  }
+}
