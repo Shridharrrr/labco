@@ -168,36 +168,40 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
           ${collapsed ? 'md:w-16' : 'w-64 md:w-60'}
         `}
       >
-        {/* Brand Header (Matches Solaris Reference 1) */}
-        <div className={`flex items-center h-14 border-b border-black/[0.06] dark:border-white/[0.06] px-4 shrink-0 ${collapsed ? 'justify-center' : 'justify-between'}`}>
-          <Link
-            to="/"
-            onClick={() => setMobileSidebarOpen(false)}
-            className="flex items-center group cursor-pointer"
-          >
-            <Logo size="sm" showText={!collapsed} />
-          </Link>
-
-          {!collapsed && (
+        {/* Brand Header */}
+        {collapsed ? (
+          <div className="flex items-center justify-center h-14 border-b border-black/[0.06] dark:border-white/[0.06] shrink-0">
+            <button
+              onClick={() => setCollapsed(false)}
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all group cursor-pointer"
+              title="Expand sidebar"
+            >
+              <div className="group-hover:hidden">
+                <Logo size="sm" showText={false} />
+              </div>
+              <div className="hidden group-hover:block rotate-180 text-zinc-700 dark:text-zinc-200">
+                {ICONS.chevronLeft}
+              </div>
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between h-14 border-b border-black/[0.06] dark:border-white/[0.06] px-4 shrink-0">
+            <Link
+              to="/"
+              onClick={() => setMobileSidebarOpen(false)}
+              className="flex items-center group cursor-pointer"
+            >
+              <Logo size="sm" showText={true} />
+            </Link>
             <button
               onClick={() => setCollapsed(true)}
-              className="hidden md:flex text-zinc-400 hover:text-black dark:hover:text-white p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              className="hidden md:flex text-zinc-400 hover:text-black dark:hover:text-white p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
               title="Collapse sidebar"
             >
               {ICONS.chevronLeft}
             </button>
-          )}
-
-          {collapsed && (
-            <button
-              onClick={() => setCollapsed(false)}
-              className="text-zinc-400 hover:text-black dark:hover:text-white p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              title="Expand sidebar"
-            >
-              <div className="rotate-180">{ICONS.chevronLeft}</div>
-            </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Search input (Solaris style) */}
         {!collapsed && (
@@ -219,15 +223,18 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
         <div className="flex-1 overflow-y-auto px-2.5 py-2 space-y-4">
           
           {/* Main Links */}
-          <div className="space-y-0.5">
+          <div className="space-y-1">
             <Link
               to="/"
+              title="Dashboard"
               onClick={() => setMobileSidebarOpen(false)}
-              className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center gap-2.5 rounded-lg text-xs font-medium transition-all ${
+                collapsed ? 'w-9 h-9 mx-auto justify-center' : 'px-2.5 py-2'
+              } ${
                 location.pathname === '/'
                   ? 'bg-black/5 dark:bg-white/[0.09] text-zinc-950 dark:text-white font-semibold'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]'
-              } ${collapsed ? 'justify-center' : ''}`}
+              }`}
             >
               <span className="text-zinc-500 dark:text-zinc-400">{ICONS.dashboard}</span>
               {!collapsed && <span>Dashboard</span>}
@@ -235,8 +242,11 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
 
             <Link
               to="/"
+              title="Projects"
               onClick={() => setMobileSidebarOpen(false)}
-              className={`flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04] ${collapsed ? 'justify-center' : ''}`}
+              className={`flex items-center justify-between rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04] ${
+                collapsed ? 'w-9 h-9 mx-auto justify-center' : 'px-2.5 py-2'
+              }`}
             >
               <div className="flex items-center gap-2.5">
                 <span className="text-zinc-500 dark:text-zinc-400">{ICONS.boards}</span>
@@ -273,22 +283,24 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
 
           {/* Workspaces / Board List */}
           <div>
-            {!collapsed && (
+            {!collapsed ? (
               <div className="flex items-center justify-between px-2.5 mb-1.5">
                 <p className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                   Workspaces
                 </p>
                 <button
                   onClick={() => setShowNewBoard((v) => !v)}
-                  className="text-zinc-400 hover:text-black dark:hover:text-white p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                  className="text-zinc-400 hover:text-black dark:hover:text-white p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
                   title="Create board"
                 >
                   {ICONS.plus}
                 </button>
               </div>
+            ) : (
+              <div className="w-6 h-px bg-black/[0.08] dark:bg-white/[0.08] mx-auto my-2" />
             )}
 
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {filtered.map((b) => (
                 <BoardLink
                   key={b._id}
@@ -299,6 +311,16 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
                   collapsed={collapsed}
                 />
               ))}
+
+              {collapsed && (
+                <button
+                  onClick={() => setShowNewBoard(true)}
+                  className="w-9 h-9 mx-auto rounded-lg flex items-center justify-center text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer mt-1"
+                  title="New workspace"
+                >
+                  {ICONS.plus}
+                </button>
+              )}
             </div>
 
             {/* Create Board Modal */}
@@ -391,6 +413,28 @@ export default function Sidebar({ boards, setBoards, creating, setCreating }) {
 
 function BoardLink({ board, active, isFav, onFav, collapsed }) {
   const { setMobileSidebarOpen } = useUIStore();
+
+  if (collapsed) {
+    const initial = (board.title?.[0] || 'B').toUpperCase();
+    return (
+      <Link
+        to={`/boards/${board._id}`}
+        title={board.title}
+        onClick={() => setMobileSidebarOpen(false)}
+        className={`w-9 h-9 mx-auto rounded-lg flex items-center justify-center text-xs font-semibold uppercase relative transition-colors ${
+          active
+            ? 'bg-black/10 dark:bg-white/[0.12] text-zinc-950 dark:text-white font-bold'
+            : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.05]'
+        }`}
+      >
+        <span className="leading-none">{initial}</span>
+        {active && (
+          <span className="absolute left-0 w-0.5 h-3.5 rounded-r bg-zinc-950 dark:bg-white" />
+        )}
+      </Link>
+    );
+  }
+
   return (
     <Link
       to={`/boards/${board._id}`}
@@ -400,27 +444,28 @@ function BoardLink({ board, active, isFav, onFav, collapsed }) {
         active
           ? 'bg-black/5 dark:bg-white/[0.09] text-zinc-950 dark:text-white font-semibold'
           : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]'
-      } ${collapsed ? 'justify-center' : ''}`}
+      }`}
     >
       <div className="flex items-center gap-2 min-w-0">
-        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-        {!collapsed && <span className="truncate">{board.title}</span>}
+        <span
+          className="w-1.5 h-1.5 rounded-full shrink-0"
+          style={{ backgroundColor: board.background || '#6366f1' }}
+        />
+        <span className="truncate">{board.title}</span>
       </div>
 
-      {!collapsed && (
-        <button
-          onClick={(e) => onFav(board._id, e)}
-          className={`p-0.5 rounded cursor-pointer transition-opacity ${
-            isFav
-              ? 'text-amber-400 opacity-100'
-              : 'text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-amber-400'
-          }`}
-        >
-          <svg className="w-3 h-3" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" strokeWidth="1.5" />
-          </svg>
-        </button>
-      )}
+      <button
+        onClick={(e) => onFav(board._id, e)}
+        className={`p-0.5 rounded cursor-pointer transition-opacity ${
+          isFav
+            ? 'text-amber-400 opacity-100'
+            : 'text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-amber-400'
+        }`}
+      >
+        <svg className="w-3 h-3" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" strokeWidth="1.5" />
+        </svg>
+      </button>
     </Link>
   );
 }
