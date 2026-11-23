@@ -13,7 +13,7 @@ const userColor = (userId) => {
 const presenceHandlers = (io, socket) => {
   const { userId, email } = socket.user;
 
-  // board:join — join socket room and update Redis presence
+  // board:join - join socket room and update Redis presence
   socket.on('board:join', async ({ boardId }) => {
     try {
       if (!boardId || !mongoose.isValidObjectId(boardId)) {
@@ -64,7 +64,7 @@ const presenceHandlers = (io, socket) => {
     }
   });
 
-  // cursor:move — throttle on client side (50ms), relay ephemerally
+  // cursor:move - throttle on client side (50ms), relay ephemerally
   socket.on('cursor:move', ({ boardId, x, y }) => {
     // Only broadcast if socket actually joined this board room
     if (socket.currentBoardId !== boardId) return;

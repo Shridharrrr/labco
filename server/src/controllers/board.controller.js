@@ -10,7 +10,7 @@ const crypto = require('crypto');
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ALLOWED_MEMBER_ROLES = ['editor', 'viewer'];
 
-// GET /api/boards/invitations/pending — get invitations for current user
+// GET /api/boards/invitations/pending - get invitations for current user
 exports.getPendingInvitations = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.userId);
@@ -41,7 +41,7 @@ exports.getPendingInvitations = async (req, res, next) => {
   }
 };
 
-// GET /api/boards — all boards for current user
+// GET /api/boards - all boards for current user
 exports.getBoards = async (req, res, next) => {
   try {
     const boards = await Board.find({
@@ -54,7 +54,7 @@ exports.getBoards = async (req, res, next) => {
   }
 };
 
-// POST /api/boards — create board
+// POST /api/boards - create board
 exports.createBoard = async (req, res, next) => {
   try {
     const { title, description = '', background = '#1e1b4b' } = req.body;
@@ -86,7 +86,7 @@ exports.createBoard = async (req, res, next) => {
   }
 };
 
-// GET /api/boards/:boardId — full board with columns + cards
+// GET /api/boards/:boardId - full board with columns + cards
 exports.getBoard = async (req, res, next) => {
   try {
     const board = await Board.findById(req.params.boardId)
@@ -113,7 +113,7 @@ exports.getBoard = async (req, res, next) => {
   }
 };
 
-// PATCH /api/boards/:boardId — update title/description/background
+// PATCH /api/boards/:boardId - update title/description/background
 exports.updateBoard = async (req, res, next) => {
   try {
     const { title, description, background } = req.body;
@@ -141,7 +141,7 @@ exports.updateBoard = async (req, res, next) => {
   }
 };
 
-// DELETE /api/boards/:boardId — archive board (owner only)
+// DELETE /api/boards/:boardId - archive board (owner only)
 exports.archiveBoard = async (req, res, next) => {
   try {
     req.board.isArchived = true;
@@ -152,7 +152,7 @@ exports.archiveBoard = async (req, res, next) => {
   }
 };
 
-// POST /api/boards/:boardId/members — invite member (owner only)
+// POST /api/boards/:boardId/members - invite member (owner only)
 exports.inviteMember = async (req, res, next) => {
   try {
     const { email, role = 'editor' } = req.body;
@@ -283,7 +283,7 @@ exports.revokeInvitation = async (req, res, next) => {
   }
 };
 
-// PATCH /api/boards/:boardId/members/:userId — change member role (owner only)
+// PATCH /api/boards/:boardId/members/:userId - change member role (owner only)
 exports.changeMemberRole = async (req, res, next) => {
   try {
     const { role } = req.body;
@@ -314,7 +314,7 @@ exports.changeMemberRole = async (req, res, next) => {
   }
 };
 
-// DELETE /api/boards/:boardId/members/:userId — remove member (owner or member themselves)
+// DELETE /api/boards/:boardId/members/:userId - remove member (owner or member themselves)
 exports.removeMember = async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -351,7 +351,7 @@ exports.removeMember = async (req, res, next) => {
   }
 };
 
-// POST /api/boards/:boardId/star — toggle favorite star for user
+// POST /api/boards/:boardId/star - toggle favorite star for user
 exports.toggleStar = async (req, res, next) => {
   try {
     const board = req.board;

@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
 /**
- * LabCoApiClient — Handles HTTP communication and real-time Socket.io
+ * LabCoApiClient - Handles HTTP communication and real-time Socket.io
  * updates with the LabCo Express/MongoDB backend.
  */
 export class LabCoApiClient {

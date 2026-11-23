@@ -168,7 +168,7 @@ export default function TableView() {
                         })}
                       </span>
                     ) : (
-                      <span className="text-zinc-400 text-xs">—</span>
+                      <span className="text-zinc-400 text-xs">-</span>
                     )}
                   </td>
 
@@ -197,7 +197,7 @@ export default function TableView() {
                         </span>
                       </div>
                     ) : (
-                      <span className="text-zinc-400 text-xs">—</span>
+                      <span className="text-zinc-400 text-xs">-</span>
                     )}
                   </td>
 
@@ -224,7 +224,7 @@ export default function TableView() {
                         )}
                       </div>
                     ) : (
-                      <span className="text-zinc-400 text-xs">—</span>
+                      <span className="text-zinc-400 text-xs">-</span>
                     )}
                   </td>
                 </tr>

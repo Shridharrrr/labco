@@ -25,5 +25,5 @@ const activitySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Activity is append-only — no updates or deletes
+// Activity is append-only - no updates or deletes
 module.exports = mongoose.model('Activity', activitySchema);

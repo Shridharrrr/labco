@@ -123,7 +123,7 @@ export default function Home() {
 
   const firstName = user?.name?.trim()?.split(/\s+/)[0] || 'there';
 
-  // Stat rows — purely textual, no color icons
+  // Stat rows - purely textual, no color icons
   const stats = [
     { label: 'Workspaces', value: boards ? boards.length : null },
     { label: 'Starred', value: favoriteBoards.length },
@@ -180,7 +180,7 @@ export default function Home() {
 
       <div className="max-w-6xl mx-auto px-6 sm:px-10 py-7 space-y-7">
 
-        {/* Stat strip — horizontal, no icons, just numbers */}
+        {/* Stat strip - horizontal, no icons, just numbers */}
         <div className="grid grid-cols-4 divide-x divide-black/[0.07] dark:divide-white/[0.07] border border-black/[0.07] dark:border-white/[0.07] rounded-lg bg-white dark:bg-[#0f0f12] overflow-hidden">
           {stats.map((s) => (
             <div key={s.label} className="px-5 py-4">

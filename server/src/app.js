@@ -13,7 +13,7 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// CORS — allow the Vite dev client
+// CORS - allow the Vite dev client
 app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:5173',

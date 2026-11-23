@@ -8,7 +8,7 @@ const writeActivity = async ({ boardId, userId, type, payload = {} }) => {
   try {
     await Activity.create({ board: boardId, user: userId, type, payload });
   } catch (err) {
-    // Non-fatal — log and continue
+    // Non-fatal - log and continue
     console.error('Activity log write failed:', err.message);
   }
 };

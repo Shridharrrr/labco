@@ -24,7 +24,7 @@ const useOptimistic = () => {
       } catch (err) {
         rollback();
         addToast({
-          message: err?.response?.data?.message || 'Action failed — changes reverted',
+          message: err?.response?.data?.message || 'Action failed - changes reverted',
           type: 'error',
         });
       }

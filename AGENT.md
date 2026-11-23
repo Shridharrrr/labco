@@ -1,4 +1,4 @@
-# AGENT.md — Real-time Collaborative Task Board
+# AGENT.md - Real-time Collaborative Task Board
 
 > This file describes the complete architecture, folder structure, data models, API contracts, socket events, and Zustand slice design for the project. Read this before writing any code.
 
@@ -8,7 +8,7 @@
 
 A real-time collaborative Kanban board where multiple users can manage shared tasks simultaneously. Built with the MERN stack (MongoDB, Express, React, Node.js), Zustand for client state management, and Socket.io for real-time sync.
 
-**Core value:** Multiple users on the same board always see the same state — live, without refreshing. Cards can be created, moved, and deleted by any collaborator and every connected client updates instantly.
+**Core value:** Multiple users on the same board always see the same state - live, without refreshing. Cards can be created, moved, and deleted by any collaborator and every connected client updates instantly.
 
 ---
 
@@ -241,47 +241,47 @@ All routes prefixed with `/api`. Protected routes require `Authorization: Bearer
 
 ### Auth
 ```
-POST   /api/auth/register          — Create account
-POST   /api/auth/login             — Returns accessToken + sets refreshToken cookie
-POST   /api/auth/refresh           — Rotate access token using refresh cookie
-POST   /api/auth/logout            — Invalidate refresh token
-GET    /api/auth/me                — Get current user profile [protected]
+POST   /api/auth/register          - Create account
+POST   /api/auth/login             - Returns accessToken + sets refreshToken cookie
+POST   /api/auth/refresh           - Rotate access token using refresh cookie
+POST   /api/auth/logout            - Invalidate refresh token
+GET    /api/auth/me                - Get current user profile [protected]
 ```
 
 ### Boards
 ```
-GET    /api/boards                 — Get all boards for current user [protected]
-POST   /api/boards                 — Create new board [protected]
-GET    /api/boards/:boardId        — Get full board with columns + cards [protected]
-PATCH  /api/boards/:boardId        — Update title, description, background [protected]
-DELETE /api/boards/:boardId        — Archive board (soft delete) [owner only]
-POST   /api/boards/:boardId/members         — Invite member [owner only]
-PATCH  /api/boards/:boardId/members/:userId — Change member role [owner only]
-DELETE /api/boards/:boardId/members/:userId — Remove member [owner only]
+GET    /api/boards                 - Get all boards for current user [protected]
+POST   /api/boards                 - Create new board [protected]
+GET    /api/boards/:boardId        - Get full board with columns + cards [protected]
+PATCH  /api/boards/:boardId        - Update title, description, background [protected]
+DELETE /api/boards/:boardId        - Archive board (soft delete) [owner only]
+POST   /api/boards/:boardId/members         - Invite member [owner only]
+PATCH  /api/boards/:boardId/members/:userId - Change member role [owner only]
+DELETE /api/boards/:boardId/members/:userId - Remove member [owner only]
 ```
 
 ### Columns
 ```
-POST   /api/boards/:boardId/columns         — Create column [editor+]
-PATCH  /api/columns/:columnId              — Rename column [editor+]
-DELETE /api/columns/:columnId              — Delete column + its cards [editor+]
-PATCH  /api/boards/:boardId/columns/reorder — Reorder columns array [editor+]
+POST   /api/boards/:boardId/columns         - Create column [editor+]
+PATCH  /api/columns/:columnId              - Rename column [editor+]
+DELETE /api/columns/:columnId              - Delete column + its cards [editor+]
+PATCH  /api/boards/:boardId/columns/reorder - Reorder columns array [editor+]
 ```
 
 ### Cards
 ```
-POST   /api/columns/:columnId/cards        — Create card [editor+]
-GET    /api/cards/:cardId                  — Get single card detail [protected]
-PATCH  /api/cards/:cardId                  — Update any card field [editor+]
-DELETE /api/cards/:cardId                  — Archive card [editor+]
-PATCH  /api/cards/:cardId/move             — Move card (column + order) [editor+]
-POST   /api/cards/:cardId/attachments      — Upload file (Multer) [editor+]
-DELETE /api/cards/:cardId/attachments/:id  — Remove attachment [editor+]
+POST   /api/columns/:columnId/cards        - Create card [editor+]
+GET    /api/cards/:cardId                  - Get single card detail [protected]
+PATCH  /api/cards/:cardId                  - Update any card field [editor+]
+DELETE /api/cards/:cardId                  - Archive card [editor+]
+PATCH  /api/cards/:cardId/move             - Move card (column + order) [editor+]
+POST   /api/cards/:cardId/attachments      - Upload file (Multer) [editor+]
+DELETE /api/cards/:cardId/attachments/:id  - Remove attachment [editor+]
 ```
 
 ### Activity
 ```
-GET    /api/boards/:boardId/activity       — Paginated activity log [protected]
+GET    /api/boards/:boardId/activity       - Paginated activity log [protected]
 ```
 
 ---
@@ -434,7 +434,7 @@ Every write operation follows this pattern to keep the UI snappy:
 2. Apply change to Zustand immediately (user sees update at 0ms)
 3. Emit socket event to server
 4. Also fire REST API call (source of truth write)
-5a. On success: server broadcasts to other clients — they apply via applyRemoteUpdate()
+5a. On success: server broadcasts to other clients - they apply via applyRemoteUpdate()
 5b. On error: rollback Zustand to snapshot, show toast error
 ```
 
@@ -485,9 +485,9 @@ Three roles enforced in `boardAccess.middleware.js`:
 
 Redis is used for two purposes only:
 
-1. **Presence tracking** — When a user joins a board room, their userId is added to a Redis Set keyed `presence:${boardId}`. On disconnect, removed. The server queries this set to return the current online users list on `board:join`.
+1. **Presence tracking** - When a user joins a board room, their userId is added to a Redis Set keyed `presence:${boardId}`. On disconnect, removed. The server queries this set to return the current online users list on `board:join`.
 
-2. **Refresh token store** — Refresh tokens are stored in Redis with TTL=7days as a fast invalidation layer (so logout works instantly without a DB query on every refresh).
+2. **Refresh token store** - Refresh tokens are stored in Redis with TTL=7days as a fast invalidation layer (so logout works instantly without a DB query on every refresh).
 
 ---
 
@@ -529,8 +529,8 @@ VITE_SOCKET_URL=http://localhost:5000
 - **Column order and card order** are stored as ordered arrays of IDs (not a numeric `order` field) on the client. On the server, the `order` field is a number for simple sorting. Reconcile on `board:join` fetch.
 - **Activity log** is append-only. Never update or delete activity documents. Write an activity entry in every controller action that mutates board data.
 - **File uploads** go through Multer (memory storage) → Cloudinary upload stream → URL saved to card's attachments array. Never store files in MongoDB.
-- **Cursor relay** must be throttled on the client (50ms) and on the server. Do not broadcast cursor events to Redis or MongoDB — they are ephemeral and only go through Socket.io.
-- **All socket handlers on the server must verify board membership** before broadcasting. Do not trust the client's claimed boardId — look up the socket's authenticated userId and confirm they are a member of that board.
+- **Cursor relay** must be throttled on the client (50ms) and on the server. Do not broadcast cursor events to Redis or MongoDB - they are ephemeral and only go through Socket.io.
+- **All socket handlers on the server must verify board membership** before broadcasting. Do not trust the client's claimed boardId - look up the socket's authenticated userId and confirm they are a member of that board.
 
 ---
 

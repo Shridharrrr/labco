@@ -81,7 +81,7 @@ export default function Board({ boardId }) {
           </div>
         </SortableContext>
 
-        {/* Drag overlay — ghost card while dragging */}
+        {/* Drag overlay - ghost card while dragging */}
         <DragOverlay dropAnimation={{ duration: 150, easing: 'ease' }}>
           {activeCard ? (
             <div className="rotate-1 scale-103 shadow-2xl opacity-90">

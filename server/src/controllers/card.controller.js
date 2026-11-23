@@ -71,7 +71,7 @@ exports.getCard = async (req, res, next) => {
   }
 };
 
-// PATCH /api/cards/:cardId — update card properties (comments excluded for security)
+// PATCH /api/cards/:cardId - update card properties (comments excluded for security)
 exports.updateCard = async (req, res, next) => {
   try {
     // Note: 'comments' is strictly excluded to prevent comment forgery/tampering
@@ -118,7 +118,7 @@ exports.updateCard = async (req, res, next) => {
   }
 };
 
-// DELETE /api/cards/:cardId — archive card
+// DELETE /api/cards/:cardId - archive card
 exports.archiveCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
@@ -203,7 +203,7 @@ exports.moveCard = async (req, res, next) => {
   }
 };
 
-// POST /api/cards/:cardId/comments — add a comment
+// POST /api/cards/:cardId/comments - add a comment
 exports.addComment = async (req, res, next) => {
   try {
     const { text } = req.body;
@@ -230,7 +230,7 @@ exports.addComment = async (req, res, next) => {
   }
 };
 
-// DELETE /api/cards/:cardId/comments/:commentId — delete a comment
+// DELETE /api/cards/:cardId/comments/:commentId - delete a comment
 exports.deleteComment = async (req, res, next) => {
   try {
     const card = await Card.findById(req.params.cardId);
@@ -256,7 +256,7 @@ exports.deleteComment = async (req, res, next) => {
   }
 };
 
-// POST /api/cards/:cardId/attachments — upload via Multer → Cloudinary
+// POST /api/cards/:cardId/attachments - upload via Multer → Cloudinary
 exports.addAttachment = async (req, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });

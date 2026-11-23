@@ -208,7 +208,7 @@ exports.logout = async (req, res, next) => {
         await redis.del(`refresh:${decoded.userId}`);
         await User.findByIdAndUpdate(decoded.userId, { refreshToken: null });
       } catch {
-        // Token already invalid — still clear cookie
+        // Token already invalid - still clear cookie
       }
     }
     res.clearCookie('refreshToken', {
@@ -235,7 +235,7 @@ exports.getMe = async (req, res, next) => {
   }
 };
 
-// PATCH /api/auth/me — update user profile (e.g. name)
+// PATCH /api/auth/me - update user profile (e.g. name)
 exports.updateMe = async (req, res, next) => {
   try {
     const { name } = req.body;

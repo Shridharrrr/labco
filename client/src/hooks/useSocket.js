@@ -22,7 +22,7 @@ const useSocket = () => {
     socketRef.current = socketInstance;
 
     return () => {
-      // Don't disconnect on unmount — keep single instance alive
+      // Don't disconnect on unmount - keep single instance alive
     };
   }, [accessToken]);
 

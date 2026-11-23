@@ -7,7 +7,7 @@ const boardListeners = new Set();
 export const notifyBoardCreated = (board) => boardListeners.forEach((fn) => fn(board));
 
 /**
- * AppShell — persistent layout shell with sidebar.
+ * AppShell - persistent layout shell with sidebar.
  * Fetches boards once and passes them down to the Sidebar.
  * Child pages can call notifyBoardCreated(board) to push a new board
  * into the sidebar without a full refetch.
