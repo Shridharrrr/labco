@@ -265,3 +265,4 @@ export default function BoardSettingsModal({ isOpen, onClose, boardId }) {
     </div>
   );
 }
+

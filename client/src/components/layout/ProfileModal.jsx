@@ -168,3 +168,4 @@ export default function ProfileModal({ isOpen, onClose, onLogout }) {
     </div>
   );
 }
+

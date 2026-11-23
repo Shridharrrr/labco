@@ -195,7 +195,7 @@ export default function Home() {
                 Welcome back, {firstName}!
               </h1>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                Real-time collaborative workspaces and active sprint boards.
+                Here is an overview of your active projects and velocity.
               </p>
             </div>
           </div>
@@ -237,7 +237,7 @@ export default function Home() {
             <div>
               <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Active Workspaces</p>
               <p className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mt-0.5">
-                {boards ? boards.length : '—'}
+                {boards ? boards.length : 0}
               </p>
             </div>
           </div>
@@ -404,7 +404,7 @@ export default function Home() {
                         {b.title}
                       </h3>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-1 leading-relaxed">
-                        {b.description || 'Sprint & task collaboration workspace.'}
+                        {b.description}
                       </p>
                     </div>
 
