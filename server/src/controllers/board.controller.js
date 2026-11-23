@@ -314,11 +314,18 @@ exports.changeMemberRole = async (req, res, next) => {
   }
 };
 
-// DELETE /api/boards/:boardId/members/:userId — remove member (owner only)
+// DELETE /api/boards/:boardId/members/:userId — remove member (owner or member themselves)
 exports.removeMember = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const board = req.board;
+
+    const isOwner = board.owner.toString() === req.user.userId;
+    const isSelf = userId === req.user.userId;
+
+    if (!isOwner && !isSelf) {
+      return res.status(403).json({ message: 'Requires owner role to remove other members' });
+    }
 
     // Prevent removing the board owner
     if (userId === board.owner.toString()) {

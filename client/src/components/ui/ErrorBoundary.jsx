@@ -38,9 +38,11 @@ export default class ErrorBoundary extends React.Component {
               An unexpected error occurred while rendering this view. You can reload the page or return to safety.
             </p>
 
-            {this.state.error?.message && (
+            {this.state.error && (
               <div className="mb-6 p-3 bg-white/[0.03] border border-white/[0.06] rounded-lg text-left overflow-x-auto max-h-32 text-xs font-mono text-zinc-400">
-                {this.state.error.message}
+                {typeof this.state.error === 'string'
+                  ? this.state.error
+                  : (this.state.error?.message || JSON.stringify(this.state.error))}
               </div>
             )}
 

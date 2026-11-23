@@ -4,6 +4,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import * as authService from '../../services/authService';
 import useAuthStore from '../../store/authSlice';
 import Spinner from '../ui/Spinner';
+import Logo from '../ui/Logo';
 
 // Premium Inline SVG Icons
 const ZapIcon = (props) => (
@@ -118,11 +119,8 @@ export default function LoginForm() {
         <div className="absolute top-0 right-0 bottom-0 w-[1px] bg-gradient-to-b from-brand-500/0 via-brand-500/30 to-brand-500/0 translate-x-[36px] -skew-x-[6deg] origin-top pointer-events-none" />
 
         {/* Logo */}
-        <Link to="/" className="relative z-10 flex items-center gap-2 group w-fit cursor-pointer">
-          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-bold text-black text-sm shadow-[0_0_15px_rgba(255,255,255,0.2)] group-hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><path d="M8 7v7M16 7v4M12 7v10" /></svg>
-          </div>
-          <span className="font-bold text-[16px] tracking-tight text-white/90 group-hover:text-white transition-colors">LabCo</span>
+        <Link to="/" className="relative z-10 flex items-center group w-fit cursor-pointer">
+          <Logo size="md" />
         </Link>
 
         {/* Feature highlights */}
@@ -170,11 +168,8 @@ export default function LoginForm() {
         <div className="w-full max-w-[360px]">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-10">
-            <Link to="/" className="inline-flex items-center gap-2 group cursor-pointer">
-              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-bold text-black text-sm shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><path d="M8 7v7M16 7v4M12 7v10" /></svg>
-              </div>
-              <span className="font-bold text-[16px] tracking-tight text-white">LabCo</span>
+            <Link to="/" className="inline-flex items-center group cursor-pointer">
+              <Logo size="md" />
             </Link>
           </div>
 
@@ -188,7 +183,7 @@ export default function LoginForm() {
               <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              {error}
+              {typeof error === 'string' ? error : (error?.message || JSON.stringify(error || ''))}
             </div>
           )}
 

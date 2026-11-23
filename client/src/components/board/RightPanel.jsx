@@ -123,29 +123,29 @@ export default function RightPanel({ boardId, onClose }) {
         onClick={onClose}
       />
 
-      <div className="fixed right-0 top-0 bottom-0 w-full sm:w-80 bg-[#0c0c0f] border-l border-white/[0.06]
-        z-50 sm:z-40 flex flex-col shadow-2xl shadow-black/80 animate-[slideIn_0.2s_ease-out]">
+      <div className="fixed right-0 top-0 bottom-0 w-full sm:w-80 bg-white dark:bg-[#0c0d12] border-l border-black/[0.07] dark:border-white/[0.07]
+        z-50 sm:z-40 flex flex-col shadow-2xl animate-[slideIn_0.2s_ease-out]">
         {/* Header Tabs */}
-        <div className="flex items-center justify-between px-4 pt-3.5 border-b border-white/[0.06] shrink-0">
+        <div className="flex items-center justify-between px-4 pt-3.5 border-b border-black/[0.06] dark:border-white/[0.06] bg-black/[0.01] dark:bg-white/[0.02] shrink-0">
         <div className="flex gap-4">
           <button
             onClick={() => setActiveTab('chat')}
-            className={`pb-2.5 text-[12px] font-medium border-b-2 transition-colors ${
-              activeTab === 'chat' ? 'border-brand-500 text-white' : 'border-transparent text-zinc-400 hover:text-white'
+            className={`pb-2.5 text-[12px] font-semibold border-b-2 transition-colors cursor-pointer ${
+              activeTab === 'chat' ? 'border-zinc-950 dark:border-white text-zinc-950 dark:text-white' : 'border-transparent text-zinc-400 hover:text-black dark:hover:text-white'
             }`}
           >
             Board Chat
           </button>
           <button
             onClick={() => setActiveTab('members')}
-            className={`pb-2.5 text-[12px] font-medium border-b-2 transition-colors ${
-              activeTab === 'members' ? 'border-brand-500 text-white' : 'border-transparent text-zinc-400 hover:text-white'
+            className={`pb-2.5 text-[12px] font-semibold border-b-2 transition-colors cursor-pointer ${
+              activeTab === 'members' ? 'border-zinc-950 dark:border-white text-zinc-950 dark:text-white' : 'border-transparent text-zinc-400 hover:text-black dark:hover:text-white'
             }`}
           >
             Members
           </button>
         </div>
-        <button onClick={onClose} className="mb-2.5 p-1 rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-95">
+        <button onClick={onClose} className="mb-2.5 p-1 rounded-md text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
@@ -178,7 +178,7 @@ export default function RightPanel({ boardId, onClose }) {
                       )}
                       
                       {msg.text && (
-                        <div className="px-1 text-[12px] leading-relaxed text-white/85 break-words">
+                        <div className="px-1 text-[12px] leading-relaxed text-zinc-800 dark:text-zinc-200 break-words">
                           {renderMarkdown(msg.text)}
                         </div>
                       )}
@@ -188,14 +188,14 @@ export default function RightPanel({ boardId, onClose }) {
                         <div className="flex flex-col gap-1.5 mt-1.5 px-1">
                           {msg.attachments.map((att, idx) => (
                             isImage(att.filename) ? (
-                              <a key={idx} href={att.url} target="_blank" rel="noopener noreferrer" className="block max-w-[90%] rounded-lg overflow-hidden border border-white/[0.08] hover:border-white/20 transition-all">
+                              <a key={idx} href={att.url} target="_blank" rel="noopener noreferrer" className="block max-w-[90%] rounded-lg overflow-hidden border border-black/10 dark:border-white/[0.08] hover:border-black/20 dark:hover:border-white/20 transition-all">
                                 <img src={att.url} alt={att.filename} className="object-cover w-full max-h-[160px]" />
                               </a>
                             ) : (
-                              <a key={idx} href={att.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 max-w-[90%] bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/[0.15] rounded-lg px-2 py-2 transition-all">
+                              <a key={idx} href={att.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 max-w-[90%] bg-black/[0.02] dark:bg-white/[0.03] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] border border-black/10 dark:border-white/[0.08] rounded-lg px-2 py-2 transition-all">
                                 <FileTypeIcon name={att.filename} className="w-6 h-6 shrink-0" />
                                 <div className="min-w-0">
-                                  <p className="text-[10px] font-medium text-white/80 truncate">{att.filename}</p>
+                                  <p className="text-[10px] font-medium text-zinc-800 dark:text-zinc-200 truncate">{att.filename}</p>
                                 </div>
                               </a>
                             )
@@ -210,25 +210,29 @@ export default function RightPanel({ boardId, onClose }) {
             </div>
 
             {/* Chat Input */}
-            <form onSubmit={handleSend} className="p-3 border-t border-white/[0.06] bg-[#0c0c0f] shrink-0">
-              {error && <div className="text-[10px] text-rose-400 mb-2 px-1">{error}</div>}
+            <form onSubmit={handleSend} className="p-3 border-t border-black/[0.06] dark:border-white/[0.06] bg-white dark:bg-[#0c0d12] shrink-0">
+              {error && (
+                <div className="text-[10px] text-rose-500 mb-2 px-1">
+                  {typeof error === 'string' ? error : (error?.message || JSON.stringify(error || ''))}
+                </div>
+              )}
               
               {/* Staged files */}
               {stagedFiles.length > 0 && (
                 <div className="flex flex-col gap-1.5 mb-2.5 px-1">
                   {stagedFiles.map(({ file, preview }, i) => (
-                    <div key={i} className="flex items-center justify-between bg-white/[0.04] border border-white/[0.08] rounded-md px-2 py-1.5">
+                    <div key={i} className="flex items-center justify-between bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-md px-2 py-1.5">
                       <div className="flex items-center gap-2 min-w-0">
                         {preview ? <img src={preview} className="w-5 h-5 object-cover rounded-sm" /> : <FileTypeIcon name={file.name} className="w-4 h-4" />}
                         <span className={`text-[10px] truncate ${fileColor(file.name)}`}>{file.name}</span>
                       </div>
-                      <button type="button" onClick={() => removeStaged(i)} className="text-white/40 hover:text-white">✕</button>
+                      <button type="button" onClick={() => removeStaged(i)} className="text-zinc-400 hover:text-black dark:hover:text-white">✕</button>
                     </div>
                   ))}
                 </div>
               )}
 
-              <div className="relative flex flex-col bg-white/[0.04] border border-white/[0.08] rounded-lg focus-within:border-brand-500/50 transition-colors">
+              <div className="relative flex flex-col bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.08] dark:border-white/[0.08] rounded-xl focus-within:border-black/20 dark:focus-within:border-white/20 transition-colors">
                 <textarea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
@@ -236,7 +240,7 @@ export default function RightPanel({ boardId, onClose }) {
                     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(e); }
                   }}
                   placeholder="Type a message..."
-                  className="w-full bg-transparent p-2.5 text-xs text-zinc-100 placeholder-zinc-500 outline-none resize-none min-h-[40px] max-h-32"
+                  className="w-full bg-transparent p-2.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 outline-none resize-none min-h-[40px] max-h-32"
                   rows={1}
                 />
                 
@@ -252,13 +256,13 @@ export default function RightPanel({ boardId, onClose }) {
                 />
 
                 <div className="flex items-center justify-between px-2 pb-2">
-                  <button type="button" onClick={() => fileInputRef.current?.click()} className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors" title="Attach file">
+                  <button type="button" onClick={() => fileInputRef.current?.click()} className="p-1.5 text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors" title="Attach file">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                   </button>
                   <button
                     type="submit"
                     disabled={(!text.trim() && stagedFiles.length === 0) || uploading}
-                    className="p-1.5 rounded-md bg-brand-600 text-white hover:bg-brand-500 disabled:opacity-30 disabled:scale-95 transition-all"
+                    className="p-1.5 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:opacity-90 disabled:opacity-30 transition-all cursor-pointer shadow-xs"
                   >
                     {uploading ? (
                       <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -276,12 +280,12 @@ export default function RightPanel({ boardId, onClose }) {
         ) : (
           <div className="flex-1 overflow-y-auto p-4 space-y-5">
             <div>
-              <h4 className="text-[10px] font-semibold text-zinc-400 uppercase tracking-[0.12em] mb-2.5">Board Owner</h4>
+              <h4 className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-2.5">Board Owner</h4>
               {board.members.filter(m => m.role === 'owner').map(m => (
                 <div key={m._id} className="flex items-center gap-2.5">
                   <Avatar name={m.user.name || m.user.email} src={m.user.avatar} />
                   <div>
-                    <p className="text-[13px] font-medium text-white/90">{m.user.name || m.user.email?.split('@')[0]}</p>
+                    <p className="text-xs font-semibold text-zinc-900 dark:text-white">{m.user.name || m.user.email?.split('@')[0]}</p>
                     <p className="text-[11px] text-zinc-400">{m.user.email}</p>
                   </div>
                 </div>
@@ -289,19 +293,19 @@ export default function RightPanel({ boardId, onClose }) {
             </div>
             
             <div>
-              <h4 className="text-[10px] font-semibold text-zinc-400 uppercase tracking-[0.12em] mb-2.5 mt-4">Editors & Viewers</h4>
+              <h4 className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-2.5 mt-4">Editors & Viewers</h4>
               <div className="space-y-3">
                 {board.members.filter(m => m.role !== 'owner').map(m => (
                   <div key={m._id} className="flex items-center gap-2.5">
                     <Avatar name={m.user.name || m.user.email} src={m.user.avatar} size="sm" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] font-medium text-zinc-200 truncate">{m.user.name || m.user.email?.split('@')[0]}</p>
+                      <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">{m.user.name || m.user.email?.split('@')[0]}</p>
                       <p className="text-[10px] text-zinc-400 capitalize">{m.role}</p>
                     </div>
                   </div>
                 ))}
                 {board.members.length === 1 && (
-                  <p className="text-[11px] text-zinc-500 italic">No other members</p>
+                  <p className="text-[11px] text-zinc-400 italic">No other members</p>
                 )}
               </div>
             </div>

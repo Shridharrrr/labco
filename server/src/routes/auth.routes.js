@@ -7,6 +7,7 @@ const {
   refresh,
   logout,
   getMe,
+  updateMe,
   verifyEmail,
   resendVerification,
   googleAuth
@@ -20,5 +21,6 @@ router.post('/google', googleAuth);
 router.post('/refresh', refresh);
 router.post('/logout', logout);
 router.get('/me', auth, getMe);
+router.patch('/me', auth, updateMe);
 
 module.exports = router;

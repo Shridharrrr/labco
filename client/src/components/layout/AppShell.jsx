@@ -37,7 +37,7 @@ export default function AppShell({ children }) {
   }, [handleNewBoard]);
 
   return (
-    <div className="flex h-screen bg-[#09090b] overflow-hidden">
+    <div className="flex h-screen bg-[#f8f9fb] dark:bg-[#07080b] text-zinc-900 dark:text-zinc-100 overflow-hidden transition-colors">
       <Sidebar
         boards={boards}
         setBoards={setBoards}

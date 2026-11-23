@@ -1,39 +1,92 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as boardService from '../services/boardService';
 import Spinner from '../components/ui/Spinner';
+import CreateBoardModal from '../components/board/CreateBoardModal';
 import { notifyBoardCreated } from '../components/layout/AppShell';
 import useUIStore from '../store/uiSlice';
+import useAuthStore from '../store/authSlice';
 import Avatar from '../components/ui/Avatar';
 import NotificationsModal from '../components/layout/NotificationsModal';
 
-const BG_GRADIENTS = [
-  'from-indigo-600 to-indigo-800',
-  'from-rose-600 to-rose-800',
-  'from-cyan-600 to-cyan-800',
-  'from-emerald-600 to-emerald-800',
-  'from-amber-600 to-amber-800',
-  'from-violet-600 to-violet-800',
-];
+// Clean icons
+const Icons = {
+  Plus: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  ),
+  Boards: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M8 7v7M16 7v4M12 7v10" />
+    </svg>
+  ),
+  Star: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  ),
+  StarFilled: (props) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" {...props}>
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  ),
+  Users: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  ),
+  Mail: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
+  ),
+  Bell: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  ),
+  ArrowUpRight: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <line x1="7" y1="17" x2="17" y2="7" />
+      <polyline points="7 7 17 7 17 17" />
+    </svg>
+  ),
+  Search: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  ),
+};
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const { toggleMobileSidebar } = useUIStore();
-  const [boards, setBoards] = useState(null); // null = loading
-  const [creating, setCreating] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
+  const [boards, setBoards] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [invitations, setInvitations] = useState([]);
+  const [search, setSearch] = useState('');
+  const [filterTab, setFilterTab] = useState('all'); // 'all' | 'starred'
 
-  // Fetch on mount
+  const currentUserId = user?.userId || user?._id || user?.id;
+
   const fetchData = async () => {
     try {
       const [boardsRes, invitesRes] = await Promise.all([
         boardService.getBoards(),
-        boardService.getPendingInvitations()
+        boardService.getPendingInvitations(),
       ]);
-      setBoards(boardsRes.data);
+      setBoards(boardsRes.data || []);
       setInvitations(invitesRes.data || []);
     } catch {
       setBoards([]);
@@ -44,164 +97,383 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
-    setCreating(true);
-    try {
-      const { data } = await boardService.createBoard({ title: newTitle.trim() });
-      setBoards(prev => [...(prev || []), data]);
-      notifyBoardCreated(data);
-      setNewTitle('');
-      setShowCreate(false);
-      navigate(`/boards/${data._id}`);
-    } catch { }
-    finally { setCreating(false); }
+  const handleCreateBoard = async ({ title, description, accentColor }) => {
+    const { data } = await boardService.createBoard({
+      title,
+      description,
+      background: accentColor || '#1e1b4b',
+    });
+    setBoards((prev) => [...(prev || []), data]);
+    notifyBoardCreated(data);
+    navigate(`/boards/${data._id}`);
   };
 
+  const handleToggleStar = async (boardId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!currentUserId) return;
+
+    const targetBoard = boards?.find((b) => b._id === boardId);
+    const prevStars = targetBoard?.stars || [];
+    const isFav = prevStars.some((id) => (id?._id || id)?.toString() === currentUserId.toString());
+    const newStars = isFav
+      ? prevStars.filter((id) => (id?._id || id)?.toString() !== currentUserId.toString())
+      : [...prevStars, currentUserId];
+
+    setBoards((prev) => prev?.map((b) => (b._id === boardId ? { ...b, stars: newStars } : b)));
+
+    try {
+      const { data } = await boardService.toggleStar(boardId);
+      if (data?.stars) {
+        setBoards((prev) => prev?.map((b) => (b._id === boardId ? { ...b, stars: data.stars } : b)));
+      }
+    } catch {
+      setBoards((prev) => prev?.map((b) => (b._id === boardId ? { ...b, stars: prevStars } : b)));
+    }
+  };
+
+  // Compute metrics with 100% real database data
+  const favoriteBoards = useMemo(() => {
+    if (!boards || !currentUserId) return [];
+    return boards.filter((b) =>
+      b.stars?.some((id) => (id?._id || id)?.toString() === currentUserId.toString())
+    );
+  }, [boards, currentUserId]);
+
+  const uniqueCollaborators = useMemo(() => {
+    if (!boards) return 0;
+    const ids = new Set();
+    boards.forEach((b) => {
+      b.members?.forEach((m) => {
+        const uid = m.user?._id || m.user || m._id;
+        if (uid) ids.add(uid.toString());
+      });
+    });
+    return ids.size || 1;
+  }, [boards]);
+
+  // Filtered boards based on search and active tab
+  const displayedBoards = useMemo(() => {
+    if (!boards) return [];
+    let list = boards;
+    if (filterTab === 'starred') {
+      list = favoriteBoards;
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase().trim();
+      list = list.filter(
+        (b) =>
+          b.title?.toLowerCase().includes(q) ||
+          b.description?.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [boards, filterTab, search, favoriteBoards]);
+
+  const firstName = user?.name?.trim()?.split(/\s+/)[0] || 'there';
+
   return (
-    <div className="flex-1 overflow-y-auto bg-[#0c0c0f]">
-      {/* Page header */}
-      <div className="px-4 sm:px-8 pt-5 sm:pt-7 pb-4 sm:pb-5 border-b border-white/[0.06]">
-        <div className="flex items-center justify-between">
+    <div className="flex-1 overflow-y-auto bg-[#f8f9fb] dark:bg-[#07080b] text-zinc-900 dark:text-zinc-100 transition-colors">
+      
+      {/* ── Top Bar / Header ────────────────────────────────────────────── */}
+      <div className="px-5 sm:px-8 py-5 border-b border-black/[0.06] dark:border-white/[0.06] bg-white/70 dark:bg-[#090a0f]/80 backdrop-blur-md sticky top-0 z-20 transition-colors">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          
           <div className="flex items-center gap-3">
             <button
               onClick={toggleMobileSidebar}
-              className="md:hidden p-1.5 -ml-1 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors cursor-pointer"
+              className="md:hidden p-1.5 text-zinc-500 hover:text-black dark:text-zinc-400 dark:hover:text-white rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               title="Open sidebar"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
+
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">My Boards</h1>
-              <p className="text-zinc-400 text-xs mt-0.5">Pick a board or create a new one</p>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">
+                Welcome back, {firstName}!
+              </h1>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Real-time collaborative workspaces and active sprint boards.
+              </p>
             </div>
           </div>
+
+          {/* Action buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setShowNotifications(true)}
-              className="relative flex items-center justify-center w-8 h-8 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200 active:scale-95"
+              className="relative p-2 rounded-lg border border-black/[0.07] dark:border-white/[0.08] text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-xs"
               title="Notifications"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
+              <Icons.Bell className="w-4 h-4" />
               {invitations.length > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.8)] border border-[#0c0c0f]"></span>
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 shadow-xs animate-pulse" />
               )}
             </button>
+
             <button
-              id="create-board-btn"
               onClick={() => setShowCreate(true)}
-              className="group relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-all duration-200 text-zinc-300 hover:text-white hover:bg-white/[0.06]"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold hover:opacity-90 transition-all shadow-sm active:scale-98"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-              <span>New board</span>
+              <Icons.Plus className="w-3.5 h-3.5" />
+              <span>Add Project</span>
             </button>
           </div>
+
         </div>
       </div>
 
-      <div className="px-4 sm:px-8 py-5 sm:py-6 max-w-7xl">
-        {/* Create board inline form */}
-        {showCreate && (
-          <form
-            onSubmit={handleCreate}
-            className="mb-8 flex flex-col sm:flex-row gap-3 items-center p-2 pl-4 bg-[#161619] border border-white/[0.12] shadow-2xl shadow-brand-500/5 rounded-xl relative overflow-hidden transition-all group hover:border-brand-500/30"
-            style={{ animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
-          >
-            {/* Subtle glow */}
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-6 space-y-6">
 
-            <div className="flex-1 w-full relative z-10 flex items-center gap-3">
-              <input
-                autoFocus
-                type="text"
-                value={newTitle}
-                onChange={e => setNewTitle(e.target.value)}
-                onKeyDown={e => e.key === 'Escape' && setShowCreate(false)}
-                placeholder="Give your board a title..."
-                className="w-full bg-transparent border-none px-0 py-2 text-[15px] font-medium
-                  text-zinc-100 placeholder-zinc-500 outline-none ring-0 focus:ring-0"
-              />
+        {/* ── Real Metric Cards Row (No fake numbers) ──────────────────── */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          
+          <div className="p-4 rounded-xl border border-black/[0.06] dark:border-white/[0.07] bg-white dark:bg-[#0d0e14] shadow-xs flex items-center gap-3.5 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 flex items-center justify-center">
+              <Icons.Boards className="w-5 h-5 stroke-[1.8]" />
             </div>
-            <div className="flex items-center gap-2 shrink-0 z-10 w-full sm:w-auto">
-              <button type="button" onClick={() => setShowCreate(false)}
-                className="flex-1 sm:flex-none px-4 py-2 text-zinc-400 hover:text-white hover:bg-white/[0.06] text-sm font-medium transition-all duration-200 rounded-lg">
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={creating || !newTitle.trim()}
-                className="flex-1 sm:flex-none px-5 py-2 bg-brand-600 hover:bg-brand-500 shadow-[0_0_15px_rgba(99,102,241,0.25)] text-white text-sm
-                  font-semibold rounded-lg transition-all disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2 active:scale-[0.98]"
-              >
-                {creating ? <Spinner size="sm" /> : 'Create Board'}
-              </button>
+            <div>
+              <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Active Workspaces</p>
+              <p className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mt-0.5">
+                {boards ? boards.length : '—'}
+              </p>
             </div>
-          </form>
-        )}
-
-        {boards === null ? (
-          <div className="flex justify-center py-20"><Spinner /></div>
-        ) : boards.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-14 h-14 rounded-lg bg-white/[0.04] flex items-center justify-center mx-auto mb-4 border border-white/[0.06]">
-              <svg className="w-7 h-7 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" /></svg>
-            </div>
-            <p className="text-zinc-400 text-sm font-medium">No boards yet. Create your first one!</p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
-            {boards.map((board, i) => (
-              <Link
-                key={board._id}
-                to={`/boards/${board._id}`}
-                className={`group relative h-36 rounded-xl bg-gradient-to-br ${BG_GRADIENTS[i % BG_GRADIENTS.length]}
-                  p-4 flex flex-col justify-end overflow-hidden hover:scale-[1.03] active:scale-[0.98]
-                  transition-all duration-200 shadow-md hover:shadow-xl hover:shadow-black/40 cursor-pointer`}
-              >
-                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors duration-200" />
-                {/* Decorative geometric shapes */}
-                <div className="absolute -top-6 -right-6 w-20 h-20 rounded-lg bg-white/[0.07] rotate-12 group-hover:rotate-[18deg] transition-transform duration-300" />
-                <div className="absolute top-2 -right-2 w-10 h-10 rounded-lg bg-white/[0.05] rotate-12 group-hover:rotate-[20deg] transition-transform duration-300" />
-                <div className="relative">
-                  <h2 className="font-semibold text-white text-sm leading-snug truncate">{board.title}</h2>
-                  <p className="text-zinc-300 group-hover:text-white text-[11px] mt-1.5 font-medium transition-colors">
-                    {board.members?.length} member{board.members?.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </Link>
-            ))}
 
-            {/* Create new board card */}
+          <div className="p-4 rounded-xl border border-black/[0.06] dark:border-white/[0.07] bg-white dark:bg-[#0d0e14] shadow-xs flex items-center gap-3.5 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
+              <Icons.Star className="w-5 h-5 stroke-[1.8]" />
+            </div>
+            <div>
+              <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Starred Boards</p>
+              <p className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mt-0.5">
+                {favoriteBoards.length}
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-xl border border-black/[0.06] dark:border-white/[0.07] bg-white dark:bg-[#0d0e14] shadow-xs flex items-center gap-3.5 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center">
+              <Icons.Users className="w-5 h-5 stroke-[1.8]" />
+            </div>
+            <div>
+              <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Collaborators</p>
+              <p className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mt-0.5">
+                {uniqueCollaborators}
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-xl border border-black/[0.06] dark:border-white/[0.07] bg-white dark:bg-[#0d0e14] shadow-xs flex items-center gap-3.5 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center">
+              <Icons.Mail className="w-5 h-5 stroke-[1.8]" />
+            </div>
+            <div>
+              <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Pending Invites</p>
+              <p className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mt-0.5">
+                {invitations.length}
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── Search & Filter Controls ─────────────────────────────────── */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+          
+          {/* Tabs: All Workspaces vs Starred */}
+          <div className="flex items-center bg-black/5 dark:bg-white/5 p-1 rounded-xl border border-black/[0.06] dark:border-white/[0.08] w-fit">
             <button
-              onClick={() => setShowCreate(true)}
-              className="group h-36 rounded-xl border border-dashed border-white/[0.12] hover:border-white/[0.25]
-                flex flex-col items-center justify-center gap-2.5 transition-all duration-200
-                hover:bg-white/[0.06] cursor-pointer active:scale-[0.98]"
+              onClick={() => setFilterTab('all')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                filterTab === 'all'
+                  ? 'bg-white dark:bg-[#12131b] text-zinc-950 dark:text-white shadow-xs'
+                  : 'text-zinc-500 hover:text-black dark:hover:text-white'
+              }`}
             >
-              <div className="w-10 h-10 rounded-lg bg-white/[0.04] group-hover:bg-white/[0.06] flex items-center justify-center transition-all duration-200 border border-white/[0.06] group-hover:border-white/[0.12] group-hover:scale-110">
-                <svg className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-              </div>
-              <span className="text-xs text-zinc-300 group-hover:text-white transition-colors duration-200 font-medium">New board</span>
+              All Projects ({boards ? boards.length : 0})
+            </button>
+            <button
+              onClick={() => setFilterTab('starred')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+                filterTab === 'starred'
+                  ? 'bg-white dark:bg-[#12131b] text-zinc-950 dark:text-white shadow-xs'
+                  : 'text-zinc-500 hover:text-black dark:hover:text-white'
+              }`}
+            >
+              <Icons.Star className="w-3.5 h-3.5" />
+              <span>Starred ({favoriteBoards.length})</span>
             </button>
           </div>
-        )}
+
+          {/* Search bar */}
+          <div className="relative flex-1 sm:max-w-xs">
+            <Icons.Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search projects..."
+              className="w-full pl-9 pr-3.5 py-1.5 rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-[#0c0d14] text-xs text-zinc-900 dark:text-white placeholder-zinc-400 outline-none focus:border-indigo-500 transition-colors"
+            />
+          </div>
+
+        </div>
+
+        {/* ── Boards Grid ─────────────────────────────────────────────── */}
+        <div>
+          {boards === null ? (
+            <div className="flex justify-center py-20"><Spinner /></div>
+          ) : displayedBoards.length === 0 ? (
+            <div className="text-center py-16 px-4 border border-dashed border-black/10 dark:border-white/10 rounded-2xl bg-white dark:bg-[#0c0d14] transition-colors">
+              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3 text-zinc-400">
+                <Icons.Boards className="w-6 h-6 stroke-[1.5]" />
+              </div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-1">
+                {search.trim() ? 'No matching projects found' : filterTab === 'starred' ? 'No starred projects yet' : 'No workspaces created yet'}
+              </h3>
+              <p className="text-xs text-zinc-500 max-w-sm mx-auto mb-4">
+                {search.trim()
+                  ? 'Try searching with different keywords or clear your search query.'
+                  : filterTab === 'starred'
+                  ? 'Star any workspace to access it quickly from this tab.'
+                  : 'Get started by creating your first project workspace to collaborate in real time.'}
+              </p>
+              {filterTab !== 'starred' && !search.trim() && (
+                <button
+                  onClick={() => setShowCreate(true)}
+                  className="px-4 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold rounded-xl shadow-sm hover:opacity-90 transition-all inline-flex items-center gap-1.5"
+                >
+                  <Icons.Plus className="w-3.5 h-3.5" />
+                  <span>Create Your First Project</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {displayedBoards.map((b) => {
+                const isFav = b.stars?.some(
+                  (id) => (id?._id || id)?.toString() === currentUserId?.toString()
+                );
+                return (
+                  <Link
+                    key={b._id}
+                    to={`/boards/${b._id}`}
+                    className="group p-5 rounded-2xl border border-black/[0.06] dark:border-white/[0.07] bg-white dark:bg-[#0c0d14] hover:border-black/15 dark:hover:border-white/15 shadow-xs hover:shadow-md transition-all flex flex-col justify-between h-48 cursor-pointer relative overflow-hidden"
+                  >
+                    {/* Top color indicator accent stripe */}
+                    <div
+                      className="absolute top-0 left-0 right-0 h-1"
+                      style={{ backgroundColor: b.background || '#6366f1' }}
+                    />
+
+                    <div>
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: b.background || '#6366f1' }}
+                          />
+                          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
+                            Active
+                          </span>
+                        </div>
+
+                        {/* Star Button */}
+                        <button
+                          type="button"
+                          onClick={(e) => handleToggleStar(b._id, e)}
+                          className={`p-1 rounded-md transition-colors ${
+                            isFav
+                              ? 'text-amber-400 hover:text-amber-500'
+                              : 'text-zinc-400 hover:text-amber-400 hover:bg-black/5 dark:hover:bg-white/5'
+                          }`}
+                          title={isFav ? 'Unstar workspace' : 'Star workspace'}
+                        >
+                          {isFav ? (
+                            <Icons.StarFilled className="w-4 h-4" />
+                          ) : (
+                            <Icons.Star className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+
+                      <h3 className="text-sm font-semibold text-zinc-950 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        {b.title}
+                      </h3>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-1 leading-relaxed">
+                        {b.description || 'Sprint & task collaboration workspace.'}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-black/[0.05] dark:border-white/[0.06] flex items-center justify-between text-xs text-zinc-500">
+                      <div className="flex items-center -space-x-1.5">
+                        {b.members?.slice(0, 3).map((m, i) => (
+                          <div
+                            key={i}
+                            className="w-5 h-5 rounded-full border border-white dark:border-[#0c0d14] overflow-hidden"
+                          >
+                            <Avatar name={m.user?.name || m.user?.email || 'Member'} size="xs" />
+                          </div>
+                        ))}
+                        {(b.members?.length || 1) > 3 && (
+                          <span className="w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-[9px] font-bold text-zinc-600 dark:text-zinc-300 flex items-center justify-center border border-white dark:border-[#0c0d14]">
+                            +{(b.members?.length || 1) - 3}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] text-zinc-400">
+                          {b.columns?.length || 0} columns
+                        </span>
+                        <Icons.ArrowUpRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+
+              {/* Add Board Card */}
+              <button
+                type="button"
+                onClick={() => setShowCreate(true)}
+                className="p-5 rounded-2xl border border-dashed border-black/10 dark:border-white/10 hover:border-black/20 dark:hover:border-white/20 bg-black/[0.01] dark:bg-white/[0.01] hover:bg-black/[0.03] dark:hover:bg-white/[0.03] flex flex-col items-center justify-center gap-2.5 h-48 transition-all text-zinc-500 hover:text-black dark:hover:text-white cursor-pointer"
+              >
+                <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center">
+                  <Icons.Plus className="w-5 h-5 stroke-[1.8]" />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-semibold">New Workspace</p>
+                  <p className="text-[11px] text-zinc-400 mt-0.5">Create a sprint board</p>
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
+
       </div>
 
+      {/* Create Project Modal Popup */}
+      <CreateBoardModal
+        isOpen={showCreate}
+        onClose={() => setShowCreate(false)}
+        onCreate={handleCreateBoard}
+      />
+
       {showNotifications && (
-        <NotificationsModal 
-          onClose={() => setShowNotifications(false)} 
+        <NotificationsModal
+          onClose={() => setShowNotifications(false)}
           invitations={invitations}
           onAccept={(token) => {
-            setInvitations(prev => prev.filter(i => i.token !== token));
+            setInvitations((prev) => prev.filter((i) => i.token !== token));
             fetchData();
           }}
         />
       )}
+
     </div>
   );
 }

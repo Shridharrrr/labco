@@ -19,11 +19,20 @@ function getAvatarGradient(name = '') {
 }
 
 function getInitials(name = '') {
-  if (!name) return '?';
+  let safeName = '';
+  if (typeof name === 'string') {
+    safeName = name;
+  } else if (name && typeof name === 'object') {
+    safeName = name.name || name.email || '';
+  } else {
+    safeName = String(name || '');
+  }
+
+  if (!safeName) return '?';
   
   // If email, use first letters of username
-  if (name.includes('@')) {
-    const username = name.split('@')[0];
+  if (safeName.includes('@')) {
+    const username = safeName.split('@')[0];
     const parts = username.replace(/[._-]/g, ' ').trim().split(/\s+/);
     if (parts.length > 1) {
       return (parts[0][0] + parts[1][0]).toUpperCase();
@@ -31,7 +40,7 @@ function getInitials(name = '') {
     return username.slice(0, 2).toUpperCase();
   }
 
-  const parts = name.trim().split(/\s+/);
+  const parts = safeName.trim().split(/\s+/);
   if (parts.length === 1) {
     return parts[0].slice(0, 2).toUpperCase();
   }
@@ -51,8 +60,12 @@ export default function Avatar({
     setImgError(false);
   }, [src]);
 
-  const initials = getInitials(name);
-  const gradient = getAvatarGradient(name);
+  const safeName = typeof name === 'string'
+    ? name
+    : (name && typeof name === 'object' ? (name.name || name.email || 'User') : String(name || 'User'));
+
+  const initials = getInitials(safeName);
+  const gradient = getAvatarGradient(safeName);
 
   const sizes = {
     xs: 'w-6 h-6 text-[10px]',
@@ -71,7 +84,7 @@ export default function Avatar({
       style={{
         backgroundColor: !showImg && color ? color : undefined,
       }}
-      title={name}
+      title={typeof name === 'string' ? name : (name?.name || name?.email || '')}
     >
       {showImg ? (
         <img

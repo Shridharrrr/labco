@@ -30,7 +30,7 @@ function ToastItem({ toast }) {
         ${COLORS[toast.type] || COLORS.info}`}
     >
       <span className="text-sm">{ICONS[toast.type]}</span>
-      <span>{toast.message}</span>
+      <span>{typeof toast.message === 'string' ? toast.message : (toast.message?.message || JSON.stringify(toast.message || ''))}</span>
       <button
         onClick={() => removeToast(toast.id)}
         className="ml-auto opacity-50 hover:opacity-100 transition-opacity"

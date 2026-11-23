@@ -127,25 +127,25 @@ export default function DiscussionTab({ boardId }) {
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="flex-1 flex flex-col bg-[#0c0c0f] overflow-hidden">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#08090d] overflow-hidden">
 
       {/* Header */}
-      <div className="px-3 sm:px-5 py-3 sm:py-3.5 border-b border-white/[0.06] bg-[#111114] shrink-0 z-10 flex items-center justify-between">
+      <div className="px-3 sm:px-5 py-3 sm:py-3.5 border-b border-black/[0.06] dark:border-white/[0.06] bg-black/[0.01] dark:bg-[#0c0d12] shrink-0 z-10 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-white tracking-tight flex items-center gap-2">
-            <svg className="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <h2 className="text-sm font-semibold text-zinc-950 dark:text-white tracking-tight flex items-center gap-2">
+            <svg className="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                 d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
             </svg>
             # discussion
           </h2>
-          <p className="text-[11px] text-white/35 mt-0.5">
-            Central hub for team communication on <strong>{board?.title}</strong>
+          <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+            Central hub for team communication on <strong className="text-zinc-800 dark:text-zinc-200">{board?.title}</strong>
           </p>
         </div>
         <div className="flex -space-x-1.5">
           {board?.members?.slice(0, 5).map(m => (
-            <div key={m.user._id} className="w-7 h-7 rounded-md border-2 border-[#111114]" title={m.user.name || m.user.email}>
+            <div key={m.user._id} className="w-7 h-7 rounded-md border-2 border-white dark:border-[#0c0d12]" title={m.user.name || m.user.email}>
               <Avatar name={m.user.name || m.user.email} src={m.user.avatar} size="sm" />
             </div>
           ))}
@@ -178,27 +178,27 @@ export default function DiscussionTab({ boardId }) {
               <div key={msg._id}>
                 {showDate && (
                   <div className="flex items-center gap-4 my-5 px-3 sm:px-5">
-                    <div className="flex-1 border-b border-white/[0.06]" />
+                    <div className="flex-1 border-b border-black/[0.06] dark:border-white/[0.06]" />
                     <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-zinc-400">
                       {dateStr(msg.createdAt)}
                     </span>
-                    <div className="flex-1 border-b border-white/[0.06]" />
+                    <div className="flex-1 border-b border-black/[0.06] dark:border-white/[0.06]" />
                   </div>
                 )}
 
-                <div className={`group flex gap-2.5 sm:gap-3 px-3 sm:px-5 py-1 hover:bg-[#111114] transition-colors relative ${isGrouped ? 'mt-0' : 'mt-4'}`}>
+                <div className={`group flex gap-2.5 sm:gap-3 px-3 sm:px-5 py-1.5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors relative ${isGrouped ? 'mt-0' : 'mt-4'}`}>
 
                   {/* Hover Actions */}
-                  <div className="absolute right-2 sm:right-5 -top-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity bg-[#161619] border border-white/[0.10] rounded-md shadow-xl flex items-center px-0.5 z-10">
+                  <div className="absolute right-2 sm:right-5 -top-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity bg-white dark:bg-[#161619] border border-black/10 dark:border-white/[0.10] rounded-md shadow-md flex items-center px-0.5 z-10">
                     <button onClick={() => handleReply(msg.user)}
-                      className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95" title="Reply">
+                      className="p-1.5 text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-all duration-200 active:scale-95" title="Reply">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                       </svg>
                     </button>
                     {msg.text && (
                       <button onClick={() => navigator.clipboard.writeText(msg.text)}
-                        className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-lg transition-all duration-200 active:scale-95" title="Copy text">
+                        className="p-1.5 text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-all duration-200 active:scale-95" title="Copy text">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                             d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -220,15 +220,15 @@ export default function DiscussionTab({ boardId }) {
                   <div className="flex flex-col flex-1 min-w-0 pb-1">
                     {!isGrouped && (
                       <div className="flex items-baseline gap-2 mb-0.5">
-                        <span className={`text-[13px] font-semibold ${isMe ? 'text-brand-400' : 'text-white/90'}`}>
+                        <span className={`text-[13px] font-semibold ${isMe ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
                           {msg.user.name || msg.user.email?.split('@')[0]}
                         </span>
-                        <span className="text-[10px] text-zinc-400">{timeStr(msg.createdAt)}</span>
+                        <span className="text-[10px] text-zinc-400 font-mono">{timeStr(msg.createdAt)}</span>
                       </div>
                     )}
 
                     {msg.text && (
-                      <div className="text-[13px] leading-[1.6] text-zinc-200 break-words whitespace-pre-wrap">
+                      <div className="text-[13px] leading-[1.6] text-zinc-800 dark:text-zinc-200 break-words whitespace-pre-wrap">
                         {renderMarkdown(msg.text)}
                       </div>
                     )}
@@ -273,34 +273,34 @@ export default function DiscussionTab({ boardId }) {
       </div>
 
       {/* Composer */}
-      <div className="px-3 sm:px-5 pb-3 sm:pb-5 pt-2 bg-[#0c0c0f] shrink-0">
+      <div className="px-3 sm:px-5 pb-3 sm:pb-5 pt-2 bg-transparent shrink-0">
 
         {/* Error */}
         {error && (
-          <div className="mb-2 flex items-center gap-2 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-[11px] text-rose-400">
+          <div className="mb-2 flex items-center gap-2 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-[11px] text-rose-500">
             <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" />
             </svg>
-            {error}
-            <button onClick={() => setError('')} className="ml-auto text-rose-400/60 hover:text-rose-300">✕</button>
+            {typeof error === 'string' ? error : (error?.message || JSON.stringify(error || ''))}
+            <button onClick={() => setError('')} className="ml-auto text-rose-500/60 hover:text-rose-500">✕</button>
           </div>
         )}
 
         <form onSubmit={handleSend}
-          className="relative flex flex-col bg-[#111114] border border-white/[0.08] rounded-xl transition-all focus-within:border-brand-500/50 focus-within:bg-[#141418]">
+          className="relative flex flex-col bg-white dark:bg-[#0c0d12] border border-black/[0.08] dark:border-white/[0.08] rounded-xl transition-all focus-within:border-black/20 dark:focus-within:border-white/20 shadow-xs">
 
           {/* Staged file previews */}
           {stagedFiles.length > 0 && (
             <div className="flex flex-wrap gap-2 px-3 pt-3">
               {stagedFiles.map(({ file, preview }, i) => (
                 <div key={i}
-                  className="relative flex items-center gap-2.5 bg-white/[0.04] border border-white/[0.08] rounded-lg overflow-hidden"
+                  className="relative flex items-center gap-2.5 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-lg overflow-hidden"
                   style={{ maxWidth: '200px' }}>
                   {preview ? (
                     <img src={preview} alt={file.name}
                       className="w-12 h-12 object-cover shrink-0" />
                   ) : (
-                    <div className="w-12 h-12 flex items-center justify-center bg-white/[0.04] shrink-0">
+                    <div className="w-12 h-12 flex items-center justify-center bg-black/[0.02] dark:bg-white/[0.04] shrink-0">
                       <FileTypeIcon name={file.name} className="w-6 h-6" />
                     </div>
                   )}
@@ -325,7 +325,7 @@ export default function DiscussionTab({ boardId }) {
             onChange={e => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={`Message #${board?.title?.replace(/\s+/g, '-').toLowerCase() || 'general'}`}
-            className="w-full max-h-48 min-h-[44px] bg-transparent text-[13px] text-zinc-100 placeholder-zinc-500 outline-none resize-none px-4 pt-3 pb-1"
+            className="w-full max-h-48 min-h-[44px] bg-transparent text-[13px] text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 outline-none resize-none px-4 pt-3 pb-1"
             rows={1}
           />
 
@@ -376,7 +376,7 @@ export default function DiscussionTab({ boardId }) {
               <button
                 type="submit"
                 disabled={(!text.trim() && stagedFiles.length === 0) || uploading}
-                className="px-3 py-1.5 rounded-lg bg-brand-600 text-white font-semibold text-[11px] hover:bg-brand-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-semibold text-[11px] hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center gap-1.5 shadow-xs"
               >
                 {uploading ? (
                   <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -396,8 +396,8 @@ export default function DiscussionTab({ boardId }) {
           </div>
         </form>
 
-        <p className="hidden sm:block text-[10px] text-zinc-500 mt-1.5 px-1">
-          Attach up to 5 files · 10 MB each · Images, PDFs, Docs · Press <kbd className="px-1 py-0.5 bg-white/[0.06] rounded text-[9px]">Enter</kbd> to send
+        <p className="hidden sm:block text-[10px] text-zinc-400 mt-1.5 px-1">
+          Attach up to 5 files · 10 MB each · Images, PDFs, Docs · Press <kbd className="px-1 py-0.5 bg-black/5 dark:bg-white/10 rounded text-[9px] font-mono">Enter</kbd> to send
         </p>
       </div>
     </div>

@@ -21,7 +21,6 @@ export default function Column({ column, boardId }) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
-  // Close menu on outside click
   useEffect(() => {
     if (!showMenu) return;
     const handler = (e) => {
@@ -31,7 +30,6 @@ export default function Column({ column, boardId }) {
     return () => document.removeEventListener('mousedown', handler);
   }, [showMenu]);
 
-  // Column drag (for reordering columns)
   const {
     attributes,
     listeners,
@@ -44,12 +42,9 @@ export default function Column({ column, boardId }) {
     data: { type: 'column' },
   });
 
-  // Also set as droppable for cards
   const { setNodeRef: droppableRef } = useDroppable({ id: column._id, data: { columnId: column._id } });
 
-  const rawColumnCards = (column.cards || [])
-    .map((id) => cards[id])
-    .filter(Boolean);
+  const rawColumnCards = (column.cards || []).map((id) => cards[id]).filter(Boolean);
   const columnCards = applyFilters(rawColumnCards, filters);
   const isFiltered = columnCards.length !== rawColumnCards.length;
 
@@ -68,7 +63,10 @@ export default function Column({ column, boardId }) {
 
   const handleRename = async () => {
     const title = renameValue.trim();
-    if (!title || title === column.title) { setIsRenaming(false); return; }
+    if (!title || title === column.title) {
+      setIsRenaming(false);
+      return;
+    }
     try {
       await boardService.updateColumn(column._id, { title });
       updateColumn(column._id, { title });
@@ -116,10 +114,9 @@ export default function Column({ column, boardId }) {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.4 : 1,
   };
 
-  // Combine refs
   const setRef = (el) => {
     sortableRef(el);
     droppableRef(el);
@@ -131,59 +128,62 @@ export default function Column({ column, boardId }) {
     <div
       ref={setRef}
       style={style}
-      className="shrink-0 w-[84vw] sm:w-72 flex flex-col max-h-[calc(100vh-10rem)] select-none"
+      className="shrink-0 w-[84vw] sm:w-72 flex flex-col max-h-[calc(100vh-10rem)] p-3 rounded-2xl bg-white/70 dark:bg-[#0c0d13] border border-black/[0.06] dark:border-white/[0.07] shadow-xs select-none"
     >
       {/* Column header */}
-      <div className="flex items-center justify-between px-1 pt-1 pb-2.5 group">
-        {/* Drag handle area (left side) */}
+      <div className="flex items-center justify-between px-1 pt-1 pb-3 group">
         <div
           {...attributes}
           {...listeners}
           className="flex items-center gap-2 flex-1 cursor-grab active:cursor-grabbing min-w-0"
         >
-          {/* Color dot */}
-          <span
-            className="w-1.5 h-1.5 rounded-full shrink-0"
-            style={{ background: dotColor }}
-          />
+          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: dotColor }} />
           {isRenaming ? (
             <input
               autoFocus
               value={renameValue}
-              onChange={e => setRenameValue(e.target.value)}
+              onChange={(e) => setRenameValue(e.target.value)}
               onBlur={handleRename}
-              onKeyDown={e => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') setIsRenaming(false); }}
-              className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-2 py-0.5 text-xs font-medium text-zinc-100 outline-none"
-              onClick={e => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleRename();
+                if (e.key === 'Escape') setIsRenaming(false);
+              }}
+              className="flex-1 bg-white dark:bg-zinc-900 border border-black/20 dark:border-zinc-700 rounded px-2 py-0.5 text-xs font-semibold text-zinc-900 dark:text-zinc-100 outline-none"
+              onClick={(e) => e.stopPropagation()}
             />
           ) : (
             <h3
-              className="text-xs font-semibold text-zinc-300 truncate tracking-wider uppercase"
-              onDoubleClick={() => { setRenameValue(column.title); setIsRenaming(true); }}
+              className="text-xs font-bold text-zinc-800 dark:text-zinc-200 truncate uppercase tracking-wider"
+              onDoubleClick={() => {
+                setRenameValue(column.title);
+                setIsRenaming(true);
+              }}
             >
               {column.title}
             </h3>
           )}
 
-          {/* Column type badge */}
           {column.columnType && column.columnType !== 'none' && (
-            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide shrink-0
-              ${column.columnType === 'initial' ? 'bg-blue-500/15 text-blue-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
+            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide shrink-0 ${
+              column.columnType === 'initial' ? 'bg-blue-500/15 text-blue-500' : 'bg-emerald-500/15 text-emerald-500'
+            }`}>
               {column.columnType === 'initial' ? 'Start' : 'Final'}
             </span>
           )}
 
-          <span className="text-[11px] shrink-0 font-mono text-zinc-300 bg-zinc-800/80 px-1.5 py-0.5 rounded font-medium">
+          <span className="text-[10px] shrink-0 font-mono text-zinc-500 dark:text-zinc-400 bg-black/5 dark:bg-white/5 px-1.5 py-0.5 rounded-md font-medium">
             {isFiltered ? `${columnCards.length}/${rawColumnCards.length}` : rawColumnCards.length}
           </span>
         </div>
 
         {/* Right actions */}
-        <div className="flex items-center gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all">
-          {/* Quick add card */}
+        <div className="flex items-center gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <button
-            onClick={(e) => { e.stopPropagation(); setAddingCard(column._id, true); }}
-            className="text-zinc-400 hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg transition-all duration-200 cursor-pointer active:scale-95"
+            onClick={(e) => {
+              e.stopPropagation();
+              setAddingCard(column._id, true);
+            }}
+            className="text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 p-1 rounded-md transition-colors"
             title="Add card"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,15 +191,14 @@ export default function Column({ column, boardId }) {
             </svg>
           </button>
 
-          {/* 3-dots settings menu */}
           <div className="relative" ref={menuRef}>
             <button
-              onClick={(e) => { e.stopPropagation(); setShowMenu(v => !v); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu((v) => !v);
+              }}
               title="Column settings"
-              className={`p-1.5 rounded-lg transition-all duration-200 cursor-pointer active:scale-95
-                ${showMenu
-                  ? 'bg-white/[0.08] text-white'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.06]'}`}
+              className="text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 p-1 rounded-md transition-colors"
             >
               <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                 <circle cx="5" cy="12" r="1.5" />
@@ -209,14 +208,15 @@ export default function Column({ column, boardId }) {
             </button>
 
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1.5 z-50 w-52
-                bg-[#1a1a1e] border border-white/[0.10] rounded-xl shadow-2xl shadow-black/60
-                animate-[slideUp_0.12s_ease-out] overflow-hidden">
-
-                {/* Rename */}
+              <div className="absolute right-0 top-full mt-1.5 z-50 w-52 bg-white dark:bg-[#14151e] border border-black/10 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden animate-fadeIn">
                 <button
-                  onClick={(e) => { e.stopPropagation(); setShowMenu(false); setRenameValue(column.title); setIsRenaming(true); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] text-zinc-200 hover:text-white hover:bg-white/[0.05] transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(false);
+                    setRenameValue(column.title);
+                    setIsRenaming(true);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-zinc-700 dark:text-zinc-200 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                 >
                   <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -224,23 +224,17 @@ export default function Column({ column, boardId }) {
                   Rename column
                 </button>
 
-                {/* Divider */}
-                <div className="mx-3 border-t border-white/[0.06]" />
+                <div className="mx-3 border-t border-black/[0.06] dark:border-white/[0.06]" />
 
-                {/* Color label */}
                 <div className="px-3 pt-2 pb-1">
                   <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Color</p>
                   <div className="flex gap-2">
-                    {COLUMN_COLORS.map(c => (
+                    {COLUMN_COLORS.map((c) => (
                       <button
                         key={c}
                         onClick={() => handleColorChange(c)}
-                        className="w-6 h-6 rounded-md transition-all hover:scale-110 flex items-center justify-center"
-                        style={{
-                          background: c,
-                          outline: column.color === c ? `2px solid ${c}` : '2px solid transparent',
-                          outlineOffset: '2px',
-                        }}
+                        className="w-5 h-5 rounded-md transition-all hover:scale-110 flex items-center justify-center"
+                        style={{ background: c }}
                       >
                         {column.color === c && (
                           <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
@@ -252,39 +246,14 @@ export default function Column({ column, boardId }) {
                   </div>
                 </div>
 
-                {/* Divider */}
-                <div className="mx-3 border-t border-white/[0.06] mt-2" />
+                <div className="mx-3 border-t border-black/[0.06] dark:border-white/[0.06] mt-2" />
 
-                {/* Column type */}
-                <div className="px-3 py-2">
-                  <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">Column Type</p>
-                  <div className="flex gap-1">
-                    {[
-                      { key: 'none', label: 'Standard', active: 'bg-white/10 text-white/90' },
-                      { key: 'initial', label: 'Start', active: 'bg-blue-500/20 text-blue-400' },
-                      { key: 'final', label: 'Final', active: 'bg-emerald-500/20 text-emerald-400' },
-                    ].map(({ key, label, active }) => (
-                      <button
-                        key={key}
-                        onClick={() => handleColumnTypeChange(key)}
-                        className={`flex-1 py-1.5 text-[10px] font-semibold rounded-md transition-all
-                          ${column.columnType === key || (!column.columnType && key === 'none')
-                            ? active
-                            : 'text-zinc-400 hover:bg-white/[0.05] hover:text-white'}`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Divider */}
-                <div className="mx-3 border-t border-white/[0.06]" />
-
-                {/* Delete — danger zone */}
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] text-red-400/70 hover:text-red-400 hover:bg-red-500/[0.06] transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete();
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-rose-500 hover:bg-rose-500/10 transition-colors"
                 >
                   <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -298,17 +267,13 @@ export default function Column({ column, boardId }) {
       </div>
 
       {/* Cards list */}
-      <div className="flex-1 overflow-y-auto px-0.5 pb-3 space-y-2">
-        <SortableContext
-          items={columnCards.map((c) => c._id)}
-          strategy={verticalListSortingStrategy}
-        >
+      <div className="flex-1 overflow-y-auto px-0.5 pb-2 space-y-2.5">
+        <SortableContext items={columnCards.map((c) => c._id)} strategy={verticalListSortingStrategy}>
           {columnCards.map((card) => (
             <Card key={card._id} card={card} boardId={boardId} />
           ))}
         </SortableContext>
 
-        {/* Add card form */}
         {isAdding && (
           <AddCardForm
             onAdd={handleAddCard}
@@ -316,6 +281,19 @@ export default function Column({ column, boardId }) {
           />
         )}
       </div>
+
+      {/* Quick Add Button at bottom of column */}
+      {!isAdding && (
+        <button
+          onClick={() => setAddingCard(column._id, true)}
+          className="mt-1 flex items-center gap-2 w-full px-3 py-2 rounded-xl text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all text-left"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Add task</span>
+        </button>
+      )}
     </div>
   );
 }

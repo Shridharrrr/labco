@@ -235,6 +235,28 @@ exports.getMe = async (req, res, next) => {
   }
 };
 
+// PATCH /api/auth/me — update user profile (e.g. name)
+exports.updateMe = async (req, res, next) => {
+  try {
+    const { name } = req.body;
+    if (typeof name !== 'string' || !name.trim()) {
+      return res.status(400).json({ message: 'Name cannot be empty' });
+    }
+    const cleanName = name.trim().slice(0, 80);
+    const user = await User.findByIdAndUpdate(
+      req.user.userId,
+      { name: cleanName },
+      { new: true }
+    ).select('-passwordHash -refreshToken');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    const userObj = user.toObject();
+    userObj.userId = user._id;
+    return res.json(userObj);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // POST /api/auth/verify-email
 exports.verifyEmail = async (req, res, next) => {
   try {

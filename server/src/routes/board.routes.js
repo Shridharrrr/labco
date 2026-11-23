@@ -30,7 +30,7 @@ router.post('/:boardId/members', auth, boardAccess('owner'), inviteMember);
 router.delete('/:boardId/invitations/:email', auth, boardAccess('owner'), revokeInvitation);
 router.post('/:boardId/accept-invite', auth, acceptInvite);
 router.patch('/:boardId/members/:userId', auth, boardAccess('owner'), changeMemberRole);
-router.delete('/:boardId/members/:userId', auth, boardAccess('owner'), removeMember);
+router.delete('/:boardId/members/:userId', auth, boardAccess('viewer'), removeMember);
 
 // Columns nested under board
 router.post('/:boardId/columns', auth, boardAccess('editor'), createColumn);
