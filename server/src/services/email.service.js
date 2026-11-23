@@ -1,31 +1,37 @@
 const nodemailer = require('nodemailer');
 
 const getTransporter = () => {
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  const host = process.env.SMTP_HOST || 'smtp-relay.brevo.com';
+  const port = parseInt(process.env.SMTP_PORT || '587', 10);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  // Check if SMTP credentials are provided and not placeholders
+  if (!user || !pass || user === 'your_smtp_user' || user === 'your_brevo_login_email' || pass === 'your_smtp_password' || pass === 'your_brevo_smtp_key') {
     return null;
   }
-  
+
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT || 587,
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+    host,
+    port,
+    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for 587 (STARTTLS)
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user,
+      pass,
     },
   });
 };
 
 /**
- * Send a board invitation email using Nodemailer.
+ * Send a board invitation email using Brevo / Nodemailer.
  */
 const sendInviteEmail = async ({ to, inviterName, boardTitle, boardId, token }) => {
   const transporter = getTransporter();
-  const inviteUrl = `${process.env.CLIENT_URL}/accept-invite?token=${token}&boardId=${boardId}`;
+  const inviteUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/accept-invite?token=${token}&boardId=${boardId}`;
 
   if (!transporter) {
-    console.log('SMTP configuration missing — skipping invite email');
-    console.log(`Invite link would have been: ${inviteUrl}`);
+    console.log('📬 Brevo / SMTP configuration not active (credentials missing or placeholder).');
+    console.log(`   Invite link generated: ${inviteUrl}`);
     return;
   }
 
@@ -45,22 +51,24 @@ const sendInviteEmail = async ({ to, inviterName, boardTitle, boardId, token }) 
         <p style="color:#888;font-size:12px;margin-top:16px;">
           If you don't have an account yet, you will be asked to create one before joining.
         </p>
-      `
+      `,
     });
+    console.log(`✉️ Invite email dispatched to ${to} via Brevo`);
   } catch (error) {
-    console.error('Failed to send invite email via Nodemailer:', error.message);
+    console.error('Failed to send invite email via Brevo / Nodemailer:', error.message);
+    console.log(`📬 Fallback direct invite link: ${inviteUrl}`);
   }
 };
 
 /**
- * Send an email verification link using Nodemailer.
+ * Send an email verification link using Brevo / Nodemailer.
  */
 const sendVerificationEmail = async ({ to, name, token }) => {
   const transporter = getTransporter();
-  const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
+  const verifyUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
 
   if (!transporter) {
-    console.log(`SMTP configuration missing — skipping verification email for ${to}. Token: ${token}`);
+    console.log(`📬 Brevo / SMTP configuration not active. Verification link: ${verifyUrl}`);
     return;
   }
 
@@ -79,10 +87,12 @@ const sendVerificationEmail = async ({ to, name, token }) => {
         <p style="color:#888;font-size:12px;margin-top:16px;">
           If you did not create this account, you can safely ignore this email.
         </p>
-      `
+      `,
     });
+    console.log(`✉️ Verification email dispatched to ${to} via Brevo`);
   } catch (error) {
-    console.error('Failed to send verification email via Nodemailer:', error.message);
+    console.error('Failed to send verification email via Brevo / Nodemailer:', error.message);
+    console.log(`📬 Fallback direct verification link: ${verifyUrl}`);
   }
 };
 

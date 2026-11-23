@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Board = require('../models/Board');
 const Column = require('../models/Column');
 const Card = require('../models/Card');
@@ -6,25 +7,33 @@ const { writeActivity } = require('../services/activity.service');
 const { sendInviteEmail } = require('../services/email.service');
 const crypto = require('crypto');
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ALLOWED_MEMBER_ROLES = ['editor', 'viewer'];
+
 // GET /api/boards/invitations/pending — get invitations for current user
 exports.getPendingInvitations = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.userId);
-    const boards = await Board.find({ 'invitations.email': user.email })
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const boards = await Board.find({
+      'invitations.email': user.email,
+      isArchived: false,
+    })
       .select('title invitations owner')
       .populate('owner', 'name email avatar');
 
-    const pending = boards.map(b => {
-      const inv = b.invitations.find(i => i.email === user.email);
+    const pending = boards.map((b) => {
+      const inv = b.invitations.find((i) => i.email === user.email);
       return {
         boardId: b._id,
         boardTitle: b.title,
         owner: b.owner,
         role: inv?.role,
         token: inv?.token,
-        createdAt: inv?.createdAt
+        createdAt: inv?.createdAt,
       };
-    }).filter(i => i.token); // ensure we found it
+    }).filter((i) => i.token);
 
     return res.json(pending);
   } catch (err) {
@@ -48,13 +57,18 @@ exports.getBoards = async (req, res, next) => {
 // POST /api/boards — create board
 exports.createBoard = async (req, res, next) => {
   try {
-    const { title, description, background } = req.body;
-    if (!title) return res.status(400).json({ message: 'title is required' });
+    const { title, description = '', background = '#1e1b4b' } = req.body;
+    if (typeof title !== 'string' || !title.trim()) {
+      return res.status(400).json({ message: 'title is required' });
+    }
+
+    const cleanTitle = title.trim().slice(0, 100);
+    const cleanDesc = typeof description === 'string' ? description.slice(0, 5000) : '';
 
     const board = await Board.create({
-      title,
-      description,
-      background,
+      title: cleanTitle,
+      description: cleanDesc,
+      background: typeof background === 'string' ? background : '#1e1b4b',
       owner: req.user.userId,
       members: [{ user: req.user.userId, role: 'owner' }],
     });
@@ -63,7 +77,7 @@ exports.createBoard = async (req, res, next) => {
       boardId: board._id,
       userId: req.user.userId,
       type: 'board.created',
-      payload: { boardTitle: title },
+      payload: { boardTitle: cleanTitle },
     });
 
     return res.status(201).json(board);
@@ -79,7 +93,7 @@ exports.getBoard = async (req, res, next) => {
       .populate('owner', 'name email avatar')
       .populate('members.user', 'name email avatar');
 
-    if (!board) return res.status(404).json({ message: 'Board not found' });
+    if (!board || board.isArchived) return res.status(404).json({ message: 'Board not found' });
 
     // Load columns in order
     const columns = await Column.find({ board: board._id }).sort('order');
@@ -90,6 +104,7 @@ exports.getBoard = async (req, res, next) => {
       isArchived: false,
     })
       .populate('assignees', 'name email avatar')
+      .populate('comments.author', 'name email avatar')
       .sort('order');
 
     return res.json({ board, columns, cards });
@@ -102,11 +117,22 @@ exports.getBoard = async (req, res, next) => {
 exports.updateBoard = async (req, res, next) => {
   try {
     const { title, description, background } = req.body;
-    const board = req.board; // set by boardAccess middleware
+    const board = req.board;
 
-    if (title) board.title = title;
-    if (description !== undefined) board.description = description;
-    if (background) board.background = background;
+    if (title !== undefined) {
+      if (typeof title !== 'string' || !title.trim()) {
+        return res.status(400).json({ message: 'title cannot be empty' });
+      }
+      board.title = title.trim().slice(0, 100);
+    }
+
+    if (description !== undefined) {
+      board.description = typeof description === 'string' ? description.slice(0, 5000) : '';
+    }
+
+    if (background !== undefined && typeof background === 'string') {
+      board.background = background;
+    }
 
     await board.save();
     return res.json(board);
@@ -130,38 +156,54 @@ exports.archiveBoard = async (req, res, next) => {
 exports.inviteMember = async (req, res, next) => {
   try {
     const { email, role = 'editor' } = req.body;
-    if (!email) return res.status(400).json({ message: 'email is required' });
+    if (typeof email !== 'string' || !email.trim()) {
+      return res.status(400).json({ message: 'email is required' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    if (!EMAIL_REGEX.test(cleanEmail)) {
+      return res.status(400).json({ message: 'Invalid email address format' });
+    }
+
+    if (!ALLOWED_MEMBER_ROLES.includes(role)) {
+      return res.status(400).json({ message: 'role must be editor or viewer' });
+    }
 
     const board = req.board;
 
-    // Check if already member
-    const invitee = await User.findOne({ email });
+    // Check if inviter is trying to invite themselves
+    if (cleanEmail === req.user.email) {
+      return res.status(400).json({ message: 'You are already the owner of this board' });
+    }
+
+    // Check if already a member
+    const invitee = await User.findOne({ email: cleanEmail });
     if (invitee) {
       const alreadyMember = board.members.find(
-        (m) => m.user.toString() === invitee._id.toString()
+        (m) => m.user && m.user.toString() === invitee._id.toString()
       );
       if (alreadyMember) return res.status(409).json({ message: 'User is already a member' });
     }
 
     // Check if already invited
-    const alreadyInvited = board.invitations?.find(i => i.email === email);
+    const alreadyInvited = board.invitations?.find((i) => i.email === cleanEmail);
     if (alreadyInvited) return res.status(409).json({ message: 'User is already invited' });
 
     // Generate token
-    const token = crypto.randomBytes(20).toString('hex');
+    const token = crypto.randomBytes(24).toString('hex');
 
     if (!board.invitations) board.invitations = [];
-    board.invitations.push({ email, role, token });
+    board.invitations.push({ email: cleanEmail, role, token });
     await board.save();
 
     // Send email
     const inviter = await User.findById(req.user.userId);
     await sendInviteEmail({
-      to: email,
-      inviterName: inviter.name || inviter.email,
+      to: cleanEmail,
+      inviterName: inviter?.name || inviter?.email || 'A team member',
       boardTitle: board.title,
       boardId: board._id,
-      token
+      token,
     });
 
     return res.json({ message: 'Invitation sent' });
@@ -174,32 +216,34 @@ exports.inviteMember = async (req, res, next) => {
 exports.acceptInvite = async (req, res, next) => {
   try {
     const { token } = req.body;
-    if (!token) return res.status(400).json({ message: 'token is required' });
+    if (typeof token !== 'string' || !token.trim()) {
+      return res.status(400).json({ message: 'token is required' });
+    }
 
     const board = await Board.findById(req.params.boardId);
-    if (!board) return res.status(404).json({ message: 'Board not found' });
+    if (!board || board.isArchived) return res.status(404).json({ message: 'Board not found' });
 
-    const invitationIndex = board.invitations.findIndex(i => i.token === token);
+    const invitationIndex = board.invitations.findIndex((i) => i.token === token.trim());
     if (invitationIndex === -1) {
       return res.status(400).json({ message: 'Invalid or expired invitation token' });
     }
 
     const invitation = board.invitations[invitationIndex];
-    
-    // User must be logged in with the same email (or any email? Let's say any logged in user can accept if they have the token, to allow signing up with a different email, but checking email is safer)
     const user = await User.findById(req.user.userId);
-    if (user.email !== invitation.email) {
-      return res.status(403).json({ message: 'This invitation was sent to a different email address' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+      return res.status(403).json({ message: `This invitation was sent to ${invitation.email}` });
     }
 
     const alreadyMember = board.members.find(
-      (m) => m.user.toString() === user._id.toString()
+      (m) => m.user && m.user.toString() === user._id.toString()
     );
 
     if (!alreadyMember) {
       board.members.push({ user: user._id, role: invitation.role });
     }
-    
+
     // Remove invitation
     board.invitations.splice(invitationIndex, 1);
     await board.save();
@@ -221,10 +265,10 @@ exports.acceptInvite = async (req, res, next) => {
 exports.revokeInvitation = async (req, res, next) => {
   try {
     const board = req.board;
-    const { email } = req.params;
+    const cleanEmail = req.params.email ? decodeURIComponent(req.params.email).toLowerCase() : '';
 
     const initialLength = board.invitations?.length || 0;
-    board.invitations = board.invitations?.filter((i) => i.email !== email) || [];
+    board.invitations = board.invitations?.filter((i) => i.email.toLowerCase() !== cleanEmail) || [];
 
     if (board.invitations.length === initialLength) {
       return res.status(404).json({ message: 'Invitation not found' });
@@ -232,7 +276,7 @@ exports.revokeInvitation = async (req, res, next) => {
 
     await board.save();
     await board.populate('members.user', 'name email avatar');
-    
+
     return res.json(board);
   } catch (err) {
     next(err);
@@ -243,16 +287,27 @@ exports.revokeInvitation = async (req, res, next) => {
 exports.changeMemberRole = async (req, res, next) => {
   try {
     const { role } = req.body;
+    const { userId } = req.params;
     const board = req.board;
 
+    if (!ALLOWED_MEMBER_ROLES.includes(role)) {
+      return res.status(400).json({ message: 'Role must be editor or viewer' });
+    }
+
+    // Prevent changing the role of the board owner
+    if (userId === board.owner.toString()) {
+      return res.status(400).json({ message: 'Cannot modify board owner role' });
+    }
+
     const member = board.members.find(
-      (m) => m.user.toString() === req.params.userId
+      (m) => m.user && m.user.toString() === userId
     );
     if (!member) return res.status(404).json({ message: 'Member not found' });
+
     member.role = role;
     await board.save();
     await board.populate('members.user', 'name email avatar');
-    
+
     return res.json(board);
   } catch (err) {
     next(err);
@@ -262,9 +317,16 @@ exports.changeMemberRole = async (req, res, next) => {
 // DELETE /api/boards/:boardId/members/:userId — remove member (owner only)
 exports.removeMember = async (req, res, next) => {
   try {
+    const { userId } = req.params;
     const board = req.board;
+
+    // Prevent removing the board owner
+    if (userId === board.owner.toString()) {
+      return res.status(400).json({ message: 'Cannot remove board owner' });
+    }
+
     board.members = board.members.filter(
-      (m) => m.user.toString() !== req.params.userId
+      (m) => m.user && m.user.toString() !== userId
     );
     await board.save();
     await board.populate('members.user', 'name email avatar');
@@ -273,7 +335,7 @@ exports.removeMember = async (req, res, next) => {
       boardId: board._id,
       userId: req.user.userId,
       type: 'member.removed',
-      payload: { removedUserId: req.params.userId },
+      payload: { removedUserId: userId },
     });
 
     return res.json(board);
@@ -289,8 +351,8 @@ exports.toggleStar = async (req, res, next) => {
     const userId = req.user.userId;
 
     if (!board.stars) board.stars = [];
-    const index = board.stars.findIndex(id => id.toString() === userId.toString());
-    
+    const index = board.stars.findIndex((id) => id && id.toString() === userId.toString());
+
     if (index > -1) {
       board.stars.splice(index, 1);
     } else {

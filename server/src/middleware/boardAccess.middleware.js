@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Board = require('../models/Board');
 
 /**
@@ -11,6 +12,10 @@ const boardAccess = (minRole = 'viewer') => async (req, res, next) => {
   const roleRank = { viewer: 0, editor: 1, owner: 2 };
   const boardId = req.params.boardId || req.body.boardId;
 
+  if (!boardId || !mongoose.isValidObjectId(boardId)) {
+    return res.status(400).json({ message: 'Invalid or missing board identifier' });
+  }
+
   try {
     const board = await Board.findById(boardId);
     if (!board || board.isArchived) {
@@ -18,14 +23,14 @@ const boardAccess = (minRole = 'viewer') => async (req, res, next) => {
     }
 
     const member = board.members.find(
-      (m) => m.user.toString() === req.user.userId
+      (m) => m.user && m.user.toString() === req.user.userId
     );
 
     if (!member) {
       return res.status(403).json({ message: 'Access denied – not a board member' });
     }
 
-    if (roleRank[member.role] < roleRank[minRole]) {
+    if (roleRank[member.role] === undefined || roleRank[member.role] < roleRank[minRole]) {
       return res.status(403).json({ message: `Requires ${minRole} role or higher` });
     }
 

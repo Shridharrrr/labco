@@ -21,7 +21,13 @@ const useAuthStore = create(
       setAuth: ({ user, accessToken }) =>
         set({ user: normalizeUser(user), accessToken, isAuthenticated: true }),
 
+      updateToken: (accessToken) =>
+        set({ accessToken }),
+
       clearAuth: () =>
+        set({ user: null, accessToken: null, isAuthenticated: false }),
+
+      logout: () =>
         set({ user: null, accessToken: null, isAuthenticated: false }),
 
       updateUser: (changes) =>

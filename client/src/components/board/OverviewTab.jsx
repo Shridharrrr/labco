@@ -4,6 +4,7 @@ import useAuthStore from '../../store/authSlice';
 import * as boardService from '../../services/boardService';
 import Spinner from '../ui/Spinner';
 import Avatar from '../ui/Avatar';
+import { parseSafeMarkdown } from '../../utils/sanitize';
 
 export default function OverviewTab({ boardId }) {
   const { board, cards, columns } = useBoardStore();
@@ -124,43 +125,7 @@ export default function OverviewTab({ boardId }) {
 
   // Progress calculation removed
 
-  const parseMarkdown = (text) => {
-    if (!text) return '';
-    let html = text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-
-    // Code blocks
-    html = html.replace(/```([\s\S]*?)```/g, '<pre class="bg-black/40 p-3 rounded-md my-3 overflow-x-auto font-mono text-xs"><code>$1</code></pre>');
-    // Inline code
-    html = html.replace(/`([^`]+)`/g, '<code class="bg-white/10 px-1.5 py-0.5 rounded text-brand-300 font-mono text-[11px]">$1</code>');
-    // Headings
-    html = html.replace(/^### (.*$)/gim, '<h3 class="text-sm font-bold mt-4 mb-2 text-white/90">$1</h3>');
-    html = html.replace(/^## (.*$)/gim, '<h2 class="text-base font-bold mt-5 mb-2 text-white border-b border-white/10 pb-1.5">$1</h2>');
-    html = html.replace(/^# (.*$)/gim, '<h1 class="text-lg font-bold mt-6 mb-3 text-white border-b border-white/10 pb-2">$1</h1>');
-    // Bold & Italic
-    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-white/90">$1</strong>');
-    html = html.replace(/\*([^*]+)\*/g, '<em class="italic">$1</em>');
-    html = html.replace(/_([^_]+)_/g, '<em class="italic">$1</em>');
-    // Links
-    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-brand-400 hover:underline">$1</a>');
-    // Unordered Lists
-    html = html.replace(/^\s*[-*+] (.*$)/gim, '<li class="ml-5 list-disc marker:text-white/30">$1</li>');
-    // Blockquotes
-    html = html.replace(/^\> (.*$)/gim, '<blockquote class="border-l-2 border-brand-500/50 pl-3 py-0.5 my-2 text-white/60 bg-brand-500/5 rounded-r">$1</blockquote>');
-
-    // Wrap list items in ul
-    html = html.replace(/(<li class="ml-5 list-disc marker:text-white\/30">.*?<\/li>(?:\s*<br\s*\/?>|\n)*)+/g, match => `<ul class="my-2 space-y-1">${match}</ul>`);
-
-    // Paragraphs / Line breaks
-    html = html.split(/\n\n+/).map(p => {
-      if (p.trim().startsWith('<h') || p.trim().startsWith('<pre') || p.trim().startsWith('<ul') || p.trim().startsWith('<blockquote')) return p;
-      return `<p class="mb-3">${p.replace(/\n/g, '<br/>')}</p>`;
-    }).join('');
-
-    return html;
-  };
+  const parseMarkdown = (text) => parseSafeMarkdown(text);
 
   return (
     <div className="flex-1 overflow-y-auto p-3 sm:p-5">

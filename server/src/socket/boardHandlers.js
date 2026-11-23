@@ -1,12 +1,24 @@
+const mongoose = require('mongoose');
 const Board = require('../models/Board');
+
+/**
+ * Verify the socket user is a member of the given board.
+ */
+const verifyMember = async (boardId, userId) => {
+  if (!boardId || !mongoose.isValidObjectId(boardId)) return false;
+  const board = await Board.findById(boardId).select('members isArchived');
+  if (!board || board.isArchived) return false;
+  return board.members.some((m) => m.user && m.user.toString() === userId);
+};
 
 /**
  * Verify the socket user is an editor+ of the given board.
  */
 const verifyEditor = async (boardId, userId) => {
+  if (!boardId || !mongoose.isValidObjectId(boardId)) return false;
   const board = await Board.findById(boardId).select('members isArchived');
   if (!board || board.isArchived) return false;
-  const member = board.members.find((m) => m.user.toString() === userId);
+  const member = board.members.find((m) => m.user && m.user.toString() === userId);
   if (!member) return false;
   return ['editor', 'owner'].includes(member.role);
 };
@@ -94,6 +106,9 @@ const boardHandlers = (io, socket) => {
 
   socket.on('chat:message', async ({ boardId, message }) => {
     try {
+      if (!(await verifyMember(boardId, userId))) {
+        return socket.emit('error', { message: 'Permission denied: not a board member', code: 403 });
+      }
       socket.to(boardId).emit('chat:message', { message });
     } catch (err) {
       socket.emit('error', { message: err.message, code: 500 });

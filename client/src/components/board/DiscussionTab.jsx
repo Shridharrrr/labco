@@ -6,6 +6,7 @@ import { getSocket } from '../../hooks/useSocket';
 import Avatar from '../ui/Avatar';
 import Spinner from '../ui/Spinner';
 import { isImage, FileTypeIcon, formatBytes, fileColor } from '../../utils/fileHelpers';
+import { parseSafeMarkdown } from '../../utils/sanitize';
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function DiscussionTab({ boardId }) {
@@ -25,24 +26,7 @@ export default function DiscussionTab({ boardId }) {
   // ── Markdown ────────────────────────────────────────────────────────────
   const renderMarkdown = (msgText) => {
     if (!msgText) return null;
-    
-    // Escape HTML to prevent XSS
-    let html = msgText
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-
-    html = html
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g,     '<em>$1</em>')
-      .replace(/`([^`]+)`/g,    '<code class="bg-white/10 text-brand-300 px-1 py-0.5 rounded text-[13px] font-mono">$1</code>')
-      // Explicit markdown links [text](url)
-      .replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-brand-400 hover:underline hover:text-brand-300 transition-colors">$1</a>')
-      // Raw URLs not inside an href attribute
-      .replace(/(?<!href=")(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-brand-400 hover:underline hover:text-brand-300 transition-colors">$1</a>')
-      .replace(/\n/g, '<br />');
-
-    return <span dangerouslySetInnerHTML={{ __html: html }} />;
+    return <span dangerouslySetInnerHTML={{ __html: parseSafeMarkdown(msgText, { inlineOnly: true }) }} />;
   };
 
   // ── Message feed ────────────────────────────────────────────────────────

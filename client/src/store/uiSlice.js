@@ -35,9 +35,13 @@ const useUIStore = create((set) => ({
   toggleMobileSidebar: () => set((s) => ({ isMobileSidebarOpen: !s.isMobileSidebarOpen })),
   setMobileSidebarOpen: (bool) => set({ isMobileSidebarOpen: bool }),
 
-  addToast: ({ message, type = 'info' }) =>
+  addToast: (toastArg, typeOverride) =>
     set((s) => {
       const id = ++toastId;
+      if (typeof toastArg === 'string') {
+        return { toasts: [...s.toasts, { id, message: toastArg, type: typeOverride || 'info' }] };
+      }
+      const { message = '', type = 'info' } = toastArg || {};
       return { toasts: [...s.toasts, { id, message, type }] };
     }),
 

@@ -5,6 +5,8 @@ export const getCard = (cardId) => api.get(`/cards/${cardId}`);
 export const updateCard = (cardId, data) => api.patch(`/cards/${cardId}`, data);
 export const archiveCard = (cardId) => api.delete(`/cards/${cardId}`);
 export const moveCard = (cardId, data) => api.patch(`/cards/${cardId}/move`, data);
+export const addComment = (cardId, data) => api.post(`/cards/${cardId}/comments`, data);
+export const deleteComment = (cardId, commentId) => api.delete(`/cards/${cardId}/comments/${commentId}`);
 export const addAttachment = (cardId, formData) =>
   api.post(`/cards/${cardId}/attachments`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },

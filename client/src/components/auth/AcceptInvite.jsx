@@ -30,7 +30,7 @@ export default function AcceptInvite() {
     const accept = async () => {
       try {
         await api.post(`/boards/${boardId}/accept-invite`, { token });
-        addToast('Invitation accepted successfully!', 'success');
+        addToast({ message: 'Invitation accepted successfully!', type: 'success' });
         navigate(`/boards/${boardId}`, { replace: true });
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to accept invitation. It may have expired or was sent to a different email.');
@@ -69,7 +69,7 @@ export default function AcceptInvite() {
           </button>
           <button
             onClick={() => {
-              useAuthStore.getState().logout();
+              useAuthStore.getState().clearAuth();
               navigate(`/login?redirect=/accept-invite?token=${token}%26boardId=${boardId}`);
             }}
             className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-sm font-medium transition-colors"

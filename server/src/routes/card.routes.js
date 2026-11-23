@@ -4,13 +4,14 @@ const auth = require('../middleware/auth.middleware');
 const boardAccess = require('../middleware/boardAccess.middleware');
 const multer = require('multer');
 const {
-  createCard,
   getCard,
   updateCard,
   archiveCard,
   moveCard,
   addAttachment,
   removeAttachment,
+  addComment,
+  deleteComment,
 } = require('../controllers/card.controller');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
@@ -28,8 +29,6 @@ const loadBoardFromCard = async (req, res, next) => {
   }
 };
 
-// No column routes here
-
 // GET /api/cards/:cardId
 router.get('/:cardId', auth, loadBoardFromCard, boardAccess('viewer'), getCard);
 
@@ -41,6 +40,12 @@ router.delete('/:cardId', auth, loadBoardFromCard, boardAccess('editor'), archiv
 
 // PATCH /api/cards/:cardId/move
 router.patch('/:cardId/move', auth, loadBoardFromCard, boardAccess('editor'), moveCard);
+
+// POST /api/cards/:cardId/comments
+router.post('/:cardId/comments', auth, loadBoardFromCard, boardAccess('editor'), addComment);
+
+// DELETE /api/cards/:cardId/comments/:commentId
+router.delete('/:cardId/comments/:commentId', auth, loadBoardFromCard, boardAccess('editor'), deleteComment);
 
 // POST /api/cards/:cardId/attachments
 router.post('/:cardId/attachments', auth, loadBoardFromCard, boardAccess('editor'), upload.single('file'), addAttachment);

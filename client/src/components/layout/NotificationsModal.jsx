@@ -3,9 +3,17 @@ import * as boardService from '../../services/boardService';
 import useUIStore from '../../store/uiSlice';
 import Avatar from '../ui/Avatar';
 
-export default function NotificationsModal({ onClose, onAccept, invitations }) {
+export default function NotificationsModal({ onClose, onAccept, onIgnore, invitations }) {
   const { addToast } = useUIStore();
   const [loadingId, setLoadingId] = useState(null);
+  const [ignoredTokens, setIgnoredTokens] = useState([]);
+
+  const visibleInvitations = (invitations || []).filter(i => !ignoredTokens.includes(i.token));
+
+  const handleIgnore = (token) => {
+    setIgnoredTokens(prev => [...prev, token]);
+    if (onIgnore) onIgnore(token);
+  };
 
   const handleAccept = async (boardId, token) => {
     setLoadingId(token);
@@ -40,7 +48,7 @@ export default function NotificationsModal({ onClose, onAccept, invitations }) {
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto p-2">
-          {invitations.length === 0 ? (
+          {visibleInvitations.length === 0 ? (
             <div className="py-10 text-center flex flex-col items-center">
               <div className="w-10 h-10 rounded-full bg-white/[0.04] flex items-center justify-center mb-3">
                 <svg className="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
@@ -49,7 +57,7 @@ export default function NotificationsModal({ onClose, onAccept, invitations }) {
             </div>
           ) : (
             <div className="space-y-1">
-              {invitations.map(inv => (
+              {visibleInvitations.map(inv => (
                 <div key={inv.token} className="bg-white/[0.03] hover:bg-white/[0.05] border border-transparent hover:border-white/[0.08] transition-colors rounded-lg p-3">
                   <div className="flex gap-3">
                     <Avatar name={inv.owner?.name || inv.owner?.email} src={inv.owner?.avatar} size="md" />
@@ -70,6 +78,8 @@ export default function NotificationsModal({ onClose, onAccept, invitations }) {
                           {loadingId === inv.token ? 'Accepting...' : 'Accept'}
                         </button>
                         <button
+                          type="button"
+                          onClick={() => handleIgnore(inv.token)}
                           className="flex-none px-3 bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 hover:text-white text-[11px] font-semibold rounded-md transition-colors"
                         >
                           Ignore

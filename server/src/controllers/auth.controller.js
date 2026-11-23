@@ -6,6 +6,22 @@ const { OAuth2Client } = require('google-auth-library');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const isPlaceholderSmtp = () => {
+  const host = process.env.SMTP_HOST || '';
+  const user = process.env.SMTP_USER || '';
+  return (
+    !host ||
+    host.includes('example.com') ||
+    user === 'your_smtp_user' ||
+    user === 'your_brevo_login_email' ||
+    !process.env.SMTP_PASS ||
+    process.env.SMTP_PASS === 'your_smtp_password' ||
+    process.env.SMTP_PASS === 'your_brevo_smtp_key'
+  );
+};
+
 const signAccess = (userId, email) =>
   jwt.sign({ userId, email }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m',
@@ -20,26 +36,64 @@ const signRefresh = (userId) =>
 exports.register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'name, email and password are required' });
+
+    if (
+      typeof name !== 'string' ||
+      typeof email !== 'string' ||
+      typeof password !== 'string' ||
+      !name.trim() ||
+      !email.trim() ||
+      !password
+    ) {
+      return res.status(400).json({ message: 'Name, valid email and password are required' });
     }
 
-    const existing = await User.findOne({ email });
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name.trim();
+
+    if (!EMAIL_REGEX.test(cleanEmail)) {
+      return res.status(400).json({ message: 'Invalid email address format' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
+    const existing = await User.findOne({ email: cleanEmail });
     if (existing) {
       return res.status(409).json({ message: 'Email already registered' });
     }
 
-    const user = await User.create({ name, email, passwordHash: password, isEmailVerified: false });
+    // In local dev with placeholder SMTP, auto-verify to prevent developer lockout
+    const autoVerify = process.env.NODE_ENV !== 'production' && isPlaceholderSmtp();
 
-    // Generate email verification token (valid for 24 hours)
+    const user = await User.create({
+      name: cleanName,
+      email: cleanEmail,
+      passwordHash: password,
+      isEmailVerified: autoVerify,
+    });
+
+    // Generate email verification token (valid for 24 hours) with strict type claim
     const verificationToken = jwt.sign(
-      { userId: user._id.toString() },
+      { userId: user._id.toString(), type: 'email-verification' },
       process.env.JWT_ACCESS_SECRET,
       { expiresIn: '24h' }
     );
 
     // Send verification email
     await sendVerificationEmail({ to: user.email, name: user.name, token: verificationToken });
+
+    if (autoVerify) {
+      console.log(`\n======================================================`);
+      console.log(`[DEV MODE] Auto-verified email for ${cleanEmail} (placeholder SMTP detected).`);
+      console.log(`Direct verification link: ${process.env.CLIENT_URL || 'http://localhost:5173'}/verify-email?token=${verificationToken}`);
+      console.log(`======================================================\n`);
+      return res.status(201).json({
+        message: 'Registration successful! You can now log in immediately.',
+        autoVerified: true,
+      });
+    }
 
     return res.status(201).json({
       message: 'Registration successful. Please check your email to verify your account.',
@@ -53,19 +107,26 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ message: 'email and password are required' });
+    if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: 'Wrong credentials' });
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
     if (!user.isEmailVerified) {
-      return res.status(403).json({ message: 'Please verify your email before logging in.' });
+      // In development with placeholder SMTP, auto-verify on first login attempt
+      if (process.env.NODE_ENV !== 'production' && isPlaceholderSmtp()) {
+        user.isEmailVerified = true;
+        await user.save();
+      } else {
+        return res.status(403).json({ message: 'Please verify your email before logging in.' });
+      }
     }
 
     const match = await user.comparePassword(password);
-    if (!match) return res.status(401).json({ message: 'Wrong credentials' });
+    if (!match) return res.status(401).json({ message: 'Invalid credentials' });
 
     const accessToken = signAccess(user._id.toString(), user.email);
     const refreshToken = signRefresh(user._id.toString());
@@ -100,17 +161,22 @@ exports.refresh = async (req, res, next) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
     } catch {
+      res.clearCookie('refreshToken');
       return res.status(401).json({ message: 'Invalid refresh token' });
     }
 
     // Verify against Redis
     const stored = await redis.get(`refresh:${decoded.userId}`);
     if (!stored || stored !== token) {
+      res.clearCookie('refreshToken');
       return res.status(401).json({ message: 'Refresh token revoked' });
     }
 
     const user = await User.findById(decoded.userId);
-    if (!user) return res.status(401).json({ message: 'User not found' });
+    if (!user) {
+      res.clearCookie('refreshToken');
+      return res.status(401).json({ message: 'User not found' });
+    }
 
     const newAccess = signAccess(user._id.toString(), user.email);
     const newRefresh = signRefresh(user._id.toString());
@@ -145,7 +211,11 @@ exports.logout = async (req, res, next) => {
         // Token already invalid — still clear cookie
       }
     }
-    res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
     return res.json({ message: 'Logged out' });
   } catch (err) {
     next(err);
@@ -169,7 +239,9 @@ exports.getMe = async (req, res, next) => {
 exports.verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.body;
-    if (!token) return res.status(400).json({ message: 'Token is required' });
+    if (typeof token !== 'string' || !token.trim()) {
+      return res.status(400).json({ message: 'Token is required' });
+    }
 
     let decoded;
     try {
@@ -178,11 +250,16 @@ exports.verifyEmail = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid or expired verification token' });
     }
 
+    // Ensure it is specifically a verification token
+    if (decoded.type && decoded.type !== 'email-verification') {
+      return res.status(400).json({ message: 'Invalid token type' });
+    }
+
     const user = await User.findById(decoded.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     if (user.isEmailVerified) {
-      return res.status(400).json({ message: 'Email already verified' });
+      return res.json({ message: 'Email already verified. You can log in.' });
     }
 
     user.isEmailVerified = true;
@@ -194,11 +271,48 @@ exports.verifyEmail = async (req, res, next) => {
   }
 };
 
+// POST /api/auth/resend-verification
+exports.resendVerification = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (typeof email !== 'string' || !email.trim()) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      // Do not reveal email existence to prevent user enumeration
+      return res.json({ message: 'If this email is registered and unverified, a verification link has been sent.' });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({ message: 'Email is already verified. Please log in.' });
+    }
+
+    const verificationToken = jwt.sign(
+      { userId: user._id.toString(), type: 'email-verification' },
+      process.env.JWT_ACCESS_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    await sendVerificationEmail({ to: user.email, name: user.name, token: verificationToken });
+
+    if (process.env.NODE_ENV !== 'production' && isPlaceholderSmtp()) {
+      console.log(`[DEV MODE] Resend verification link: ${process.env.CLIENT_URL || 'http://localhost:5173'}/verify-email?token=${verificationToken}`);
+    }
+
+    return res.json({ message: 'If this email is registered and unverified, a verification link has been sent.' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // POST /api/auth/google
 exports.googleAuth = async (req, res, next) => {
   try {
     const { credential } = req.body;
-    if (!credential) {
+    if (typeof credential !== 'string' || !credential) {
       return res.status(400).json({ message: 'Google credential is required' });
     }
 
@@ -206,36 +320,34 @@ exports.googleAuth = async (req, res, next) => {
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-    
+
     const payload = ticket.getPayload();
     if (!payload || !payload.email) {
       return res.status(400).json({ message: 'Invalid Google credential' });
     }
 
     const { sub: googleId, email, name, picture: avatar } = payload;
+    const cleanEmail = email.trim().toLowerCase();
 
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email: cleanEmail });
 
     if (user) {
-      // Link google account if not linked
       if (!user.googleId) {
         user.googleId = googleId;
-        user.isEmailVerified = true; // Google emails are already verified
+        user.isEmailVerified = true;
         if (!user.avatar && avatar) user.avatar = avatar;
         await user.save();
       }
     } else {
-      // Create new user
       user = await User.create({
-        name,
-        email,
+        name: name || cleanEmail.split('@')[0],
+        email: cleanEmail,
         googleId,
-        avatar,
-        isEmailVerified: true, // Google emails are verified
+        avatar: avatar || '',
+        isEmailVerified: true,
       });
     }
 
-    // Login logic
     const accessToken = signAccess(user._id.toString(), user.email);
     const refreshToken = signRefresh(user._id.toString());
 

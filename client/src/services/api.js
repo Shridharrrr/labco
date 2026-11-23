@@ -1,4 +1,5 @@
 import axios from 'axios';
+import useAuthStore from '../store/authSlice';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
@@ -62,6 +63,11 @@ api.interceptors.response.use(
           { withCredentials: true }
         );
         const newToken = data.accessToken;
+
+        // Update in-memory Zustand store immediately
+        try {
+          useAuthStore.getState().updateToken(newToken);
+        } catch {}
 
         // Update persisted store
         const stored = localStorage.getItem('labco-auth');
