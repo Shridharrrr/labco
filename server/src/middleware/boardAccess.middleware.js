@@ -27,7 +27,7 @@ const boardAccess = (minRole = 'viewer') => async (req, res, next) => {
     );
 
     if (!member) {
-      return res.status(403).json({ message: 'Access denied – not a board member' });
+      return res.status(403).json({ message: 'Access denied: not a board member' });
     }
 
     if (roleRank[member.role] === undefined || roleRank[member.role] < roleRank[minRole]) {

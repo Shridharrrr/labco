@@ -119,16 +119,16 @@ export default function BoardPage() {
   return (
     <div className="flex flex-col flex-1 overflow-hidden bg-[#f8f9fb] dark:bg-[#07080b] text-zinc-900 dark:text-zinc-100 transition-colors" onMouseMove={handleMouseMove}>
 
-      {/* ── Top bar (Solaris aesthetic) ─────────────────────────────────── */}
-      <header className="shrink-0 border-b border-black/[0.06] dark:border-white/[0.06] bg-white/70 dark:bg-[#090a0f]/85 backdrop-blur-md">
+      {/* ── Top bar ─────────────────────────────────── */}
+      <header className="shrink-0 border-b border-black/[0.07] dark:border-white/[0.07] bg-white/80 dark:bg-[#0a0a0c]/90 backdrop-blur-md">
 
         {/* Row 1: breadcrumb + actions */}
-        <div className="flex items-center justify-between px-4 sm:px-6 pt-3 pb-2 gap-3">
+        <div className="flex items-center justify-between px-4 sm:px-6 pt-3 pb-2.5 gap-3">
           <div className="flex items-center gap-2 text-xs min-w-0">
             {/* Mobile Sidebar Hamburger */}
             <button
               onClick={toggleMobileSidebar}
-              className="md:hidden p-1.5 -ml-1 text-zinc-500 hover:text-black dark:text-zinc-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors cursor-pointer shrink-0"
+              className="md:hidden p-1.5 -ml-1 text-zinc-500 hover:text-black dark:text-zinc-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors cursor-pointer shrink-0"
               title="Open sidebar"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,13 +147,13 @@ export default function BoardPage() {
             <button
               onClick={handleToggleStar}
               title={isStarred ? "Remove from favorites" : "Add to favorites"}
-              className={`p-1 rounded-md transition-colors cursor-pointer ${
+              className={`p-1 rounded transition-colors cursor-pointer ${
                 isStarred 
-                  ? 'text-amber-400 bg-amber-400/10' 
+                  ? 'text-zinc-700 dark:text-zinc-200' 
                   : 'text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
               }`}
             >
-              <svg className="w-3.5 h-3.5" fill={isStarred ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5" fill={isStarred ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
               </svg>
             </button>
@@ -161,7 +161,7 @@ export default function BoardPage() {
             {/* Share / Invite */}
             <button
               onClick={() => setIsMembersOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-black/[0.07] dark:border-white/[0.08] text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-xs"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-black/[0.08] dark:border-white/[0.08] text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               title="Share & Members"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -173,7 +173,7 @@ export default function BoardPage() {
             {/* Workspace Settings */}
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-black/[0.07] dark:border-white/[0.08] text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all shadow-xs"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-black/[0.08] dark:border-white/[0.08] text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               title="Workspace Settings"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -192,10 +192,10 @@ export default function BoardPage() {
               <button
                 onClick={() => setShowFilters((v) => !v)}
                 title="Filter tasks"
-                className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all border ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors border ${
                   showFilters || filterActive
-                    ? 'bg-white dark:bg-[#1a1c27] text-zinc-950 dark:text-white border-black/15 dark:border-white/15 shadow-xs'
-                    : 'border-black/[0.07] dark:border-white/[0.08] text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
+                    ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 border-transparent font-semibold'
+                    : 'border-black/[0.08] dark:border-white/[0.08] text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -209,10 +209,10 @@ export default function BoardPage() {
             <button
               onClick={toggleActivity}
               title="Activity Log"
-              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all border ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors border ${
                 isActivityOpen
-                  ? 'bg-white dark:bg-[#1a1c27] text-zinc-950 dark:text-white border-black/15 dark:border-white/15 shadow-xs'
-                  : 'border-black/[0.07] dark:border-white/[0.08] text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
+                  ? 'bg-black/5 dark:bg-white/10 text-zinc-950 dark:text-white border-black/15 dark:border-white/15'
+                  : 'border-black/[0.08] dark:border-white/[0.08] text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
               }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -225,10 +225,10 @@ export default function BoardPage() {
             <button
               onClick={toggleRightPanel}
               title="Board Chat"
-              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all border ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors border ${
                 isRightPanelOpen
-                  ? 'bg-white dark:bg-[#1a1c27] text-zinc-950 dark:text-white border-black/15 dark:border-white/15 shadow-xs'
-                  : 'border-black/[0.07] dark:border-white/[0.08] text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
+                  ? 'bg-black/5 dark:bg-white/10 text-zinc-950 dark:text-white border-black/15 dark:border-white/15'
+                  : 'border-black/[0.08] dark:border-white/[0.08] text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
               }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -240,7 +240,7 @@ export default function BoardPage() {
         </div>
 
         {/* Row 2: tabs with clean underline */}
-        <div className="flex items-center gap-1 px-4 sm:px-6 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-6 px-4 sm:px-6 overflow-x-auto no-scrollbar">
           {TABS.map((tab) => {
             const key = tab.toLowerCase();
             const isActive = activeTab === key;
@@ -248,10 +248,10 @@ export default function BoardPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(key)}
-                className={`px-3 py-2 text-xs font-medium border-b-2 transition-all -mb-px cursor-pointer shrink-0 ${
+                className={`pb-2.5 text-xs font-medium border-b-[1.5px] transition-colors -mb-px cursor-pointer shrink-0 ${
                   isActive
                     ? 'text-zinc-950 dark:text-white border-zinc-950 dark:border-white font-semibold'
-                    : 'text-zinc-500 hover:text-black dark:hover:text-zinc-200 border-transparent'
+                    : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 border-transparent'
                 }`}
               >
                 {tab}

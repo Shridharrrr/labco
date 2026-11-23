@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import useAuthStore from '../../store/authSlice';
 import useUIStore from '../../store/uiSlice';
 import * as authService from '../../services/authService';
-import Avatar from '../ui/Avatar';
 import Spinner from '../ui/Spinner';
 
 export default function ProfileModal({ isOpen, onClose, onLogout }) {
@@ -50,48 +49,58 @@ export default function ProfileModal({ isOpen, onClose, onLogout }) {
     }
   };
 
+  const displayName = user?.name || user?.email || 'User';
+  const initial = (displayName[0] || 'U').toUpperCase();
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-[fadeIn_0.12s_ease-out]"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.12s_ease-out]"
       onClick={(e) => e.target === e.currentTarget && onClose()}
       role="dialog"
       aria-modal="true"
     >
-      <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#0d0e15] border border-black/[0.08] dark:border-white/[0.09] shadow-2xl p-6 relative text-zinc-900 dark:text-white animate-[modalIn_0.15s_ease-out]">
+      <div className="w-full max-w-[380px] rounded-xl bg-white dark:bg-[#111218] border border-black/[0.08] dark:border-white/[0.08] shadow-xl p-5 relative text-zinc-900 dark:text-white animate-[modalIn_0.15s_ease-out]">
         
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          type="button"
-          className="absolute top-5 right-5 p-1.5 rounded-lg text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-          title="Close"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-black/[0.06] dark:border-white/[0.07]">
+          <h2 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-white">
+            Profile &amp; Settings
+          </h2>
+          <button
+            onClick={onClose}
+            type="button"
+            className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            title="Close"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
         {/* Profile Card Header */}
-        <div className="flex flex-col items-center text-center pb-5 border-b border-black/[0.06] dark:border-white/[0.07]">
-          <Avatar
-            name={user?.name || user?.email}
-            src={user?.avatar}
-            size="lg"
-            className="w-16 h-16 rounded-2xl mb-3 shadow-md"
-          />
-          <h2 className="text-base font-bold text-zinc-950 dark:text-white">
-            {user?.name || 'User'}
-          </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-            {user?.email}
-          </p>
+        <div className="flex items-center gap-3.5 py-4 border-b border-black/[0.06] dark:border-white/[0.07]">
+          <div className="w-11 h-11 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center text-base font-semibold shrink-0 select-none border border-black/[0.06] dark:border-white/[0.08]">
+            {user?.avatar ? (
+              <img src={user.avatar} alt="" className="w-full h-full rounded-lg object-cover" />
+            ) : (
+              <span>{initial}</span>
+            )}
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-zinc-950 dark:text-white truncate">
+              {displayName}
+            </h3>
+            <p className="text-xs text-zinc-400 truncate mt-0.5">
+              {user?.email}
+            </p>
+          </div>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSave} className="space-y-4 pt-4">
-          
           <div>
-            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-[11px] font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1.5">
               Display Name
             </label>
             <input
@@ -99,39 +108,44 @@ export default function ProfileModal({ isOpen, onClose, onLogout }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
-              className="w-full px-3.5 py-2 rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] text-sm text-zinc-900 dark:text-white outline-none focus:border-indigo-500 transition-all"
+              className="w-full px-3 py-2 rounded-lg border border-black/[0.1] dark:border-white/[0.1] bg-transparent text-sm text-zinc-900 dark:text-white outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
             />
           </div>
 
           {/* Theme Selector */}
           <div>
-            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
-              Appearance Theme
+            <label className="block text-[11px] font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1.5">
+              Theme
             </label>
-            <div className="grid grid-cols-2 gap-2 bg-black/5 dark:bg-white/5 p-1 rounded-xl border border-black/[0.06] dark:border-white/[0.08]">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setTheme('dark')}
-                className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center justify-center gap-2 py-2 rounded-lg border text-xs font-medium transition-all ${
                   theme === 'dark'
-                    ? 'bg-[#181924] text-white shadow-xs'
-                    : 'text-zinc-500 hover:text-black dark:hover:text-white'
+                    ? 'border-zinc-950 dark:border-white bg-black/5 dark:bg-white/10 text-zinc-950 dark:text-white font-semibold'
+                    : 'border-black/[0.08] dark:border-white/[0.08] text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
                 }`}
               >
-                <span>🌙</span>
-                <span>Dark Obsidian</span>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" strokeWidth="1.5" />
+                </svg>
+                <span>Dark</span>
               </button>
               <button
                 type="button"
                 onClick={() => setTheme('light')}
-                className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center justify-center gap-2 py-2 rounded-lg border text-xs font-medium transition-all ${
                   theme === 'light'
-                    ? 'bg-white text-zinc-950 shadow-xs'
-                    : 'text-zinc-500 hover:text-black dark:hover:text-white'
+                    ? 'border-zinc-950 dark:border-white bg-black/5 dark:bg-white/10 text-zinc-950 dark:text-white font-semibold'
+                    : 'border-black/[0.08] dark:border-white/[0.08] text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
                 }`}
               >
-                <span>☀️</span>
-                <span>Studio Light</span>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="4" strokeWidth="1.5" />
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" strokeWidth="1.5" />
+                </svg>
+                <span>Light</span>
               </button>
             </div>
           </div>
@@ -139,33 +153,34 @@ export default function ProfileModal({ isOpen, onClose, onLogout }) {
           <div className="flex items-center justify-between pt-3 border-t border-black/[0.06] dark:border-white/[0.07]">
             <button
               type="button"
-              onClick={onLogout}
+              onClick={() => {
+                onClose();
+                if (onLogout) onLogout();
+              }}
               className="text-xs font-medium text-rose-500 hover:text-rose-600 transition-colors"
             >
-              Sign Out
+              Sign out
             </button>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3.5 py-1.5 text-xs font-medium text-zinc-500 hover:text-black dark:hover:text-white rounded-lg transition-colors"
+                className="text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving || !name.trim()}
-                className="px-4 py-1.5 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold hover:opacity-90 disabled:opacity-40 transition-all shadow-xs flex items-center gap-1.5"
+                className="px-4 py-2 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold hover:opacity-90 disabled:opacity-35 transition-all flex items-center gap-2"
               >
                 {saving ? <Spinner size="sm" /> : <span>Save</span>}
               </button>
             </div>
           </div>
-
         </form>
 
       </div>
     </div>
   );
 }
-

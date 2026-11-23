@@ -14,7 +14,7 @@ export default function AddColumnForm({ onAdd, onCancel }) {
   };
 
   return (
-    <div className="shrink-0 w-[84vw] sm:w-72 bg-[#111114] border border-white/[0.10] rounded-xl p-3 shadow-xl" style={{ animation: 'slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+    <div className="shrink-0 w-[84vw] sm:w-72 bg-white dark:bg-[#0c0d12] border border-black/[0.08] dark:border-white/[0.08] rounded-xl p-3 shadow-xl">
       <form onSubmit={handleSubmit}>
         <input
           id="add-column-input"
@@ -24,22 +24,22 @@ export default function AddColumnForm({ onAdd, onCancel }) {
           onChange={(e) => setTitle(e.target.value)}
           onKeyDown={(e) => e.key === 'Escape' && onCancel()}
           placeholder="Column title..."
-          className="w-full bg-white/[0.04] border border-white/[0.10] rounded-md px-3 py-2
-            text-zinc-100 placeholder-zinc-500 text-sm outline-none
-            focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20 transition-all"
+          className="w-full bg-black/[0.02] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-md px-2.5 py-1.5
+            text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 text-xs outline-none
+            focus:border-black/20 dark:focus:border-white/20 transition-all"
         />
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2 mt-2.5">
           <button
             type="submit"
             disabled={!title.trim() || loading}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white text-black hover:bg-white/90 disabled:opacity-40 transition-all active:scale-[0.96]"
+            className="px-3 py-1.5 rounded-md text-xs font-semibold bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:opacity-90 disabled:opacity-40 transition-all cursor-pointer"
           >
             Add column
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/[0.06] text-xs transition-all duration-200 rounded-lg"
+            className="px-2.5 py-1.5 text-zinc-400 hover:text-black dark:hover:text-white text-xs transition-colors rounded-md cursor-pointer"
           >
             Cancel
           </button>

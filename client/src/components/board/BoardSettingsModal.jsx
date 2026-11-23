@@ -7,12 +7,12 @@ import * as boardService from '../../services/boardService';
 import Spinner from '../ui/Spinner';
 
 const ACCENT_COLORS = [
-  { name: 'Indigo', value: '#6366f1', ring: 'ring-indigo-500' },
-  { name: 'Cyan', value: '#06b6d4', ring: 'ring-cyan-500' },
-  { name: 'Emerald', value: '#10b981', ring: 'ring-emerald-500' },
-  { name: 'Amber', value: '#f59e0b', ring: 'ring-amber-500' },
-  { name: 'Rose', value: '#f43f5e', ring: 'ring-rose-500' },
-  { name: 'Purple', value: '#a855f7', ring: 'ring-purple-500' },
+  { name: 'Indigo',  value: '#6366f1', ring: 'ring-indigo-500' },
+  { name: 'Cyan',    value: '#06b6d4', ring: 'ring-cyan-500'   },
+  { name: 'Emerald', value: '#10b981', ring: 'ring-emerald-500'},
+  { name: 'Amber',   value: '#f59e0b', ring: 'ring-amber-500'  },
+  { name: 'Rose',    value: '#f43f5e', ring: 'ring-rose-500'   },
+  { name: 'Purple',  value: '#a855f7', ring: 'ring-purple-500' },
 ];
 
 export default function BoardSettingsModal({ isOpen, onClose, boardId }) {
@@ -101,150 +101,133 @@ export default function BoardSettingsModal({ isOpen, onClose, boardId }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-[fadeIn_0.12s_ease-out]"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.12s_ease-out]"
       onClick={(e) => e.target === e.currentTarget && onClose()}
       role="dialog"
       aria-modal="true"
     >
-      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#0d0e15] border border-black/[0.08] dark:border-white/[0.09] shadow-2xl p-6 relative text-zinc-900 dark:text-white animate-[modalIn_0.15s_ease-out]">
+      <div className="w-full max-w-[420px] rounded-xl bg-white dark:bg-[#111218] border border-black/[0.08] dark:border-white/[0.08] shadow-xl relative text-zinc-900 dark:text-white animate-[modalIn_0.15s_ease-out]">
         
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          type="button"
-          className="absolute top-5 right-5 p-1.5 rounded-lg text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-          title="Close"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
         {/* Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 border border-black/[0.06] dark:border-white/[0.08] flex items-center justify-center text-zinc-700 dark:text-zinc-300">
-            <svg className="w-5 h-5 stroke-[1.8]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <circle cx="12" cy="12" r="3" strokeWidth="2" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" strokeWidth="1.5" />
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-black/[0.06] dark:border-white/[0.07]">
+          <h2 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-white">
+            Workspace settings
+          </h2>
+          <button
+            onClick={onClose}
+            type="button"
+            className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            title="Close"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </div>
-          <div>
-            <h2 className="text-base font-bold tracking-tight text-zinc-950 dark:text-white">
-              Workspace Settings
-            </h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Manage workspace configuration and permissions.
-            </p>
-          </div>
+          </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSave} className="space-y-4">
+        <form onSubmit={handleSave} className="px-5 py-4 space-y-4">
           
           <div>
-            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
-              Workspace Title <span className="text-rose-500">*</span>
+            <label className="block text-[11px] font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1.5">
+              Title
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none focus:border-indigo-500 transition-all"
+              className="w-full px-3 py-2 rounded-lg border border-black/[0.1] dark:border-white/[0.1] bg-transparent text-sm text-zinc-900 dark:text-white outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
-              Description
+            <label className="block text-[11px] font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1.5">
+              Description <span className="normal-case tracking-normal font-normal text-zinc-400">(optional)</span>
             </label>
             <textarea
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Workspace goals and scope..."
-              className="w-full px-3.5 py-2 rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none focus:border-indigo-500 transition-all resize-none"
+              className="w-full px-3 py-2 rounded-lg border border-black/[0.1] dark:border-white/[0.1] bg-transparent text-sm text-zinc-900 dark:text-white outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors resize-none"
             />
           </div>
 
-          {/* Accent Color */}
+          {/* Color Presets */}
           <div>
-            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-              Accent Color
+            <label className="block text-[11px] font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2">
+              Color
             </label>
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2">
               {ACCENT_COLORS.map((c) => (
                 <button
                   key={c.value}
                   type="button"
                   onClick={() => setBackground(c.value)}
-                  className={`w-7 h-7 rounded-lg transition-transform ${c.ring} flex items-center justify-center ${
-                    background === c.value ? 'scale-110 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#0d0e15]' : 'hover:scale-105'
+                  className={`w-5 h-5 rounded-full transition-all ${
+                    background === c.value
+                      ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#111218] ' + c.ring
+                      : 'opacity-60 hover:opacity-100'
                   }`}
                   style={{ backgroundColor: c.value }}
                   title={c.name}
-                >
-                  {background === c.value && (
-                    <svg className="w-3.5 h-3.5 text-white stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </button>
+                />
               ))}
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-black/[0.06] dark:border-white/[0.07]">
+          <div className="flex items-center justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="px-4 py-2 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white rounded-lg transition-colors"
+              className="text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving || !title.trim()}
-              className="px-5 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold hover:opacity-90 disabled:opacity-40 transition-all shadow-sm flex items-center gap-2"
+              className="px-4 py-2 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold hover:opacity-90 disabled:opacity-35 transition-all flex items-center gap-2"
             >
-              {saving ? <Spinner size="sm" /> : <span>Save Changes</span>}
+              {saving ? <Spinner size="sm" /> : <span>Save</span>}
             </button>
           </div>
 
         </form>
 
         {/* Danger Zone */}
-        <div className="mt-5 pt-4 border-t border-rose-500/20">
-          <p className="text-[11px] font-semibold text-rose-500 uppercase tracking-wider mb-2">Danger Zone</p>
+        <div className="px-5 py-4 border-t border-black/[0.06] dark:border-white/[0.07] bg-black/[0.01] dark:bg-white/[0.01]">
+          <p className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-2">Danger zone</p>
           
           {!showConfirmDelete ? (
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-zinc-900 dark:text-zinc-200">
-                  {isOwner ? 'Delete this workspace' : 'Leave this workspace'}
+                <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                  {isOwner ? 'Archive workspace' : 'Leave workspace'}
                 </p>
-                <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                  {isOwner ? 'Archive all board data and cards.' : 'Remove yourself from the workspace member roster.'}
+                <p className="text-[11px] text-zinc-400 mt-0.5">
+                  {isOwner ? 'Archive all board data and cards.' : 'Remove yourself from member roster.'}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowConfirmDelete(true)}
-                className="px-3 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-lg hover:bg-rose-500/10 transition-colors"
+                className="px-2.5 py-1 text-xs font-medium text-rose-600 dark:text-rose-400 border border-rose-500/20 rounded-md hover:bg-rose-500/10 transition-colors"
               >
-                {isOwner ? 'Delete' : 'Leave'}
+                {isOwner ? 'Archive' : 'Leave'}
               </button>
             </div>
           ) : (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 space-y-2.5">
-              <p className="text-xs font-semibold text-rose-600 dark:text-rose-400">
-                {isOwner ? 'Are you sure you want to delete this workspace?' : 'Are you sure you want to leave this workspace?'}
+            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 space-y-2">
+              <p className="text-xs font-medium text-rose-600 dark:text-rose-400">
+                {isOwner ? 'Are you sure you want to archive this workspace?' : 'Are you sure you want to leave this workspace?'}
               </p>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setShowConfirmDelete(false)}
-                  className="px-3 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white rounded-md"
+                  className="px-2.5 py-1 text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
                 >
                   Cancel
                 </button>
@@ -252,9 +235,9 @@ export default function BoardSettingsModal({ isOpen, onClose, boardId }) {
                   type="button"
                   onClick={handleDeleteOrLeave}
                   disabled={deleting}
-                  className="px-3.5 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-md text-xs font-semibold shadow-xs flex items-center gap-1.5"
+                  className="px-3 py-1 bg-rose-600 text-white rounded-md text-xs font-medium hover:bg-rose-500 transition-colors"
                 >
-                  {deleting ? <Spinner size="sm" /> : <span>Confirm {isOwner ? 'Delete' : 'Leave'}</span>}
+                  {deleting ? <Spinner size="sm" /> : <span>Confirm</span>}
                 </button>
               </div>
             </div>
@@ -265,4 +248,3 @@ export default function BoardSettingsModal({ isOpen, onClose, boardId }) {
     </div>
   );
 }
-
