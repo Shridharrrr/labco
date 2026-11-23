@@ -258,11 +258,11 @@ export default function Home() {
             /* Table-style list */
             <div className="border border-black/[0.07] dark:border-white/[0.07] rounded-lg overflow-hidden bg-white dark:bg-[#0f0f12]">
               {/* Header row */}
-              <div className="grid grid-cols-[1fr_120px_80px_36px] px-4 py-2.5 border-b border-black/[0.07] dark:border-white/[0.07] text-[10px] font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-600">
+              <div className="grid grid-cols-[1fr_140px_100px_48px] gap-4 items-center px-5 py-2.5 border-b border-black/[0.07] dark:border-white/[0.07] text-[10px] font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
                 <span>Project</span>
                 <span>Members</span>
                 <span>Columns</span>
-                <span />
+                <span className="text-right">Action</span>
               </div>
 
               {displayedBoards.map((b, i) => {
@@ -271,7 +271,7 @@ export default function Home() {
                   <Link
                     key={b._id}
                     to={`/boards/${b._id}`}
-                    className={`group grid grid-cols-[1fr_120px_80px_36px] items-center px-4 py-3.5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors ${
+                    className={`group grid grid-cols-[1fr_140px_100px_48px] gap-4 items-center px-5 py-3.5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors ${
                       i !== 0 ? 'border-t border-black/[0.05] dark:border-white/[0.05]' : ''
                     }`}
                   >
@@ -295,14 +295,26 @@ export default function Home() {
                     </div>
 
                     {/* Members */}
-                    <div className="flex items-center -space-x-1.5">
-                      {b.members?.slice(0, 4).map((m, idx) => (
-                        <div key={idx} className="w-5 h-5 rounded-full border border-white dark:border-[#0f0f12] overflow-hidden shrink-0">
-                          <Avatar name={m.user?.name || m.user?.email || 'M'} size="xs" />
-                        </div>
-                      ))}
+                    <div className="flex items-center -space-x-1.5 min-w-0">
+                      {b.members?.slice(0, 4).map((m, idx) => {
+                        const memberName = m.user?.name || m.user?.email || 'M';
+                        const initial = (memberName[0] || 'M').toUpperCase();
+                        return (
+                          <div
+                            key={idx}
+                            title={memberName}
+                            className="w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-white dark:border-[#0f0f12] flex items-center justify-center text-[9px] font-semibold select-none shrink-0"
+                          >
+                            {m.user?.avatar ? (
+                              <img src={m.user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+                            ) : (
+                              <span className="leading-none">{initial}</span>
+                            )}
+                          </div>
+                        );
+                      })}
                       {(b.members?.length || 0) > 4 && (
-                        <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-[9px] font-semibold text-zinc-500 dark:text-zinc-400 flex items-center justify-center border border-white dark:border-[#0f0f12]">
+                        <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-[9px] font-semibold text-zinc-500 dark:text-zinc-400 flex items-center justify-center border border-white dark:border-[#0f0f12] shrink-0 leading-none">
                           +{(b.members?.length || 0) - 4}
                         </span>
                       )}
@@ -337,12 +349,15 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setShowCreate(true)}
-                className="w-full grid grid-cols-[1fr_120px_80px_36px] items-center px-4 py-3 border-t border-black/[0.05] dark:border-white/[0.05] text-zinc-400 dark:text-zinc-600 hover:text-zinc-600 dark:hover:text-zinc-400 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors text-left"
+                className="w-full grid grid-cols-[1fr_140px_100px_48px] gap-4 items-center px-5 py-3 border-t border-black/[0.05] dark:border-white/[0.05] text-zinc-400 dark:text-zinc-600 hover:text-zinc-600 dark:hover:text-zinc-400 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors text-left"
               >
-                <span className="flex items-center gap-3 text-xs">
-                  <PlusIcon className="w-3.5 h-3.5 ml-0.5" />
+                <span className="flex items-center gap-2.5 text-xs font-medium">
+                  <PlusIcon className="w-3.5 h-3.5" />
                   New project
                 </span>
+                <span />
+                <span />
+                <span />
               </button>
             </div>
           )}

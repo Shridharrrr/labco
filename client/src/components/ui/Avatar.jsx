@@ -68,6 +68,7 @@ export default function Avatar({
   const gradient = getAvatarGradient(safeName);
 
   const sizes = {
+    '2xs': 'w-5 h-5 text-[9px]',
     xs: 'w-6 h-6 text-[10px]',
     sm: 'w-7 h-7 text-xs',
     md: 'w-9 h-9 text-sm',
@@ -96,7 +97,7 @@ export default function Avatar({
           className="w-full h-full object-cover"
         />
       ) : (
-        <span className="font-medium tracking-wider">{initials}</span>
+        <span className="font-medium leading-none">{initials}</span>
       )}
     </div>
   );
